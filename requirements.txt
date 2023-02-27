@@ -6,3 +6,4 @@ lxml
 streamlit
 numpy
 latest_user_agents
+openpyxl
