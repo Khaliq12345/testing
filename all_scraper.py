@@ -7,6 +7,7 @@ from latest_user_agents import get_random_user_agent
 
 post_item_list =[]
 item_list = []
+PATH = "bbwaa_roster.xlsx"
 
 def add_up(data, url, link, header, sentence, my_date):
     author_twitter = str(data.loc[data['Article URL'] == url, 'Author Twitter'].item()).replace('"', '')
@@ -96,7 +97,7 @@ def add_up(data, url, link, header, sentence, my_date):
 
 def nytimes_scraper():
     today = datetime.now()
-    data = pd.read_excel("C:/Users/lenovo/Downloads/bbwaa roster(1).xlsx")
+    data = pd.read_excel(PATH)
     urls = data['Article URL'][data['Publication Name'] == 'The New York Times']
     for url in urls:
         response = requests.get(url)
@@ -128,7 +129,7 @@ def nytimes_scraper():
         
 def forbes_scraper():
     today = datetime.now()
-    data = pd.read_excel("C:/Users/lenovo/Downloads/bbwaa roster(1).xlsx")
+    data = pd.read_excel(PATH)
     urls = data['Article URL'][data['Publication Name'] == 'Forbes']
     for url in urls:
         response = requests.get(url)
@@ -156,7 +157,7 @@ def forbes_scraper():
 
 def nj_scraper():
     today = datetime.now()
-    data = pd.read_excel("C:/Users/lenovo/Downloads/bbwaa roster(1).xlsx")
+    data = pd.read_excel(PATH)
     urls = data['Article URL'][data['Publication Name'] == 'NJ.com']
     for url in urls:
         response = requests.get(url)
