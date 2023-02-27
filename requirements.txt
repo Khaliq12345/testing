@@ -1,0 +1,8 @@
+pandas
+beautifulsoup4
+streamlit
+requests
+lxml
+streamlit
+numpy
+latest_user_agents
