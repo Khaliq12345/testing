@@ -43,7 +43,7 @@ def add_up(data, url, link, header, sentence, my_date):
     if 'N' in paywall:
         paywall = ''
     elif 'Y' in paywall:
-        paywall = '($)' 
+        paywall = '<$>' 
         
     sentence = sentence.replace('..', '')
     post = f'"{header}" by {author_twitter} for {pub_twitter}: {sentence}.. {paywall}{link} Twit($)ter'
