@@ -21,20 +21,6 @@ def add_paywall(text, symb):
 
     return new_text
 
-def remove_paywall(text):
-# define the pattern to select the link
-    pattern = r'(https?://\S+)'
-
-    # find the link in the text
-    link = re.findall(pattern, text)[0]
-
-    # add text to the link
-    link = text.split(' ')[-1]
-    new_link = link.replace('#$', '')
-    new_text = text.replace(link, f'{new_link}')
-
-    return new_text
-
 def add_hash_tags(text, symb):
 # define the pattern to select the link
     pattern = r'(https?://\S+)'
@@ -52,6 +38,7 @@ def empty_database():
     with open('temp_database.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['Text'])
+    st.experimental_rerun()
 
 def create_database():
     # Create the CSV file if it doesn't exist and add data if it is empty
@@ -78,6 +65,7 @@ def delete_rows(selected_rows):
     selected_df.to_csv('blacklist_database.csv', index=False)
     df.drop(selected_rows, inplace=True)
     df.to_csv('temp_database.csv', index=False)
+    st.experimental_rerun()
 
 def add_rows_to_new_database(selected_rows):
     # Add selected rows to a new CSV file
@@ -87,6 +75,7 @@ def add_rows_to_new_database(selected_rows):
     selected_df.to_csv('blacklist_database.csv', index=False)
     df.drop(selected_rows, inplace=True)
     df.to_csv('temp_database.csv', index=False)
+    st.experimental_rerun()
 
 def main():
     # Create the initial database
@@ -129,22 +118,26 @@ def main():
             if paywall_button:
                 df.at[index, 'Text'] = add_paywall(row['Text'], '<$>')
                 df.to_csv('temp_database.csv', index=False)
+                st.experimental_rerun()
 
         else:
             if paywall_button:
                 df.at[index, 'Text'] = row['Text'].replace('<$>', '')
                 df.to_csv('temp_database.csv', index=False)
+                st.experimental_rerun()
                 
         #add #Yankees hashtags to the post
         if '#Yankees' not in row['Text']:
             if yankees_button:
                 df.at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
                 df.to_csv('temp_database.csv', index=False)
+                st.experimental_rerun()
                 
         else:
             if yankees_button:
                 df.at[index, 'Text'] = row['Text'].replace('#Yankees', '')
                 df.to_csv('temp_database.csv', index=False)
+                st.experimental_rerun()
                 
 
         # Add #Mets hashtags to post
@@ -152,10 +145,12 @@ def main():
             if mets_button:
                 df.at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
                 df.to_csv('temp_database.csv', index=False)
+                st.experimental_rerun()
         else:
             if mets_button:
                 df.at[index, 'Text'] = row['Text'].replace('#Mets', '')
                 df.to_csv('temp_database.csv', index=False)
+                st.experimental_rerun()
 
     # Add a button to delete selected rows
     if st.button("Delete selected rows"):
