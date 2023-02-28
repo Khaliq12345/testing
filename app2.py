@@ -9,10 +9,10 @@ from all_scraper import NewsScraper
 from sqlalchemy import create_engine
 from datetime import datetime
 
-hostname=st.secrets['DB_HOST']
-dbname=st.secrets['DB_NAME']
-uname=st.secrets['DB_USER']
-pwd=st.secrets['DB_PASSWORD']
+hostname="162.240.57.245"
+dbname="hardball2019_bbwaa"
+uname="hardball2019_scraper"
+pwd="Bbo549ahhN;Y"
 
 def add_paywall(text, symb):
 # define the pattern to select the link
