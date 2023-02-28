@@ -45,7 +45,7 @@ def add_up(data, url, link, header, sentence, my_date):
     elif 'Y' in paywall:
         paywall = '<$>' 
         
-    sentence = sentence.replace('..', '')
+    sentence = sentence.replace('..', '').encode('utf-8').decode('utf-8').replace('“', '').replace('”', '').replace('$', '')
     post = f'"{header}" by {author_twitter} for {pub_twitter}: {sentence}.. {paywall}{link} Twit($)ter'
     post_item = {
         'Text': post,
@@ -189,4 +189,5 @@ class NewsScraper:
     def scrapers():
         nytimes_scraper()
         forbes_scraper()
+        nj_scraper()
         return item_list, post_item_list
