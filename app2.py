@@ -60,7 +60,7 @@ def add_paywall(text, symb):
     link = re.findall(pattern, text)[0]
 
     # add text to the link
-    new_text = text.replace(link, f'{symb}{link}')
+    new_text = text.replace(link, f'{symb} {link}')
 
     return new_text
 
@@ -72,7 +72,7 @@ def add_hash_tags(text, symb):
     link = re.findall(pattern, text)[0]
 
     # add text to the link
-    new_text = text.replace(link, f'{link}{symb}')
+    new_text = text.replace(link, f'{link} {symb}')
 
     return new_text
 
@@ -264,7 +264,7 @@ def main():
 
             else:
                 if paywall_button:
-                    df.at[index, 'Text'] = row['Text'].replace('<$>', '')
+                    df.at[index, 'Text'] = row['Text'].replace('<$>')
                     df.to_csv('temp_database.csv', index=False, encoding='utf-8')
                     st.experimental_rerun()
                     
@@ -277,7 +277,7 @@ def main():
                     
             else:
                 if yankees_button:
-                    df.at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+                    df.at[index, 'Text'] = row['Text'].replace('#Yankees')
                     df.to_csv('temp_database.csv', index=False, encoding='utf-8')
                     st.experimental_rerun()
                     
@@ -290,7 +290,7 @@ def main():
                     st.experimental_rerun()
             else:
                 if mets_button:
-                    df.at[index, 'Text'] = row['Text'].replace('#Mets', '')
+                    df.at[index, 'Text'] = row['Text'].replace('#Mets')
                     df.to_csv('temp_database.csv', index=False, encoding='utf-8')
                     st.experimental_rerun()
 
