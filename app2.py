@@ -69,8 +69,7 @@ def delete_rows(selected_rows):
     df = pd.read_csv('temp_database.csv')
     selected_df = df.iloc[selected_rows, :]
     #saving to black_list database for the so as to not to extract in the future
-    with engine.begin() as con:
-        selected_df.to_sql(name='black_list', con=con, schema='hardball2019_bbwaa', if_exists='append', index=False)
+    selected_df.to_sql(name='black_list', con=engine, schema='hardball2019_bbwaa', if_exists='append', index=False)
     #drop the rows from the web app
     df.drop(selected_rows, inplace=True)
     df.to_csv('temp_database.csv', index=False, encoding='utf-8')
@@ -82,11 +81,9 @@ def add_rows_to_new_database(selected_rows):
     df = pd.read_csv('temp_database.csv')
     selected_df = df.iloc[selected_rows, :]
     #saving to commit database for the next step
-    with engine.begin() as con:
-        selected_df.to_sql(name='commit', con=con, schema='hardball2019_bbwaa', if_exists='append', index=False)  
+    selected_df.to_sql(name='commit', con=engine, schema='hardball2019_bbwaa', if_exists='append', index=False)  
     #saving to black_list database for the so as to not to extract in the future
-    with engine.begin() as con:
-        selected_df.to_sql(name='black_list', con=con, schema='hardball2019_bbwaa', if_exists='append', index=False)
+    selected_df.to_sql(name='black_list', con=engine, schema='hardball2019_bbwaa', if_exists='append', index=False)
     #drop the rows from the web app
     df.drop(selected_rows, inplace=True)
     df.to_csv('temp_database.csv', index=False, encoding='utf-8')
