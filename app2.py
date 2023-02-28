@@ -7,39 +7,12 @@ import streamlit as st
 from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
-import gspread
-from gspread_dataframe import set_with_dataframe
-from google.oauth2.service_account import Credentials
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
 
 hostname="162.240.57.245"
 dbname="hardball2019_bbwaa"
 uname="hardball2019_scraper"
 pwd="Bbo549ahhN;Y"
-cred = 'cred.json'
-g_key = '1MD91MXPeNjOiBGDFLi5vcaC9P5hpBT3Eyp63WkUCFWs'
 
-scopes = ['https://www.googleapis.com/auth/spreadsheets',
-          'https://www.googleapis.com/auth/drive']
-credentials = Credentials.from_service_account_file(cred, scopes=scopes)
-gc = gspread.authorize(credentials)
-gauth = GoogleAuth()
-drive = GoogleDrive(gauth)
-
-def send_to_sheet(g_key):
-    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
-    conn = engine.connect()
-    query = text('SELECT * FROM commit')
-    df = pd.read_sql_query(query, conn)
-    empty_df = pd.DataFrame()
-    empty_df.to_sql(name='commit', con=engine, schema='hardball2019_bbwaa', if_exists='replace', index=False)
-    df = df.drop(['Date', 'Post Link'], axis=1)
-    gs = gc.open_by_key(g_key)# select a work sheet from its name
-    worksheet1 = gs.worksheet('Sheet1')
-    worksheet1.clear()
-    set_with_dataframe(worksheet=worksheet1, dataframe=df, include_index=False,
-    include_column_header=True, resize=True)
 
 def clean_data(data):
     new_text = []
@@ -336,9 +309,9 @@ def main():
         downlaod_container = st.container()
         col1, col2 = downlaod_container.columns([1, 1])
         downlaod_button = col1.download_button("Press to Download", downlaod_commited(), "posts.csv", "text/csv", key='download-csv')
-        google_sheet_button = col2.button('Incorporate to google sheet')
-        if google_sheet_button:
-            send_to_sheet(g_key)
+        #google_sheet_button = col2.button('Incorporate to google sheet')
+        #if google_sheet_button:
+            #send_to_sheet(g_key)
 
 if __name__ == '__main__':
     main()
