@@ -1,3 +1,16 @@
+from latest_user_agents import get_random_user_agent
+import csv
+import re
+import pandas as pd
+import streamlit as st
+from all_scraper import NewsScraper
+from sqlalchemy import create_engine, text
+from datetime import datetime
+
+hostname=st.secrets['hostname']
+dbname=st.secrets['dbname']
+uname=st.secrets['uname']
+pwd=st.secrets['pwd']
 
 def clean_data(data):
     new_text = []
