@@ -62,6 +62,7 @@ def add_up(data, url, link, header, sentence, my_date):
     post_item_list.append(post_item)
     post = f'''
     "👉VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE⚾️"
+    
     "{header}" by {author_ig} for {pub_ig}: {sentence}.. {paywall}{link} I($)G
     '''
     post_item = {
