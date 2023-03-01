@@ -66,7 +66,7 @@ def empty_database():
     st.experimental_rerun()
 
 def create_database():
-    for key in st.session_state.keys():
+   for key in st.session_state.keys():
         del st.session_state[key]
     # Run the scrapers
    if 'engine' not in st.session_state:
