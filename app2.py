@@ -77,7 +77,7 @@ def create_database():
        pwd=st.secrets['pwd']
        engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
        st.session_state['engine'] = engine
-        
+
    scraper = NewsScraper()
    info, post = scraper.scrapers()
    df_info = pd.DataFrame(info)
@@ -117,26 +117,65 @@ def add_rows_to_new_database(selected_rows):
 def main():
     pass
 
+@st.cache
+def add_signs(index, row):
+    #add $ sign to the posts
+    if '<$>' not in row['Text']:
+        if paywall_button:
+            st.session_state['data1'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
+            st.session_state['data2'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
+            st.experimental_rerun()
+    else:
+        if paywall_button:
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('<$>', '')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('<$>', '')
+            st.experimental_rerun()
+
+    #add #Yankees hashtags to the post
+    if '#Yankees' not in row['Text']:
+        if yankees_button:
+            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
+            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
+            st.experimental_rerun()           
+    else:
+        if yankees_button:
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+            st.experimental_rerun()
+            
+    # Add #Mets hashtags to post
+    if '#Mets' not in row['Text']:
+        if mets_button:
+            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
+            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
+            st.experimental_rerun()
+    else:
+        if mets_button:
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
+            st.experimental_rerun()
+
+
 st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
 st.title("Latest News Extractor")
 
 scrape_button = st.button('Scrape')
 if scrape_button:
-    create_database()
-
-if 'engine' not in st.session_state:
-    hostname=st.secrets['hostname']
-    dbname=st.secrets['dbname']
-    uname=st.secrets['uname']
-    pwd=st.secrets['pwd']
-    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
-    st.session_state['engine'] = engine
+   
+   create_database()
+   if 'engine' not in st.session_state:
+       hostname=st.secrets['hostname']
+       dbname=st.secrets['dbname']
+       uname=st.secrets['uname']
+       pwd=st.secrets['pwd']
+       engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+       st.session_state['engine'] = engine
 
 if 'data1' not in st.session_state:
     df1 = pd.read_csv("temp_database.csv")
     df2 = pd.read_csv("temp_database.csv")
-    st.session_state['data1'] = df1
-    st.session_state['data2'] = df2
+    st.session_state['data1'] = df1[:5]
+    st.session_state['data2'] = df2[:5]
 
 if st.session_state['data1'].empty:
     st.subheader('No more recent Aticles')
@@ -206,41 +245,9 @@ for index, row in st.session_state['data1'].iterrows():
     mets_button = col4.button("Mets", key=f'mets_{index}')
     paywall_button = col5.button('Paywall', key=f'paywall_{index}')
 
-        #add $ sign to the posts
-    if '<$>' not in row['Text']:
-        if paywall_button:
-            st.session_state['data1'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
-            st.session_state['data2'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
-            st.experimental_rerun()
-    else:
-        if paywall_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('<$>', '')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('<$>', '')
-            st.experimental_rerun()
+    add_signs(index, row)
 
-    #add #Yankees hashtags to the post
-    if '#Yankees' not in row['Text']:
-        if yankees_button:
-            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
-            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
-            st.experimental_rerun()           
-    else:
-        if yankees_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
-            st.experimental_rerun()
-            
-    # Add #Mets hashtags to post
-    if '#Mets' not in row['Text']:
-        if mets_button:
-            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
-            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
-            st.experimental_rerun()
-    else:
-        if mets_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
-            st.experimental_rerun()
+
 
         # Add a button to delete selected rows
 if del_button:
