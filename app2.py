@@ -143,8 +143,8 @@ if scrape_button:
 if 'data1' not in st.session_state:
     df1 = pd.read_csv("temp_database.csv")
     df2 = pd.read_csv("temp_database.csv")
-    st.session_state['data1'] = df1
-    st.session_state['data2'] = df2
+    st.session_state['data1'] = df1[:30]
+    st.session_state['data2'] = df2[:30]
 
 if st.session_state['data1'].empty:
     st.subheader('No more recent Aticles')
@@ -178,7 +178,7 @@ col3.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
 col3.markdown('</div>', unsafe_allow_html=True)
 
 selected_rows = []
-for index, row in st.session_state['data1'][:50].iterrows():
+for index, row in st.session_state['data1'].iterrows():
     row_container = st.container()
     col1, col2, col3, col4, col5 = st.columns([5, 3, 2, 2, 2])
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=False)
