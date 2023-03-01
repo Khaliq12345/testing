@@ -7,6 +7,14 @@ from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
 
+if 'engine' not in st.session_state:
+    hostname=st.secrets['hostname']
+    dbname=st.secrets['dbname']
+    uname=st.secrets['uname']
+    pwd=st.secrets['pwd']
+    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+    st.session_state['engine'] = engine
+
 @st.cache
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
