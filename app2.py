@@ -1,4 +1,3 @@
-
 from latest_user_agents import get_random_user_agent
 import csv
 import re
@@ -12,29 +11,12 @@ hostname="162.240.57.245"
 dbname="hardball2019_bbwaa"
 uname="hardball2019_scraper"
 pwd="Bbo549ahhN;Y"
+engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")    
 
-
-def clean_data(data):
-    new_text = []
-    for x in data['Text']:
-        if 'Twit($)ter' in x:
-            new_text.append(x.replace('Twit($)ter', ''))
-        if 'Face($)book' in x:
-            new_text.append(x.replace('Face($)book', ''))
-        if 'I($)G' in x:
-            new_text.append(x.replace('I($)G', ''))
-        if 'Linked($)in' in x:
-            new_text.append(x.replace('Linked($)in', ''))   
-    data['Text'] = new_text
-
-    return data    
-
-@st.experimental_memo
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
-def delete_blacklisted(df_a):
-    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+def delete_blacklisted(df_a, engine):
     conn = engine.connect()
     query = text('SELECT * FROM black_list')
     df_b = pd.read_sql_query(query, conn)
@@ -43,8 +25,7 @@ def delete_blacklisted(df_a):
 
     return df_a
 
-def downlaod_commited():
-    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+def downlaod_commited(engine):
     conn = engine.connect()
     query = text('SELECT * FROM commit')
     df = pd.read_sql_query(query, conn)
@@ -77,241 +58,180 @@ def add_hash_tags(text, symb):
     return new_text
 
 def empty_database():
-    # Empty the CSV file
-    with open('temp_database.csv', 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Text'])
+    df1 = pd.DataFrame()
+    df2 = pd.DataFrame()
+    st.session_state['data1'] = df1
+    st.session_state['data2'] = df2
     st.experimental_rerun()
 
 def create_database():
+    for key in st.session_state.keys():
+        del st.session_state[key]
     # Run the scrapers
     scraper = NewsScraper()
     info, post = scraper.scrapers()
     df_info = pd.DataFrame(info)
     df_post = pd.DataFrame(post)
-    clean_post = delete_blacklisted(df_post)
-    clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8')
+    clean_post = delete_blacklisted(df_post, engine)
+    clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
 
-def delete_rows(selected_rows):
-    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
-    # Delete selected rows from the CSV file
-    df = pd.read_csv('temp_database.csv')
-    selected_df = df.iloc[selected_rows, :]
+def delete_rows(selected_rows, engine):
+    selected_df = st.session_state['data2'].loc[selected_rows, :]
     #saving to black_list database for the so as to not to extract in the future
     selected_df.to_sql(name='black_list', con=engine, schema='hardball2019_bbwaa', if_exists='append', index=False)
     #drop the rows from the web app
-    df.drop(selected_rows, inplace=True)
-    df = df.reset_index(drop=True)
-    df.to_csv('temp_database.csv', index=False, encoding='utf-8')
+    for index, row in st.session_state['data1'].iterrows():
+        if index in selected_rows:
+            st.session_state['data1'] = st.session_state['data1'].drop(index)
+            st.session_state['data2'] = st.session_state['data2'].drop(index)
     st.experimental_rerun()
 
-def add_rows_to_new_database(selected_rows):
-    # Add selected rows to a new CSV file
-    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
-    df = pd.read_csv('temp_database.csv')
-    selected_df = df.iloc[selected_rows, :]
-    clean_selected_df = clean_data(selected_df)
+def add_rows_to_new_database(selected_rows, engine):
+    selected_df = st.session_state['data2'].loc[selected_rows, :]
+    #clean_selected_df = clean_data(selected_df)
     #saving to commit database for the next step
-    clean_selected_df.to_sql(name='commit', con=engine, schema='hardball2019_bbwaa', if_exists='append', index=False)  
+    selected_df.to_sql(name='commit', con=engine, schema='hardball2019_bbwaa', if_exists='append', index=False)  
     #saving to black_list database for the so as to not to extract in the future
     selected_df.to_sql(name='black_list', con=engine, schema='hardball2019_bbwaa', if_exists='append', index=False)
     #drop the rows from the web app
-    df.drop(selected_rows, inplace=True)
-    df = df.reset_index(drop=True)
-    df.to_csv('temp_database.csv', index=False, encoding='utf-8')
+    for index, row in st.session_state['data1'].iterrows():
+        if index in selected_rows:
+            st.session_state['data1'] = st.session_state['data1'].drop(index)
+            st.session_state['data2'] = st.session_state['data2'].drop(index)
     st.experimental_rerun()
 
 def main():
-    # Set page layout
-    st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
-    st.title("Latest News Extractor")
+    pass
 
-    scrape_button = st.button('Scrape')
-    if scrape_button:
-        create_database()
+st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
+st.title("Latest News Extractor")
 
-    # Define page style
-    st.markdown(
-        """
-        <style>
-        .stButton button {
-            color: white !important;
-            background-color: #008080 !important;
-        }
+scrape_button = st.button('Scrape')
+if scrape_button:
+    create_database()
 
-        .stButton:hover button {
-            background-color: #005959 !important;
-        }
+if 'data1' not in st.session_state:
+    df1 = pd.read_csv("temp_database.csv")
+    df2 = pd.read_csv("temp_database.csv")
+    st.session_state['data1'] = df1[:5]
+    st.session_state['data2'] = df2[:5]
 
-        .stTable td {
-            font-size: 16px;
-        }
+if st.session_state['data1'].empty:
+    st.subheader('No more recent Aticles')
+else:
+    main()
 
-        .stTable th {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        
-        .button-column {
-            width: 60px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .button-column button {
-            margin-bottom: 5px;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+# Create a container for the buttons
+button_container = st.container()
 
-    # Read data from the database
-    df = pd.read_csv("temp_database.csv")
-    if df.empty:
-        st.subheader('No more recent Aticles')
+# Add buttons to the container
+with button_container:
+    col1, col2, col3 = st.columns([1, 1, 1])
+    del_button = col1.button("Delete Rows")
+    commit_button = col2.button("Commit Rows")
+    empty_button = col3.button("Empty Database")
+
+button_container_style = """
+display: flex;
+justify-content: center;
+align-items: center;
+background-color: #008080;
+border-radius: 10px;
+padding: 10px;
+"""
+
+col1.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
+col1.markdown('</div>', unsafe_allow_html=True)
+col2.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
+col2.markdown('</div>', unsafe_allow_html=True)
+col3.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
+col3.markdown('</div>', unsafe_allow_html=True)
+
+selected_rows = []
+for index, row in st.session_state['data1'].iterrows():
+    row_container = st.container()
+    col1, col2, col3, col4, col5 = st.columns([5, 3, 2, 2, 2])
+    checkbox = col1.checkbox("check_box", key=f'box_{index}', value=False)
+    if checkbox:
+        selected_rows.append(index)
+
+    if "Twit($)ter" in row["Text"]:
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", ""), height=150)
+        st.session_state['data2'].at[index, 'Text'] = edited_text
+        col2.write("Twitter")
+        date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
+        col2.write(date_obj)
+    elif "Face($)book" in row["Text"]:
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", ""), height=150)
+        st.session_state['data2'].at[index, 'Text'] = edited_text
+        col2.write("Facebook")
+        date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
+        col2.write(date_obj)
+    elif "I($)G" in row["Text"]:
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("I($)G", ""), height=150)
+        st.session_state['data2'].at[index, 'Text'] = edited_text
+        col2.write("IG")
+        date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
+        col2.write(date_obj)
+    elif "Linked($)in" in row["Text"]:
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Linked($)in", ""), height=150)
+        st.session_state['data2'].at[index, 'Text'] = edited_text
+        col2.write("Linkedin")
+        date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
+        col2.write(date_obj)
+    col1.write('---------------------------------------')
+    yankees_button = col3.button("Yankees", key=f'yankee_{index}')
+    mets_button = col4.button("Mets", key=f'mets_{index}')
+    paywall_button = col5.button('Paywall', key=f'paywall_{index}')
+
+        #add $ sign to the posts
+    if '<$>' not in row['Text']:
+        if paywall_button:
+            st.session_state['data1'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
+            st.session_state['data2'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
+            st.experimental_rerun()
     else:
-        # Create a container for the buttons
-        button_container = st.container()
+        if paywall_button:
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('<$>', '')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('<$>', '')
+            st.experimental_rerun()
 
-        # Add buttons to the container
-        with button_container:
-            col1, col2, col3 = st.columns([1, 1, 1])
-            del_button = col1.button("Delete Rows")
-            commit_button = col2.button("Commit Rows")
-            empty_button = col3.button("Empty Database")
-
-        button_container_style = """
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #008080;
-        border-radius: 10px;
-        padding: 10px;
-        """
-
-        col1.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
-        col1.markdown('</div>', unsafe_allow_html=True)
-        col2.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
-        col2.markdown('</div>', unsafe_allow_html=True)
-        col3.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
-        col3.markdown('</div>', unsafe_allow_html=True)
-
-        # Add some color to the page
-        st.markdown(
-            """
-            <style>
-                body {
-                    background-color: #f5f5f5;
-                }
-                .stButton button {
-                    background-color: #0073b7;
-                    color: #fff;
-                }
-                .stButton:hover button {
-                    background-color: #005a9e;
-                }
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        # Display the rows in a table with checkboxes to select rows for deletion or addition to new database
-        selected_rows = []
-        for index, row in df.iterrows():
-            row_container = st.container()
-            with row_container:
-                col1, col2, col3, col4, col5 = st.columns([5, 3, 2, 2, 2])
-                checkbox = col1.checkbox("", key=index)
-                if checkbox:
-                    selected_rows.append(index)
-                elif index in selected_rows:
-                    selected_rows.remove(index)
-                    
-
-                if "Twit($)ter" in row["Text"]:
-                    col1.write(row["Text"].replace("Twit($)ter", ""))
-                    col2.write("Twitter")
-                    date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
-                    col2.write(date_obj)
-                elif "Face($)book" in row["Text"]:
-                    col1.write(row["Text"].replace("Face($)book", ""))
-                    col2.write("Facebook")
-                    date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
-                    col2.write(date_obj)
-                elif "I($)G" in row["Text"]:
-                    col1.write(row["Text"].replace("I($)G", ""))
-                    col2.write("IG")
-                    date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
-                    col2.write(date_obj)
-                elif "Linked($)in" in row["Text"]:
-                    col1.write(row["Text"].replace("Linked($)in", ""))
-                    col2.write("Linkedin")
-                    date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
-                    col2.write(date_obj)
-            col1.write('---------------------------------------')
-            yankees_button = col3.button(f"Yankees {index}")
-            mets_button = col4.button(f"Mets {index}")
-            paywall_button = col5.button(f'Paywall {index}')
-
-            #add $ sign to the posts
-            if '<$>' not in row['Text']:
-                if paywall_button:
-                    df.at[index, 'Text'] = add_paywall(row['Text'], '<$>')
-                    df.to_csv('temp_database.csv', index=False, encoding='utf-8')
-                    st.experimental_rerun()
-
-            else:
-                if paywall_button:
-                    df.at[index, 'Text'] = row['Text'].replace('<$>')
-                    df.to_csv('temp_database.csv', index=False, encoding='utf-8')
-                    st.experimental_rerun()
-                    
-            #add #Yankees hashtags to the post
-            if '#Yankees' not in row['Text']:
-                if yankees_button:
-                    df.at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
-                    df.to_csv('temp_database.csv', index=False, encoding='utf-8')
-                    st.experimental_rerun()
-                    
-            else:
-                if yankees_button:
-                    df.at[index, 'Text'] = row['Text'].replace('#Yankees')
-                    df.to_csv('temp_database.csv', index=False, encoding='utf-8')
-                    st.experimental_rerun()
-                    
-
-            # Add #Mets hashtags to post
-            if '#Mets' not in row['Text']:
-                if mets_button:
-                    df.at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
-                    df.to_csv('temp_database.csv', index=False, encoding='utf-8')
-                    st.experimental_rerun()
-            else:
-                if mets_button:
-                    df.at[index, 'Text'] = row['Text'].replace('#Mets')
-                    df.to_csv('temp_database.csv', index=False, encoding='utf-8')
-                    st.experimental_rerun()
+    #add #Yankees hashtags to the post
+    if '#Yankees' not in row['Text']:
+        if yankees_button:
+            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
+            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
+            st.experimental_rerun()           
+    else:
+        if yankees_button:
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+            st.experimental_rerun()
+            
+    # Add #Mets hashtags to post
+    if '#Mets' not in row['Text']:
+        if mets_button:
+            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
+            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
+            st.experimental_rerun()
+    else:
+        if mets_button:
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
+            st.experimental_rerun()
 
         # Add a button to delete selected rows
-        if del_button:
-            delete_rows(selected_rows)
-        
-        # Add a button to add selected rows to new database
-        if commit_button:
-            add_rows_to_new_database(selected_rows)
+if del_button:
+    delete_rows(selected_rows, engine)
 
-        # Add an 'Empty database' button to the app
-        if empty_button:
-            empty_database()
-        
-        downlaod_container = st.container()
-        col1, col2 = downlaod_container.columns([1, 1])
-        downlaod_button = col1.download_button("Press to Download", downlaod_commited(), "posts.csv", "text/csv", key='download-csv')
-        #google_sheet_button = col2.button('Incorporate to google sheet')
-        #if google_sheet_button:
-            #send_to_sheet(g_key)
+# Add a button to add selected rows to new database
+if commit_button:
+    add_rows_to_new_database(selected_rows, engine)
 
-if __name__ == '__main__':
-    main()
+# Add an 'Empty database' button to the app
+if empty_button:
+    empty_database()
+
+downlaod_container = st.container()
+col1, col2 = downlaod_container.columns([1, 1])
+downlaod_button = col1.download_button("Press to Download", downlaod_commited(engine), "posts.csv", "text/csv", key='download-csv')
