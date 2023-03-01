@@ -15,7 +15,7 @@ if 'engine' not in st.session_state:
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     st.session_state['engine'] = engine
 
-@st.cache
+@st.cache_data
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
