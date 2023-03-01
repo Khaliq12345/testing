@@ -135,8 +135,8 @@ if scrape_button:
 if 'data1' not in st.session_state:
     df1 = pd.read_csv("temp_database.csv")
     df2 = pd.read_csv("temp_database.csv")
-    st.session_state['data1'] = df1[:30]
-    st.session_state['data2'] = df2[:30]
+    st.session_state['data1'] = df1[:40]
+    st.session_state['data2'] = df2[:40]
 
 if st.session_state['data1'].empty:
     st.subheader('No more recent Aticles')
