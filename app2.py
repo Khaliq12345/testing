@@ -78,14 +78,6 @@ def create_database():
    for key in st.session_state.keys():
         del st.session_state[key]
     # Run the scrapers
-   if 'engine' not in st.session_state:
-       hostname=st.secrets['hostname']
-       dbname=st.secrets['dbname']
-       uname=st.secrets['uname']
-       pwd=st.secrets['pwd']
-       engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
-       st.session_state['engine'] = engine
-
    scraper = NewsScraper()
    info, post = scraper.scrapers()
    df_info = pd.DataFrame(info)
@@ -130,15 +122,7 @@ st.title("Latest News Extractor")
 
 scrape_button = st.button('Scrape')
 if scrape_button:
-   
    create_database()
-   if 'engine' not in st.session_state:
-       hostname=st.secrets['hostname']
-       dbname=st.secrets['dbname']
-       uname=st.secrets['uname']
-       pwd=st.secrets['pwd']
-       engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
-       st.session_state['engine'] = engine
 
 if 'data1' not in st.session_state:
     df1 = pd.read_csv("temp_database.csv")
@@ -155,11 +139,10 @@ else:
 button_container = st.container()
 
 # Add buttons to the container
-with button_container:
-    col1, col2, col3 = st.columns([1, 1, 1])
-    del_button = col1.button("Delete Rows")
-    commit_button = col2.button("Commit Rows")
-    empty_button = col3.button("Empty Database")
+col1, col2, col3 = button_container.columns([1, 1, 1])
+del_button = col1.button("Delete Rows")
+commit_button = col2.button("Commit Rows")
+empty_button = col3.button("Empty Database")
 
 button_container_style = """
 display: flex;
@@ -180,7 +163,7 @@ col3.markdown('</div>', unsafe_allow_html=True)
 selected_rows = []
 for index, row in st.session_state['data1'].iterrows():
     row_container = st.container()
-    col1, col2, col3, col4, col5 = st.columns([5, 3, 2, 2, 2])
+    col1, col2, col3, col4, col5 = row_container.columns([5, 3, 2, 2, 2])
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=False)
     if checkbox:
         selected_rows.append(index)
