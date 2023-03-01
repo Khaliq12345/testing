@@ -19,7 +19,7 @@ if 'engine' not in st.session_state:
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
-@st.cache
+@st.cache_data
 def delete_blacklisted(df_a):
     engine = st.session_state['engine']
     conn = engine.connect()
@@ -39,7 +39,7 @@ def downlaod_commited():
     csv = convert_df(df)
     return csv
 
-@st.cache
+@st.cache_data
 def add_paywall(text, symb):
 # define the pattern to select the link
     pattern = r'(https?://\S+)'
@@ -52,7 +52,7 @@ def add_paywall(text, symb):
 
     return new_text
 
-@st.cache
+@st.cache_data
 def add_hash_tags(text, symb):
 # define the pattern to select the link
     pattern = r'(https?://\S+)'
@@ -65,7 +65,7 @@ def add_hash_tags(text, symb):
 
     return new_text
 
-@st.cache
+@st.cache_data
 def empty_database():
     df1 = pd.DataFrame()
     df2 = pd.DataFrame()
@@ -93,7 +93,7 @@ def create_database():
    clean_post = delete_blacklisted(df_post)
    clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
 
-@st.cache
+@st.cache_data
 def delete_rows(selected_rows):
     engine = st.session_state['engine']
     selected_df = st.session_state['data2'].loc[selected_rows, :]
@@ -106,7 +106,7 @@ def delete_rows(selected_rows):
             st.session_state['data2'] = st.session_state['data2'].drop(index)
     st.experimental_rerun()
 
-@st.cache
+@st.cache_data
 def add_rows_to_new_database(selected_rows):
     engine = st.session_state['engine']
     selected_df = st.session_state['data2'].loc[selected_rows, :]
@@ -125,7 +125,7 @@ def add_rows_to_new_database(selected_rows):
 def main():
     pass
 
-@st.cache
+@st.cache_data
 def add_signs(index, row):
     #add $ sign to the posts
     if '<$>' not in row['Text']:
