@@ -127,41 +127,6 @@ def main():
 
 @st.cache_data
 def add_signs(index, row):
-    #add $ sign to the posts
-    if '<$>' not in row['Text']:
-        if paywall_button:
-            st.session_state['data1'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
-            st.session_state['data2'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
-            st.experimental_rerun()
-    else:
-        if paywall_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('<$>', '')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('<$>', '')
-            st.experimental_rerun()
-
-    #add #Yankees hashtags to the post
-    if '#Yankees' not in row['Text']:
-        if yankees_button:
-            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
-            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
-            st.experimental_rerun()           
-    else:
-        if yankees_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
-            st.experimental_rerun()
-            
-    # Add #Mets hashtags to post
-    if '#Mets' not in row['Text']:
-        if mets_button:
-            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
-            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
-            st.experimental_rerun()
-    else:
-        if mets_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
-            st.experimental_rerun()
 
 
 st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
@@ -252,10 +217,42 @@ for index, row in st.session_state['data1'].iterrows():
     yankees_button = col3.button("Yankees", key=f'yankee_{index}')
     mets_button = col4.button("Mets", key=f'mets_{index}')
     paywall_button = col5.button('Paywall', key=f'paywall_{index}')
+    
+    #add $ sign to the posts
+    if '<$>' not in row['Text']:
+        if paywall_button:
+            st.session_state['data1'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
+            st.session_state['data2'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
+            st.experimental_rerun()
+    else:
+        if paywall_button:
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('<$>', '')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('<$>', '')
+            st.experimental_rerun()
 
-    add_signs(index, row)
-
-
+    #add #Yankees hashtags to the post
+    if '#Yankees' not in row['Text']:
+        if yankees_button:
+            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
+            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
+            st.experimental_rerun()           
+    else:
+        if yankees_button:
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+            st.experimental_rerun()
+            
+    # Add #Mets hashtags to post
+    if '#Mets' not in row['Text']:
+        if mets_button:
+            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
+            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
+            st.experimental_rerun()
+    else:
+        if mets_button:
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
+            st.experimental_rerun()
 
         # Add a button to delete selected rows
 if del_button:
