@@ -125,10 +125,6 @@ def add_rows_to_new_database(selected_rows):
 def main():
     pass
 
-@st.cache_data
-def add_signs(index, row):
-
-
 st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
 st.title("Latest News Extractor")
 
