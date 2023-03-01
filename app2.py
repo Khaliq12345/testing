@@ -66,6 +66,7 @@ def empty_database():
     st.experimental_rerun()
 
 def create_database():
+   
    for key in st.session_state.keys():
         del st.session_state[key]
     # Run the scrapers
@@ -77,12 +78,12 @@ def create_database():
        engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
        st.session_state['engine'] = engine
         
-    scraper = NewsScraper()
-    info, post = scraper.scrapers()
-    df_info = pd.DataFrame(info)
-    df_post = pd.DataFrame(post)
-    clean_post = delete_blacklisted(df_post)
-    clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
+   scraper = NewsScraper()
+   info, post = scraper.scrapers()
+   df_info = pd.DataFrame(info)
+   df_post = pd.DataFrame(post)
+   clean_post = delete_blacklisted(df_post)
+   clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
 
 @st.cache
 def delete_rows(selected_rows):
