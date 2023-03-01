@@ -135,8 +135,8 @@ if 'engine' not in st.session_state:
 if 'data1' not in st.session_state:
     df1 = pd.read_csv("temp_database.csv")
     df2 = pd.read_csv("temp_database.csv")
-    st.session_state['data1'] = df1[:5]
-    st.session_state['data2'] = df2[:5]
+    st.session_state['data1'] = df1
+    st.session_state['data2'] = df2
 
 if st.session_state['data1'].empty:
     st.subheader('No more recent Aticles')
