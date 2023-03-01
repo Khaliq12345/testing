@@ -7,16 +7,13 @@ from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
 
-hostname="162.240.57.245"
-dbname="hardball2019_bbwaa"
-uname="hardball2019_scraper"
-pwd="Bbo549ahhN;Y"
-engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")    
-
+@st.cache
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
-def delete_blacklisted(df_a, engine):
+@st.cache
+def delete_blacklisted(df_a):
+    engine = st.session_state['engine']
     conn = engine.connect()
     query = text('SELECT * FROM black_list')
     df_b = pd.read_sql_query(query, conn)
@@ -25,7 +22,8 @@ def delete_blacklisted(df_a, engine):
 
     return df_a
 
-def downlaod_commited(engine):
+def downlaod_commited():
+    engine = st.session_state['engine']
     conn = engine.connect()
     query = text('SELECT * FROM commit')
     df = pd.read_sql_query(query, conn)
@@ -33,6 +31,7 @@ def downlaod_commited(engine):
     csv = convert_df(df)
     return csv
 
+@st.cache
 def add_paywall(text, symb):
 # define the pattern to select the link
     pattern = r'(https?://\S+)'
@@ -45,6 +44,7 @@ def add_paywall(text, symb):
 
     return new_text
 
+@st.cache
 def add_hash_tags(text, symb):
 # define the pattern to select the link
     pattern = r'(https?://\S+)'
@@ -57,6 +57,7 @@ def add_hash_tags(text, symb):
 
     return new_text
 
+@st.cache
 def empty_database():
     df1 = pd.DataFrame()
     df2 = pd.DataFrame()
@@ -68,14 +69,24 @@ def create_database():
     for key in st.session_state.keys():
         del st.session_state[key]
     # Run the scrapers
+   if 'engine' not in st.session_state:
+       hostname=st.secrets['hostname']
+       dbname=st.secrets['dbname']
+       uname=st.secrets['uname']
+       pwd=st.secrets['pwd']
+       engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+       st.session_state['engine'] = engine
+        
     scraper = NewsScraper()
     info, post = scraper.scrapers()
     df_info = pd.DataFrame(info)
     df_post = pd.DataFrame(post)
-    clean_post = delete_blacklisted(df_post, engine)
+    clean_post = delete_blacklisted(df_post)
     clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
 
-def delete_rows(selected_rows, engine):
+@st.cache
+def delete_rows(selected_rows):
+    engine = st.session_state['engine']
     selected_df = st.session_state['data2'].loc[selected_rows, :]
     #saving to black_list database for the so as to not to extract in the future
     selected_df.to_sql(name='black_list', con=engine, schema='hardball2019_bbwaa', if_exists='append', index=False)
@@ -86,7 +97,9 @@ def delete_rows(selected_rows, engine):
             st.session_state['data2'] = st.session_state['data2'].drop(index)
     st.experimental_rerun()
 
-def add_rows_to_new_database(selected_rows, engine):
+@st.cache
+def add_rows_to_new_database(selected_rows):
+    engine = st.session_state['engine']
     selected_df = st.session_state['data2'].loc[selected_rows, :]
     #clean_selected_df = clean_data(selected_df)
     #saving to commit database for the next step
@@ -110,11 +123,19 @@ scrape_button = st.button('Scrape')
 if scrape_button:
     create_database()
 
+if 'engine' not in st.session_state:
+    hostname=st.secrets['hostname']
+    dbname=st.secrets['dbname']
+    uname=st.secrets['uname']
+    pwd=st.secrets['pwd']
+    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+    st.session_state['engine'] = engine
+
 if 'data1' not in st.session_state:
     df1 = pd.read_csv("temp_database.csv")
     df2 = pd.read_csv("temp_database.csv")
-    st.session_state['data1'] = df1
-    st.session_state['data2'] = df2
+    st.session_state['data1'] = df1[:5]
+    st.session_state['data2'] = df2[:5]
 
 if st.session_state['data1'].empty:
     st.subheader('No more recent Aticles')
@@ -222,11 +243,11 @@ for index, row in st.session_state['data1'].iterrows():
 
         # Add a button to delete selected rows
 if del_button:
-    delete_rows(selected_rows, engine)
+    delete_rows(selected_rows)
 
 # Add a button to add selected rows to new database
 if commit_button:
-    add_rows_to_new_database(selected_rows, engine)
+    add_rows_to_new_database(selected_rows)
 
 # Add an 'Empty database' button to the app
 if empty_button:
@@ -234,4 +255,4 @@ if empty_button:
 
 downlaod_container = st.container()
 col1, col2 = downlaod_container.columns([1, 1])
-downlaod_button = col1.download_button("Press to Download", downlaod_commited(engine), "posts.csv", "text/csv", key='download-csv')
+downlaod_button = col1.download_button("Press to Download", downlaod_commited(), "posts.csv", "text/csv", key='download-csv')
