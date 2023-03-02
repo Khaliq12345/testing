@@ -4,10 +4,20 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime, timedelta
 from latest_user_agents import get_random_user_agent
+from sqlalchemy import create_engine, text
+
+hostname=st.secrets['hostname']
+dbname=st.secrets['dbname']
+uname=st.secrets['uname']
+pwd=st.secrets['pwd']
+engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+engine = engine
+conn = engine.connect()
+query = text('SELECT * FROM articles')
+data = pd.read_sql_query(query, conn)
 
 post_item_list =[]
 item_list = []
-PATH = "bbwaa_roster.xlsx"
 
 def add_up(data, url, link, header, sentence, my_date):
     author_twitter = str(data.loc[data['Article URL'] == url, 'Author Twitter'].item()).replace('"', '')
@@ -105,98 +115,124 @@ def add_up(data, url, link, header, sentence, my_date):
     }
     item_list.append(item)
 
-def nytimes_scraper():
+def nytimes_scraper(data):
     today = datetime.now()
-    data = pd.read_excel(PATH)
-    urls = data['Article URL'][data['Publication Name'] == 'The New York Times']
-    for url in urls:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'lxml')
-        posts = soup.select('.css-112uytv')
+    data = data
+    urls = data['Article URL'][(data['Publication Name'] == 'The New York Times') & (data['Do not scrape'] == 'N')]
+    urls.dropna(inplace=True)     
+    if len(urls) > 0:
+        for url in urls:
+            ua = get_random_user_agent()
+            headers = {
+                'User-Agent': ua
+            }
+            response = requests.get(url, headers=headers)
+            response = requests.get(url)
+            soup = BeautifulSoup(response.text, 'lxml')
+            posts = soup.select('.css-112uytv')
 
-        posts = soup.select('.css-112uytv')
-        for post in posts:
-            link_date = post.select_one('.css-1l4spti a')['href']
-            date = link_date.split('/sports/baseball')
-            date = date[0].replace('/', '')
-            try:
-                date = datetime.strptime(date, "%Y%m%d")
-                my_date = date.strftime("%Y, %m, %d")
-            except:
-                date = datetime.strptime('20230215', "%Y%m%d")
-                my_date = date.strftime("%Y, %m, %d")
-                
-            delta = today - date
+            posts = soup.select('.css-112uytv')
+            for post in posts:
+                link_date = post.select_one('.css-1l4spti a')['href']
+                date = link_date.split('/sports/baseball')
+                date = date[0].replace('/', '')
+                try:
+                    date = datetime.strptime(date, "%Y%m%d")
+                    my_date = date.strftime("%Y, %m, %d")
+                except:
+                    date = datetime.strptime('20230215', "%Y%m%d")
+                    my_date = date.strftime("%Y, %m, %d")
+                    
+                delta = today - date
 
-            if delta < timedelta(days=3):
-                link = 'https://www.nytimes.com' + link_date
-                header = post.select_one('h2').text
-                sentence = post.select_one('p').text
+                if delta < timedelta(days=3):
+                    link = 'https://www.nytimes.com' + link_date
+                    header = post.select_one('h2').text
+                    sentence = post.select_one('p').text
 
-                add_up(data, url, link, header, sentence, my_date)
-            else:
-               pass
+                    add_up(data, url, link, header, sentence, my_date)
+                else:
+                    pass
+    else:
+        pass
         
-def forbes_scraper():
+def forbes_scraper(data):
     today = datetime.now()
-    data = pd.read_excel(PATH)
-    urls = data['Article URL'][data['Publication Name'] == 'Forbes']
-    for url in urls:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'lxml')
-        posts = soup.select('article')
-        for post in posts:
-            date = post['data-date']
-            try:
-                date = datetime.fromtimestamp(int(date) / 1000.0)
-                my_date = date.strftime("%Y, %m, %d")
-            except:
-                date = datetime.strptime('20230215', "%Y%m%d")
-                my_date = date.strftime("%Y, %m, %d")
-                
-            delta = today - date
+    data = data
+    urls = data['Article URL'][(data['Publication Name'] == 'Forbes') & (data['Do not scrape'] == 'N')]
+    urls.dropna(inplace=True)
+    if len(urls) > 0:
+        for url in urls:
+            ua = get_random_user_agent()
+            headers = {
+                'User-Agent': ua
+            }
+            response = requests.get(url, headers=headers)
+            response = requests.get(url)
+            soup = BeautifulSoup(response.text, 'lxml')
+            posts = soup.select('article')
+            for post in posts:
+                date = post['data-date']
+                try:
+                    date = datetime.fromtimestamp(int(date) / 1000.0)
+                    my_date = date.strftime("%Y, %m, %d")
+                except:
+                    date = datetime.strptime('20230215', "%Y%m%d")
+                    my_date = date.strftime("%Y, %m, %d")
+                    
+                delta = today - date
 
-            if delta < timedelta(days=3):
-                link = post.select_one('.stream-item__title')['href']
-                header = post.select_one('.stream-item__title').text
-                sentence = post.select_one('.stream-item__description').text
+                if delta < timedelta(days=3):
+                    link = post.select_one('.stream-item__title')['href']
+                    header = post.select_one('.stream-item__title').text
+                    sentence = post.select_one('.stream-item__description').text
 
-                add_up(data, url, link, header, sentence, my_date)
-            else:
-                pass
+                    add_up(data, url, link, header, sentence, my_date)
+                else:
+                    pass
+    else:
+        pass
 
-def nj_scraper():
+def nj_scraper(data):
     today = datetime.now()
-    data = pd.read_excel(PATH)
-    urls = data['Article URL'][data['Publication Name'] == 'NJ.com']
-    for url in urls:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'lxml')
-        posts = soup.select('.river-item')
+    data = data
+    urls = data['Article URL'][(data['Publication Name'] == 'NJ.com') & (data['Do not scrape'] == 'N')]
+    urls.dropna(inplace=True)
+    if len(urls) > 0:
+        for url in urls:
+            ua = get_random_user_agent()
+            headers = {
+                'User-Agent': ua
+            }
+            response = requests.get(url, headers=headers)
+            response = requests.get(url)
+            soup = BeautifulSoup(response.text, 'lxml')
+            posts = soup.select('.river-item')
 
-        for post in posts:
-            date = post.select_one('time')['datetime']
-            try:
-                date = datetime.fromtimestamp(int(date))
-                my_date = date.strftime("%Y, %m, %d")
-            except:
-                date = datetime.strptime('20230215', "%Y%m%d")
-                my_date = date.strftime("%Y, %m, %d")           
+            for post in posts:
+                date = post.select_one('time')['datetime']
+                try:
+                    date = datetime.fromtimestamp(int(date))
+                    my_date = date.strftime("%Y, %m, %d")
+                except:
+                    date = datetime.strptime('20230215', "%Y%m%d")
+                    my_date = date.strftime("%Y, %m, %d")           
 
-            delta = today - date
-            if delta < timedelta(days=3):
-                link = post.select_one('a.river-item__headline-link')['href']
-                header = post.select_one('h2').text
-                sentence = post.select_one('p').text
+                delta = today - date
+                if delta < timedelta(days=3):
+                    link = post.select_one('a.river-item__headline-link')['href']
+                    header = post.select_one('h2').text
+                    sentence = post.select_one('p').text
 
-                add_up(data, url, link, header, sentence, my_date)
-            else:
-                pass
+                    add_up(data, url, link, header, sentence, my_date)
+                else:
+                    pass
 
 class NewsScraper:
     
     @staticmethod
     def scrapers():
-        nj_scraper()
-        nytimes_scraper()
+        nj_scraper(data)
+        #nytimes_scraper(data)
+        #forbes_scraper(data)
         return item_list, post_item_list
