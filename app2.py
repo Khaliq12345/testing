@@ -120,8 +120,11 @@ if scrape_button:
 
 
 if 'data1' not in st.session_state:
-    df1 = pd.read_csv("temp_database.csv")
-    df2 = pd.read_csv("temp_database.csv")
+    try:
+        df1 = pd.read_csv("temp_database.csv")
+        df2 = pd.read_csv("temp_database.csv")
+    except:
+        st.warning('The scraper has no scraped data to display. Click on the scrape to display the latest news.', icon="⚠️")
     st.session_state['data1'] = df1[:30]
     st.session_state['data2'] = df2[:30]
 
