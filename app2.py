@@ -14,9 +14,10 @@ if 'engine' not in st.session_state:
     pwd=st.secrets['pwd']
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     st.session_state['engine'] = engine
-
+@st.cache_data
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
+
 
 def delete_blacklisted(df_a):
     engine = st.session_state['engine']
@@ -61,13 +62,6 @@ def add_hash_tags(text, symb):
 
     return new_text
 
-def empty_database():
-    df1 = pd.DataFrame()
-    df2 = pd.DataFrame()
-    st.session_state['data1'] = df1
-    st.session_state['data2'] = df2
-    st.experimental_rerun()
-
 def create_database():
     if 'engine' not in st.session_state:
         hostname=st.secrets['hostname']
@@ -76,7 +70,6 @@ def create_database():
         pwd=st.secrets['pwd']
         engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
         st.session_state['engine'] = engine
-
     # Run the scrapers
     scraper = NewsScraper()
     info, post = scraper.scrapers()
@@ -122,16 +115,15 @@ scrape_button = st.button('Scrape')
 if scrape_button:
     for key in st.session_state.keys():
         del st.session_state[key]
-    with open('temp_database.csv', 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerows([])
     create_database()
+    #st.session_state
+
 
 if 'data1' not in st.session_state:
     df1 = pd.read_csv("temp_database.csv")
     df2 = pd.read_csv("temp_database.csv")
-    st.session_state['data1'] = df1[:40]
-    st.session_state['data2'] = df2[:40]
+    st.session_state['data1'] = df1[:30]
+    st.session_state['data2'] = df2[:30]
 
 if st.session_state['data1'].empty:
     st.subheader('No more recent Aticles')
@@ -142,12 +134,11 @@ else:
 button_container = st.container()
 
 # Add buttons to the container
-col1, col2, col3, col4, col5 = button_container.columns([1, 1, 1, 1, 1])
+col1, col2, col3, col4 = button_container.columns([1, 1, 1, 1])
 del_button = col1.button("Delete Rows")
 commit_button = col2.button("Commit Rows")
-empty_button = col3.button("Empty Database")
-select_all_button = col4.button('Select all')
-deselect_all_button = col5.button('Deselect all')
+select_all_button = col3.button('Select all')
+deselect_all_button = col4.button('Deselect all')
 
 button_container_style = """
 display: flex;
@@ -166,8 +157,6 @@ col3.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
 col3.markdown('</div>', unsafe_allow_html=True)
 col4.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
 col4.markdown('</div>', unsafe_allow_html=True)
-col5.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
-col5.markdown('</div>', unsafe_allow_html=True)
 
 if "default_checkbox_value" not in st.session_state:
     st.session_state["default_checkbox_value"] = False
@@ -185,25 +174,25 @@ for index, row in st.session_state['data1'].iterrows():
         selected_rows.append(index)
 
     if "Twit($)ter" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", ""), height=150)
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", "").strip().replace('  ', ''), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
     elif "Face($)book" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", ""), height=150)
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip().replace('  ', ''), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("Facebook")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
     elif "I($)G" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("I($)G", ""), height=150)
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("I($)G", "").strip().replace('  ', ''), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("IG")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
     elif "Linked($)in" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Linked($)in", ""), height=150)
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Linked($)in", "").strip().replace('  ', ''), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("Linkedin")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
@@ -257,10 +246,7 @@ if del_button:
 if commit_button:
     add_rows_to_new_database(selected_rows)
 
-# Add an 'Empty database' button to the app
-if empty_button:
-    empty_database()
-
+    
 downlaod_container = st.container()
 col1, col2 = downlaod_container.columns([1, 1])
 downlaod_button = col1.download_button("Press to Download", downlaod_commited(), "posts.csv", "text/csv", key='download-csv')
