@@ -147,10 +147,12 @@ else:
 button_container = st.container()
 
 # Add buttons to the container
-col1, col2, col3 = button_container.columns([1, 1, 1])
+col1, col2, col3, col4, col5 = button_container.columns([1, 1, 1, 1, 1])
 del_button = col1.button("Delete Rows")
 commit_button = col2.button("Commit Rows")
 empty_button = col3.button("Empty Database")
+select_all_button = col4.button('Select all')
+deselect_all_button = col5.button('Deselect all')
 
 button_container_style = """
 display: flex;
@@ -168,11 +170,18 @@ col2.markdown('</div>', unsafe_allow_html=True)
 col3.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
 col3.markdown('</div>', unsafe_allow_html=True)
 
+if "default_checkbox_value" not in st.session_state:
+    st.session_state["default_checkbox_value"] = False
+if select_all_button:
+    st.session_state["default_checkbox_value"] = True
+if deselect_all_button:
+    st.session_state["default_checkbox_value"] = False
+
 selected_rows = []
 for index, row in st.session_state['data1'].iterrows():
     row_container = st.container()
     col1, col2, col3, col4, col5 = row_container.columns([5, 3, 2, 2, 2])
-    checkbox = col1.checkbox("check_box", key=f'box_{index}', value=False)
+    checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
     if checkbox:
         selected_rows.append(index)
 
