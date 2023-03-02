@@ -232,7 +232,7 @@ class NewsScraper:
     
     @staticmethod
     def scrapers():
-        nj_scraper(data)
-        #nytimes_scraper(data)
+        #nj_scraper(data)
+        nytimes_scraper(data)
         #forbes_scraper(data)
         return item_list, post_item_list
