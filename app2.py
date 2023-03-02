@@ -169,6 +169,10 @@ col2.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
 col2.markdown('</div>', unsafe_allow_html=True)
 col3.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
 col3.markdown('</div>', unsafe_allow_html=True)
+col4.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
+col4.markdown('</div>', unsafe_allow_html=True)
+col5.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
+col5.markdown('</div>', unsafe_allow_html=True)
 
 if "default_checkbox_value" not in st.session_state:
     st.session_state["default_checkbox_value"] = False
