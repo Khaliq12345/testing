@@ -110,7 +110,7 @@ def add_up(data, url, link, header, sentence, my_date):
     }
     item_list.append(item)
 
-def nytimes_scraper(data):
+def nytimes_scraper():
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -233,6 +233,6 @@ class NewsScraper:
     @staticmethod
     def scrapers():
         #nj_scraper(data)
-        nytimes_scraper(data)
+        nytimes_scraper()
         #forbes_scraper(data)
         return item_list, post_item_list
