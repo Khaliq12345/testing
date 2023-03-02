@@ -69,9 +69,6 @@ def empty_database():
     st.experimental_rerun()
 
 def create_database():
-    for key in st.session_state.keys():
-        del st.session_state[key]
-    
     if 'engine' not in st.session_state:
         hostname=st.secrets['hostname']
         dbname=st.secrets['dbname']
@@ -123,7 +120,13 @@ st.title("Latest News Extractor")
 
 scrape_button = st.button('Scrape')
 if scrape_button:
-   create_database()
+    for key in st.session_state.keys():
+        del st.session_state[key]
+    with open('temp_database.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows([])
+    create_database()
+
 
 if 'data1' not in st.session_state:
     df1 = pd.read_csv("temp_database.csv")
