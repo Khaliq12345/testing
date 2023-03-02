@@ -117,7 +117,8 @@ def add_up(data, url, link, header, sentence, my_date):
 
 def nytimes_scraper(data):
     today = datetime.now()
-    data = data
+    query = text('SELECT * FROM articles')
+    data = pd.read_sql_query(query, conn)
     urls = data['Article URL'][(data['Publication Name'] == 'The New York Times') & (data['Do not scrape'] == 'N')]
     urls.dropna(inplace=True)     
     if len(urls) > 0:
