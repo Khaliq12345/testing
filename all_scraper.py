@@ -51,42 +51,54 @@ def add_up(data, url, link, header, sentence, my_date):
         paywall = '<$>' 
         
     sentence = sentence.replace('..', '').encode('utf-8').decode('utf-8').replace('“', '').replace('”', '').replace('$', '')
+
     post = f'''
-    '{header}' by {author_twitter} for {pub_twitter}: {sentence}.. {paywall}{link} Twit($)ter
+    '{header}' by {author_twitter} for {pub_twitter}: {sentence}.. {paywall} {link} Twit($)ter
     '''
+    post_key = post + '!'
     post_item = {
         'Text': post.strip(),
         'Date': my_date,
-        'Post Link': link
+        'Post Link': link,
+        'Post key': post_key
     }
     post_item_list.append(post_item)
+
     post = f'''
-    '{header}' by {author_fb} for {pub_fb}: {sentence}.. {paywall}{link} Face($)book
+    '{header}' by {author_fb} for {pub_fb}: {sentence}.. {paywall} {link} Face($)book
     '''
+    post_key = post + '!'
     post_item = {
         'Text': post.strip(),
         'Date': my_date,
-        'Post Link': link
+        'Post Link': link,
+        'Post key': post_key
     }
     post_item_list.append(post_item)
+
     post = f'''
-    '{header}' by {author_ig} for {pub_ig}: {sentence}.. {paywall}{link} I($)G
+    '{header}' by {author_ig} for {pub_ig}: {sentence}.. {paywall} {link} I($)G
 
     VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE
     '''
+    post_key = post + '!'
     post_item = {
         'Text': post.strip(),
         'Date': my_date,
-        'Post Link': link
+        'Post Link': link,
+        'Post key': post_key
     }
     post_item_list.append(post_item)
+
     post = f'''
-    '{header}' by {author_linkedin} for {pub_linkedin}: {sentence}.. {paywall}{link} Linked($)in
+    '{header}' by {author_linkedin} for {pub_linkedin}: {sentence}.. {paywall} {link} Linked($)in
     '''
+    post_key = post + '!'
     post_item = {
         'Text': post.strip(),
         'Date': my_date,
-        'Post Link': link
+        'Post Link': link,
+        'Post key': post_key
     }
     post_item_list.append(post_item)
 
