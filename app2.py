@@ -18,13 +18,12 @@ if 'engine' not in st.session_state:
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
-
 def delete_blacklisted(df_a):
     engine = st.session_state['engine']
     conn = engine.connect()
     query = text('SELECT * FROM black_list')
     df_b = pd.read_sql_query(query, conn)
-    links_to_drop = df_a['Post Link'].isin(df_b['Post Link'])
+    links_to_drop = df_a['Post key'].isin(df_b['Post key'])
     df_a = df_a[~links_to_drop]
 
     return df_a
