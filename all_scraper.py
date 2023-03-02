@@ -50,7 +50,7 @@ def add_up(data, url, link, header, sentence, my_date):
     '{header}' by {author_twitter} for {pub_twitter}: {sentence}.. {paywall}{link} Twit($)ter
     '''
     post_item = {
-        'Text': post,
+        'Text': post.strip(),
         'Date': my_date,
         'Post Link': link
     }
@@ -59,7 +59,7 @@ def add_up(data, url, link, header, sentence, my_date):
     '{header}' by {author_fb} for {pub_fb}: {sentence}.. {paywall}{link} Face($)book
     '''
     post_item = {
-        'Text': post,
+        'Text': post.strip(),
         'Date': my_date,
         'Post Link': link
     }
@@ -70,7 +70,7 @@ def add_up(data, url, link, header, sentence, my_date):
     VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE
     '''
     post_item = {
-        'Text': post,
+        'Text': post.strip(),
         'Date': my_date,
         'Post Link': link
     }
@@ -79,7 +79,7 @@ def add_up(data, url, link, header, sentence, my_date):
     '{header}' by {author_linkedin} for {pub_linkedin}: {sentence}.. {paywall}{link} Linked($)in
     '''
     post_item = {
-        'Text': post,
+        'Text': post.strip(),
         'Date': my_date,
         'Post Link': link
     }
