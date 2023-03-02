@@ -10,11 +10,6 @@ hostname=st.secrets['hostname']
 dbname=st.secrets['dbname']
 uname=st.secrets['uname']
 pwd=st.secrets['pwd']
-engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
-engine = engine
-conn = engine.connect()
-query = text('SELECT * FROM articles')
-data = pd.read_sql_query(query, conn)
 
 post_item_list =[]
 item_list = []
@@ -117,6 +112,8 @@ def add_up(data, url, link, header, sentence, my_date):
 
 def nytimes_scraper(data):
     today = datetime.now()
+    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+    conn = engine.connect()
     query = text('SELECT * FROM articles')
     data = pd.read_sql_query(query, conn)
     urls = data['Article URL'][(data['Publication Name'] == 'The New York Times') & (data['Do not scrape'] == 'N')]
