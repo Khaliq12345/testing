@@ -64,8 +64,8 @@ def add_up(data, url, link, header, sentence, my_date):
         'Post Link': link
     }
     post_item_list.append(post_item)
-    post = f''''
-    {header}' by {author_ig} for {pub_ig}: {sentence}.. {paywall}{link} I($)G
+    post = f'''
+    '{header}' by {author_ig} for {pub_ig}: {sentence}.. {paywall}{link} I($)G
 
     VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE
     '''
@@ -198,5 +198,5 @@ class NewsScraper:
     @staticmethod
     def scrapers():
         nj_scraper()
-        forbes_scraper()
+        nytimes_scraper()
         return item_list, post_item_list
