@@ -126,6 +126,7 @@ if scrape_button:
         writer = csv.writer(csvfile)
         writer.writerows([])
     create_database()
+    st.session_state
 
 
 if 'data1' not in st.session_state:
