@@ -232,6 +232,8 @@ class NewsScraper:
     
     @staticmethod
     def scrapers():
+        post_item_list.clear()
+        item_list.clear()
         #nj_scraper(data)
         nytimes_scraper()
         #forbes_scraper(data)
