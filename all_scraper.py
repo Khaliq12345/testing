@@ -25,24 +25,24 @@ def add_up(data, url, link, header, sentence, my_date):
     pub_linkedin = str(data.loc[data['Article URL'] == url, 'Publication LinkedIn'].item()).replace('"', '')
     paywall = str(data.loc[data['Article URL'] == url, 'Default Paywall  (Y/N)'].item()).replace('"', '')
 
-    if 'nan' in author_twitter:
+    if 'None' in author_twitter:
         author_twitter = str(data.loc[data['Article URL'] == url, 'Author Name'].item()).replace('"', '')
-    if 'nan' in pub_twitter:
+    if 'None' in pub_twitter:
         pub_twitter = str(data.loc[data['Article URL'] == url, 'Publication Name'].item()).replace('"', '')
 
-    if 'nan' in author_fb:
+    if 'None' in author_fb:
         author_fb = str(data.loc[data['Article URL'] == url, 'Author Name'].item()).replace('"', '')
-    if 'nan' in pub_fb:
+    if 'None' in pub_fb:
         pub_fb = str(data.loc[data['Article URL'] == url, 'Publication Name'].item()).replace('"', '')
 
-    if 'nan' in author_ig:
+    if 'None' in author_ig:
         author_ig = str(data.loc[data['Article URL'] == url, 'Author Name'].item()).replace('"', '')
-    if 'nan' in pub_ig:
+    if 'None' in pub_ig:
         pub_ig = str(data.loc[data['Article URL'] == url, 'Publication Name'].item()).replace('"', '')
 
-    if 'nan' in author_linkedin:
+    if 'None' in author_linkedin:
         author_linkedin = str(data.loc[data['Article URL'] == url, 'Author Name'].item()).replace('"', '')
-    if 'nan' in pub_linkedin:
+    if 'None' in pub_linkedin:
         pub_linkedin = str(data.loc[data['Article URL'] == url, 'Publication Name'].item()).replace('"', '')
 
     if 'N' in paywall:
