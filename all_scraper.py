@@ -48,7 +48,7 @@ def add_up(data, url, link, header, sentence, my_date):
     if 'N' in paywall:
         paywall = ''
     elif 'Y' in paywall:
-        paywall = '<$>' 
+        paywall = '<$>'
         
     sentence = sentence.replace('..', '').encode('utf-8').decode('utf-8').replace('“', '').replace('”', '').replace('$', '')
 
@@ -166,8 +166,10 @@ def nytimes_scraper():
     else:
         pass
         
-def forbes_scraper(data):
+def forbes_scraper():
     today = datetime.now()
+    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+    conn = engine.connect()
     query = text('SELECT * FROM articles')
     data = pd.read_sql_query(query, conn)
     urls = data['Article URL'][(data['Publication Name'] == 'Forbes') & (data['Do not scrape'] == 'N')]
@@ -204,8 +206,10 @@ def forbes_scraper(data):
     else:
         pass
 
-def nj_scraper(data):
+def nj_scraper():
     today = datetime.now()
+    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+    conn = engine.connect()
     query = text('SELECT * FROM articles')
     data = pd.read_sql_query(query, conn)
     urls = data['Article URL'][(data['Publication Name'] == 'NJ.com') & (data['Do not scrape'] == 'N')]
@@ -246,7 +250,7 @@ class NewsScraper:
     def scrapers():
         post_item_list.clear()
         item_list.clear()
-        #nj_scraper(data)
+        #nj_scraper()
         nytimes_scraper()
-        forbes_scraper()
+        #forbes_scraper()
         return item_list, post_item_list
