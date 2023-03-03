@@ -248,5 +248,5 @@ class NewsScraper:
         item_list.clear()
         #nj_scraper(data)
         nytimes_scraper()
-        #forbes_scraper(data)
+        forbes_scraper(data)
         return item_list, post_item_list
