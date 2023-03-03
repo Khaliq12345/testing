@@ -33,7 +33,7 @@ def downlaod_commited():
     conn = engine.connect()
     query = text('SELECT * FROM commit')
     df = pd.read_sql_query(query, conn)
-    df = df.drop(['Date', 'Post Link'], axis=1)
+    df = df.drop(['Date', 'Post Link', 'Post key'], axis=1)
     csv = convert_df(df)
     return csv
 
