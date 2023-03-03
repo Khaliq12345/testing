@@ -250,7 +250,7 @@ class NewsScraper:
     def scrapers():
         post_item_list.clear()
         item_list.clear()
-        #nj_scraper()
+        nj_scraper()
         nytimes_scraper()
-        #forbes_scraper()
+        forbes_scraper()
         return item_list, post_item_list
