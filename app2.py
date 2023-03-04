@@ -110,7 +110,7 @@ def main():
 st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
 st.title("Latest News Extractor")
 st.warning('Please click on the scrape button to refresh the page, especially if you have just loaded it. The displayed data may have been removed or finalized.')
-st.
+
 scrape_button = st.button('Scrape')
 if scrape_button:
     for key in st.session_state.keys():
