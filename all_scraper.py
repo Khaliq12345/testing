@@ -865,8 +865,28 @@ def mlb_scraper():
             else:
                 pass
 
-
 class NewsScraper:
     
     @staticmethod
     def scrapers():
+        post_item_list.clear()
+        item_list.clear()
+        nytimes_scraper()
+        forbes_scraper()
+        nj_scraper()
+        fangraph_scraper()
+        cbs_sports_scraper()
+        ringer_scraper()
+        sportsbusinessjournal_scraper()
+        yahoo_scraper()
+        nypost_scraper()
+        foxsports_scraper()
+        insider_scraper()
+        tampabay_scraper()
+        sporting_news()
+        northjersey_scraper()
+        theathletic_scraper()
+        apnews_scraper()
+        mlb_scraper()
+
+        return item_list, post_item_list
