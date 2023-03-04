@@ -285,10 +285,10 @@ def nj_scraper():
                     link = post.select_one('a.river-item__headline-link')['href']
                     header = post.select_one('h2').text
                     try:
-                        sentence = post.select_one('.article__paragraph article__paragraph--left').text.replace('\n', ' ').split('.')
+                        sentence = post.select_one('.river-item__summary').text.replace('\n', ' ').split('.')
                         sentence = sentence[0]
                     except:
-                        sentence = post.select_one('.article__paragraph.article__paragraph--left').text.replace('\n', ' ')
+                        sentence = post.select_one('.river-item__summary').text.replace('\n', ' ')
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
