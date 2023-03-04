@@ -5,6 +5,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from latest_user_agents import get_random_user_agent
 from sqlalchemy import create_engine, text
+s = session()
 
 hostname=st.secrets['hostname']
 dbname=st.secrets['dbname']
