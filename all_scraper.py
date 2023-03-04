@@ -617,7 +617,7 @@ def insider_scraper():
                     add_up(data, url, link, header, sentence, my_date)
                 else:
                     pass
-
+                
 def tampabay_scraper():
     s = session()
     url_2 = []
@@ -647,6 +647,7 @@ def tampabay_scraper():
                     
                 delta = datetime.now() - date
                 if delta < timedelta(days=3):
+                    my_date = date.strftime("%Y, %m, %d")
                     post_link = 'https://www.tampabay.com' + post.select_one('.headline a')['href']
                     url_2.append(post_link)
 
@@ -655,7 +656,6 @@ def tampabay_scraper():
         soup = BeautifulSoup(res.text, 'lxml')
         header = soup.select_one('h1').text
         sentence = soup.select_one('.article__summary').text
-        my_date = date.strftime("%Y, %m, %d")
         link = res.url
         add_up(data, url, link, header, sentence, my_date)
 
