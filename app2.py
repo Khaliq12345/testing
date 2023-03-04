@@ -216,8 +216,8 @@ for index, row in st.session_state['data1'][:40].iterrows():
             st.experimental_rerun()
     else:
         if paywall_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('<$>', ' ')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('<$>', ' ')
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('<$>', '  ')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('<$>', '  ')
             st.experimental_rerun()
 
     #add #Yankees hashtags to the post
@@ -228,8 +228,8 @@ for index, row in st.session_state['data1'][:40].iterrows():
             st.experimental_rerun()           
     else:
         if yankees_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', ' ')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', ' ')
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', '  ')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', '  ')
             st.experimental_rerun()
             
     # Add #Mets hashtags to post
@@ -240,8 +240,8 @@ for index, row in st.session_state['data1'][:40].iterrows():
             st.experimental_rerun()
     else:
         if mets_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Mets', ' ')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Mets', ' ')
+            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Mets', '  ')
+            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Mets', '  ')
             st.experimental_rerun()
 
         # Add a button to delete selected rows
