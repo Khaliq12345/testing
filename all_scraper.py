@@ -77,14 +77,14 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
             pub_linkedin = str(data.loc[data['Article URL'] == url, 'Publication Name'].item()).replace('"', '')
 
     if 'N' in paywall:
-        paywall = ''
+        paywall = ' '
     elif 'Y' in paywall:
         paywall = '<$>'
         
-    sentence = sentence.replace('..', '').encode('utf-8').decode('utf-8').replace('“', '').replace('”', '').replace('$', '')
+    sentence = sentence.encode('utf-8').decode('utf-8').replace('“', '').replace('”', '').replace('$', '')
 
     post = f'''
-    '{header}' by {author_twitter} for {pub_twitter}: {sentence}.. {paywall} {link} Twit($)ter
+    '{header}' by {author_twitter} for {pub_twitter}: {sentence}... {paywall} {link} Twit($)ter
     '''
     post_key = post + '!'
     post_item = {
@@ -96,7 +96,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
     post_item_list.append(post_item)
 
     post = f'''
-    '{header}' by {author_fb} for {pub_fb}: {sentence}.. {paywall} {link} Face($)book
+    '{header}' by {author_fb} for {pub_fb}: {sentence}... {paywall} {link} Face($)book
     '''
     post_key = post + '!'
     post_item = {
@@ -108,7 +108,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
     post_item_list.append(post_item)
 
     post = f'''
-    '{header}' by {author_ig} for {pub_ig}: {sentence}.. {paywall} {link} I($)G
+    '{header}' by {author_ig} for {pub_ig}: {sentence}... {paywall} {link} I($)G
 
     VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE
     '''
@@ -122,7 +122,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
     post_item_list.append(post_item)
 
     post = f'''
-    '{header}' by {author_linkedin} for {pub_linkedin}: {sentence}.. {paywall} {link} Linked($)in
+    '{header}' by {author_linkedin} for {pub_linkedin}: {sentence}... {paywall} {link} Linked($)in
     '''
     post_key = post + '!'
     post_item = {
@@ -191,7 +191,11 @@ def nytimes_scraper():
                 if delta < timedelta(days=3):
                     link = 'https://www.nytimes.com' + link_date
                     header = post.select_one('h2').text
-                    sentence = post.select_one('p').text
+                    try:
+                        sentence = post.select_one('p').text.split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('p').text
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
@@ -233,7 +237,11 @@ def forbes_scraper():
                 if delta < timedelta(days=3):
                     link = post.select_one('.stream-item__title')['href']
                     header = post.select_one('.stream-item__title').text
-                    sentence = post.select_one('.stream-item__description').text
+                    try:
+                        sentence = post.select_one('.stream-item__description').text.split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('.stream-item__description').text
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
@@ -276,7 +284,11 @@ def nj_scraper():
                 if delta < timedelta(days=3):
                     link = post.select_one('a.river-item__headline-link')['href']
                     header = post.select_one('h2').text
-                    sentence = post.select_one('p').text
+                    try:
+                        sentence = post.select_one('p').text.split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('p').text
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
@@ -318,7 +330,11 @@ def fangraph_scraper():
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     header = post.select_one('h2').text
-                    sentence = post.select_one('p').text
+                    try:
+                        sentence = post.select_one('p').text.split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('p').text
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
@@ -367,8 +383,11 @@ def cbs_sports_scraper():
                     link = post.select_one('a')['href']
                     link = 'https://www.cbssports.com' + link
                     header = post.select_one('h3').text
-                    sentence = post.select_one('p').text
-
+                    try:
+                        sentence = post.select_one('p').text.split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('p').text
                     add_up(data, url, link, header, sentence, my_date)
                 else:
                     pass
@@ -408,7 +427,11 @@ def ringer_scraper():
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     header = post.select_one('h2').text
-                    sentence = post.select_one('.p-dek.c-entry-box--compact__dek').text
+                    try:
+                        sentence = post.select_one('.p-dek.c-entry-box--compact__dek').text.split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('.p-dek.c-entry-box--compact__dek').text
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
@@ -449,7 +472,11 @@ def sportsbusinessjournal_scraper():
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     header = post.select_one('h2').text
-                    sentence = post.select_one('.text-container .text-frame').text.strip().replace('\n ', '').replace('...', '')
+                    try:
+                        sentence = post.select_one('.text-container .text-frame').text.strip().replace('\n', ' ').split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('.text-container .text-frame').text.strip().replace('\n', ' ')
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
@@ -498,7 +525,11 @@ def yahoo_scraper():
                 if delta < timedelta(days=3):
                     link = post.select_one('h4 a')['href']
                     header = post.select_one('h4').text
-                    sentence = post.select_one('p').text
+                    try:
+                        sentence = post.select_one('p').text.split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('p').text
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
@@ -537,7 +568,12 @@ def nypost_scraper():
                 if delta < timedelta(days=3):
                     link = post.select_one('a')['href']
                     header = post.select_one('h3').text.strip()
-                    sentence = post.select_one('p').text.strip()
+                    try:
+                        sentence = post.select_one('p').text.strip().split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('p').text.strip()
+
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
@@ -590,7 +626,11 @@ def foxsports_scraper():
                     link = post['href']
                     link = 'https://www.foxsports.com' + link
                     header = post.select_one('h3').text.strip()
-                    sentence = post.select_one('span').text.strip()
+                    try:
+                        sentence = post.select_one('span').text.strip().split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('span').text.strip()
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
@@ -631,7 +671,11 @@ def insider_scraper():
                     link = post.select_one('h2 a')['href']
                     link = 'https://www.insider.com' + link
                     header = post.select_one('h2').text.strip()
-                    sentence = post.select_one('.tout-copy.river.body-regular').text.strip()
+                    try:
+                        sentence = post.select_one('.tout-copy.river.body-regular').text.strip().split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('.tout-copy.river.body-regular').text.strip()
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
@@ -676,7 +720,11 @@ def tampabay_scraper():
         res = s.get(u)
         soup = BeautifulSoup(res.text, 'lxml')
         header = soup.select_one('h1').text
-        sentence = soup.select_one('.article__summary').text
+        try:
+            sentence = soup.select_one('.article__summary').text.split('.')
+            sentence = sentence[0]
+        except:
+            sentence = soup.select_one('.article__summary').text
         link = res.url
         add_up(data, url, link, header, sentence, my_date)
 
@@ -707,7 +755,11 @@ def sporting_news():
         res = s.get(u)
         soup = BeautifulSoup(res.text, 'lxml')
         header = soup.select_one('h1').text.strip()
-        sentence = soup.select_one('p').text.strip()
+        try:
+            sentence = soup.select_one('p').text.strip().split('.')
+            sentence = sentence[0]
+        except:
+            sentence = soup.select_one('p').text.strip()
         try:
             date = soup.select_one('time')['datetime']
             date =  datetime.fromisoformat(date).replace(tzinfo=None)
@@ -760,7 +812,11 @@ def northjersey_scraper():
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     header = post['title']
-                    sentence = post['descripton']
+                    try:
+                        sentence = post['descripton'].split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post['descripton']
                     link = post['url']
                     
                     add_up(data, url, link, header, sentence, my_date)
@@ -807,7 +863,11 @@ def theathletic_scraper():
             my_date = date.strftime("%Y, %m, %d")
             link = res.url
             header = soup.select_one('h1').text.strip()
-            sentence = soup.select_one('.bodytext1').text.strip()
+            try:
+                sentence = soup.select_one('.bodytext1').text.strip().split('.')
+                sentence = sentence[0]
+            except:
+                sentence = soup.select_one('.bodytext1').text.strip()
             add_up(data, url, link, header, sentence, my_date)
         else:
             break
@@ -855,7 +915,11 @@ def apnews_scraper():
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     header = post.select_one('h2').text
-                    sentence = post.select_one('p').text
+                    try:
+                        sentence = post.select_one('p').text.split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('p').text
                     link = 'https://apnews.com' + post.select_one('.CardHeadline a')['href']
                     
                     add_up(data, url, link, header, sentence, my_date, author)
@@ -906,7 +970,11 @@ def mlb_scraper():
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     header = post.select_one('h1').text.strip()
-                    sentence = post.select_one('p').text.replace('  ', '').replace('\n', '')
+                    try:
+                        sentence = post.select_one('p').text.replace('  ', '').replace('\n', '').split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = post.select_one('p').text.replace('  ', '').replace('\n', '')
                     link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
                     
                     add_up(data, url, link, header, sentence, my_date, author)
@@ -915,11 +983,11 @@ def mlb_scraper():
                 pass
 
 class NewsScraper:
-    
     @staticmethod
     def scrapers():
         post_item_list.clear()
         item_list.clear()
+        s = session()
         nytimes_scraper()
         forbes_scraper()
         nj_scraper()
