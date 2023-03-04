@@ -154,7 +154,6 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
     item_list.append(item)
 
 def nytimes_scraper():
-    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -185,8 +184,10 @@ def nytimes_scraper():
                     date = datetime.strptime('20230215', "%Y%m%d")
                     my_date = date.strftime("%Y, %m, %d")
                     
-                delta = today - date
-
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = 'https://www.nytimes.com' + link_date
                     header = post.select_one('h2').text
@@ -199,7 +200,6 @@ def nytimes_scraper():
         pass
         
 def forbes_scraper():
-    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -226,8 +226,10 @@ def forbes_scraper():
                     date = datetime.strptime('20230215', "%Y%m%d")
                     my_date = date.strftime("%Y, %m, %d")
                     
-                delta = today - date
-
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = post.select_one('.stream-item__title')['href']
                     header = post.select_one('.stream-item__title').text
@@ -240,7 +242,6 @@ def forbes_scraper():
         pass
 
 def nj_scraper():
-    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -268,7 +269,10 @@ def nj_scraper():
                     date = datetime.strptime('20230215', "%Y%m%d")
                     my_date = date.strftime("%Y, %m, %d")           
 
-                delta = today - date
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = post.select_one('a.river-item__headline-link')['href']
                     header = post.select_one('h2').text
@@ -279,7 +283,6 @@ def nj_scraper():
                     pass
 
 def fangraph_scraper():
-    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -308,7 +311,10 @@ def fangraph_scraper():
                     date = datetime.strptime('20230215', "%Y%m%d")
                     my_date = date.strftime("%Y, %m, %d")             
 
-                delta = today - date
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     header = post.select_one('h2').text
@@ -319,7 +325,6 @@ def fangraph_scraper():
                     pass
 
 def cbs_sports_scraper():
-    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -354,8 +359,10 @@ def cbs_sports_scraper():
                     except:
                         date = datetime.strptime('20230215', "%Y%m%d")
                         my_date = date.strftime("%Y, %m, %d")       
-
-                delta = today - date
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = post.select_one('a')['href']
                     link = 'https://www.cbssports.com' + link
@@ -367,7 +374,6 @@ def cbs_sports_scraper():
                     pass
 
 def ringer_scraper():
-    s = session()
     today = datetime.now().date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -395,7 +401,10 @@ def ringer_scraper():
                     date = datetime.strptime('20230215', "%Y%m%d").date()
                     my_date = date.strftime("%Y, %m, %d")           
 
-                delta = today - date
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     header = post.select_one('h2').text
@@ -406,7 +415,6 @@ def ringer_scraper():
                     pass
 
 def sportsbusinessjournal_scraper():
-    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -434,7 +442,10 @@ def sportsbusinessjournal_scraper():
                     date = datetime.strptime('20230215', "%Y%m%d")
                     my_date = date.strftime("%Y, %m, %d")           
 
-                delta = today - date
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     header = post.select_one('h2').text
@@ -445,7 +456,6 @@ def sportsbusinessjournal_scraper():
                     pass
 
 def yahoo_scraper():
-    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -481,7 +491,10 @@ def yahoo_scraper():
                         date = datetime.strptime('20230215', "%Y%m%d")
                         my_date = date.strftime("%Y, %m, %d")       
 
-                delta = today - date
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = post.select_one('h4 a')['href']
                     header = post.select_one('h4').text
@@ -492,7 +505,6 @@ def yahoo_scraper():
                     pass
 
 def nypost_scraper():
-    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -518,7 +530,10 @@ def nypost_scraper():
                     date = datetime.strptime('20230215', "%Y%m%d")
                     my_date = date.strftime("%Y, %m, %d")             
 
-                delta = today - date
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = post.select_one('a')['href']
                     header = post.select_one('h3').text.strip()
@@ -529,7 +544,6 @@ def nypost_scraper():
                     pass
 
 def foxsports_scraper():
-    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -568,7 +582,10 @@ def foxsports_scraper():
                     my_date = date.strftime("%Y, %m, %d")
 
 
-                delta = today - date
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = post['href']
                     link = 'https://www.foxsports.com' + link
@@ -580,7 +597,6 @@ def foxsports_scraper():
                     pass
 
 def insider_scraper():
-    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -607,7 +623,10 @@ def insider_scraper():
                     date = datetime.strptime('20230215', "%Y%m%d")
                     my_date = date.strftime("%Y, %m, %d")             
 
-                delta = today - date
+                try:
+                    delta = today - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     link = 'https://www.insider.com' + link
@@ -617,9 +636,8 @@ def insider_scraper():
                     add_up(data, url, link, header, sentence, my_date)
                 else:
                     pass
-                
+
 def tampabay_scraper():
-    s = session()
     url_2 = []
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
@@ -645,7 +663,10 @@ def tampabay_scraper():
                 except:
                     date = datetime.strptime('20230215', "%Y%m%d")
                     
-                delta = datetime.now() - date
+                try:
+                    delta = datetime.now() - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     post_link = 'https://www.tampabay.com' + post.select_one('.headline a')['href']
@@ -660,7 +681,6 @@ def tampabay_scraper():
         add_up(data, url, link, header, sentence, my_date)
 
 def sporting_news():
-    s = session()
     url_2 = []
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
@@ -694,7 +714,10 @@ def sporting_news():
         except:
             date = datetime.strptime('20230215', "%Y%m%d")
             
-        delta = datetime.now() - date
+        try:
+            delta = datetime.now() - date
+        except:
+            delta = 5
         if delta < timedelta(days=3):
             my_date = date.strftime("%Y, %m, %d")
             link = res.url
@@ -703,7 +726,6 @@ def sporting_news():
             break
 
 def northjersey_scraper():
-    s = session()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -731,7 +753,10 @@ def northjersey_scraper():
                     date = post['publishdate']
                     date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S %z %Z").replace(tzinfo=None)
             
-                delta = datetime.now() - date
+                try:
+                    delta = datetime.now() - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     header = post['title']
@@ -743,7 +768,6 @@ def northjersey_scraper():
                     break
 
 def theathletic_scraper():
-    s = session()
     url_2 = []
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
@@ -775,7 +799,10 @@ def theathletic_scraper():
         except:
             date = datetime.strptime('20230215', "%Y%m%d")
             
-        delta = datetime.now() - date
+        try:
+            delta = datetime.now() - date
+        except:
+            delta = 5
         if delta < timedelta(days=3):
             my_date = date.strftime("%Y, %m, %d")
             link = res.url
@@ -786,7 +813,6 @@ def theathletic_scraper():
             break
 
 def apnews_scraper():
-    s = session()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -822,7 +848,10 @@ def apnews_scraper():
                 except:
                     date = datetime.strptime('20230215', "%Y%m%d")
             
-                delta = datetime.now() - date
+                try:
+                    delta = datetime.now() - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     header = post.select_one('h2').text
@@ -835,7 +864,6 @@ def apnews_scraper():
                 pass
 
 def mlb_scraper():
-    s = session()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -871,7 +899,10 @@ def mlb_scraper():
                 except:
                     date = datetime.strptime('20230215', "%Y%m%d")
             
-                delta = datetime.now() - date
+                try:
+                    delta = datetime.now() - date
+                except:
+                    delta = 5
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     header = post.select_one('h1').text.strip()
