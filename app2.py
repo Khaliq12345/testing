@@ -110,7 +110,7 @@ def main():
 st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
 st.title("Latest News Extractor")
 st.warning('Please click on the scrape button to refresh the page, especially if you have just loaded it. The displayed data may have been removed or finalized.')
-
+st.
 scrape_button = st.button('Scrape')
 if scrape_button:
     for key in st.session_state.keys():
@@ -126,6 +126,8 @@ if 'data1' not in st.session_state:
         st.session_state['data2'] = df2
     except:
         st.warning('The scraper has no scraped data to display. Click on the scrape to display the latest news.', icon="⚠️")
+total_data = len(st.session_state['data1'])
+st.subheader(f'Total Data to be processed: {total_data}')
 
 if st.session_state['data1'].empty:
     st.subheader('No more recent Aticles')
@@ -168,7 +170,7 @@ if deselect_all_button:
     st.session_state["default_checkbox_value"] = False
 
 selected_rows = []
-for index, row in st.session_state['data1'][:30].iterrows():
+for index, row in st.session_state['data1'][:40].iterrows():
     row_container = st.container()
     col1, col2, col3, col4, col5 = row_container.columns([5, 3, 2, 2, 2])
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
