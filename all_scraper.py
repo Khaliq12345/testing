@@ -971,10 +971,10 @@ def mlb_scraper():
                     my_date = date.strftime("%Y, %m, %d")
                     header = post.select_one('h1').text.strip()
                     try:
-                        sentence = post.select_one('p').text.replace('  ', '').replace('\n', '').split('.')
+                        sentence = post.select_one('p').text.replace('  ', '').replace('\n', ' ').split('.')
                         sentence = sentence[0]
                     except:
-                        sentence = post.select_one('p').text.replace('  ', '').replace('\n', '')
+                        sentence = post.select_one('p').text.replace('  ', '').replace('\n', ' ')
                     link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
                     
                     add_up(data, url, link, header, sentence, my_date, author)
