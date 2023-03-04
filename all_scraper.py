@@ -288,7 +288,7 @@ def nj_scraper():
                         sentence = post.select_one('.article__paragraph article__paragraph--left').text.replace('\n', ' ').split('.')
                         sentence = sentence[0]
                     except:
-                        sentence = post.select_one('.article__paragraph article__paragraph--left').text.replace('\n', ' ')
+                        sentence = post.select_one('.article__paragraph.article__paragraph--left').text.replace('\n', ' ')
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
