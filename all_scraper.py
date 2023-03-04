@@ -682,7 +682,6 @@ def insider_scraper():
                     pass
 
 def tampabay_scraper():
-    url_2 = []
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -714,22 +713,18 @@ def tampabay_scraper():
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     post_link = 'https://www.tampabay.com' + post.select_one('.headline a')['href']
-                    url_2.append(post_link)
-
-    for u in url_2:
-        res = s.get(u)
-        soup = BeautifulSoup(res.text, 'lxml')
-        header = soup.select_one('h1').text
-        try:
-            sentence = soup.select_one('.article__summary').text.split('.')
-            sentence = sentence[0]
-        except:
-            sentence = soup.select_one('.article__summary').text
-        link = res.url
-        add_up(data, url, link, header, sentence, my_date)
+                    res = s.get(post_link)
+                    soup = BeautifulSoup(res.text, 'lxml')
+                    header = soup.select_one('h1').text
+                    try:
+                        sentence = soup.select_one('.article__summary').text.split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = soup.select_one('.article__summary').text
+                    link = res.url
+                    add_up(data, url, link, header, sentence, my_date)
 
 def sporting_news():
-    url_2 = []
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -749,33 +744,29 @@ def sporting_news():
             posts = soup.select('.list-item')
             for post in posts:
                 post_link = 'https://www.sportingnews.com' + post.select_one('.list-item__title a')['href']
-                url_2.append(post_link)
-
-    for u in url_2:
-        res = s.get(u)
-        soup = BeautifulSoup(res.text, 'lxml')
-        header = soup.select_one('h1').text.strip()
-        try:
-            sentence = soup.select_one('p').text.strip().split('.')
-            sentence = sentence[0]
-        except:
-            sentence = soup.select_one('p').text.strip()
-        try:
-            date = soup.select_one('time')['datetime']
-            date =  datetime.fromisoformat(date).replace(tzinfo=None)
-        except:
-            date = datetime.strptime('20230215', "%Y%m%d")
-            
-        try:
-            delta = datetime.now() - date
-        except:
-            delta = 5
-        if delta < timedelta(days=3):
-            my_date = date.strftime("%Y, %m, %d")
-            link = res.url
-            add_up(data, url, link, header, sentence, my_date)
-        else:
-            break
+                res = s.get(post_link)
+                soup = BeautifulSoup(res.text, 'lxml')
+                header = soup.select_one('h1').text.strip()
+                try:
+                    sentence = soup.select_one('p').text.strip().split('.')
+                    sentence = sentence[0]
+                except:
+                    sentence = soup.select_one('p').text.strip()
+                try:
+                    date = soup.select_one('time')['datetime']
+                    date =  datetime.fromisoformat(date).replace(tzinfo=None)
+                except:
+                    date = datetime.strptime('20230215', "%Y%m%d")                    
+                try:
+                    delta = datetime.now() - date
+                except:
+                    delta = 5
+                if delta < timedelta(days=3):
+                    my_date = date.strftime("%Y, %m, %d")
+                    link = res.url
+                    add_up(data, url, link, header, sentence, my_date)
+                else:
+                    break
 
 def northjersey_scraper():
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
@@ -824,7 +815,6 @@ def northjersey_scraper():
                     break
 
 def theathletic_scraper():
-    url_2 = []
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -844,33 +834,30 @@ def theathletic_scraper():
             posts = soup.select('.sc-95dc7848-0')
             for post in posts:
                 post_link = post.select_one('a')['href']
-                url_2.append(post_link)
-
-    for u in url_2:
-        res = s.get(u)
-        soup = BeautifulSoup(res.text, 'lxml')
-        try:
-            date = soup.select_one('.sc-294a6039-3.kpapNT').text
-            date = datetime.strptime(date, "%b %d, %Y")
-        except:
-            date = datetime.strptime('20230215', "%Y%m%d")
-            
-        try:
-            delta = datetime.now() - date
-        except:
-            delta = 5
-        if delta < timedelta(days=3):
-            my_date = date.strftime("%Y, %m, %d")
-            link = res.url
-            header = soup.select_one('h1').text.strip()
-            try:
-                sentence = soup.select_one('.bodytext1').text.strip().split('.')
-                sentence = sentence[0]
-            except:
-                sentence = soup.select_one('.bodytext1').text.strip()
-            add_up(data, url, link, header, sentence, my_date)
-        else:
-            break
+                res = s.get(post_link)
+                soup = BeautifulSoup(res.text, 'lxml')
+                try:
+                    date = soup.select_one('.sc-294a6039-3.kpapNT').text
+                    date = datetime.strptime(date, "%b %d, %Y")
+                except:
+                    date = datetime.strptime('20230215', "%Y%m%d")
+                    
+                try:
+                    delta = datetime.now() - date
+                except:
+                    delta = 5
+                if delta < timedelta(days=3):
+                    my_date = date.strftime("%Y, %m, %d")
+                    link = res.url
+                    header = soup.select_one('h1').text.strip()
+                    try:
+                        sentence = soup.select_one('.bodytext1').text.strip().split('.')
+                        sentence = sentence[0]
+                    except:
+                        sentence = soup.select_one('.bodytext1').text.strip()
+                    add_up(data, url, link, header, sentence, my_date)
+                else:
+                    break
 
 def apnews_scraper():
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
