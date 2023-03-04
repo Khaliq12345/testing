@@ -87,6 +87,7 @@ def delete_rows(selected_rows):
         if index in selected_rows:
             st.session_state['data1'] = st.session_state['data1'].drop(index)
             st.session_state['data2'] = st.session_state['data2'].drop(index)
+    st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
 
 def add_rows_to_new_database(selected_rows):
@@ -102,6 +103,7 @@ def add_rows_to_new_database(selected_rows):
         if index in selected_rows:
             st.session_state['data1'] = st.session_state['data1'].drop(index)
             st.session_state['data2'] = st.session_state['data2'].drop(index)
+    st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
 
 def main():
