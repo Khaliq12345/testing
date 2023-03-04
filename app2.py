@@ -122,8 +122,8 @@ if 'data1' not in st.session_state:
     try:
         df1 = pd.read_csv("temp_database.csv")
         df2 = pd.read_csv("temp_database.csv")
-        st.session_state['data1'] = df1[:30]
-        st.session_state['data2'] = df2[:30]
+        st.session_state['data1'] = df1
+        st.session_state['data2'] = df2
     except:
         st.warning('The scraper has no scraped data to display. Click on the scrape to display the latest news.', icon="⚠️")
 
@@ -168,7 +168,7 @@ if deselect_all_button:
     st.session_state["default_checkbox_value"] = False
 
 selected_rows = []
-for index, row in st.session_state['data1'].iterrows():
+for index, row in st.session_state['data1'][:30].iterrows():
     row_container = st.container()
     col1, col2, col3, col4, col5 = row_container.columns([5, 3, 2, 2, 2])
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
