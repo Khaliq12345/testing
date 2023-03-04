@@ -180,25 +180,25 @@ for index, row in st.session_state['data1'][:40].iterrows():
         selected_rows.append(index)
 
     if "Twit($)ter" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", "").strip().replace('  ', ''), height=150)
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", "").strip(), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
     elif "Face($)book" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip().replace('  ', ''), height=150)
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("Facebook")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
     elif "I($)G" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("I($)G", "").strip().replace('  ', ''), height=150)
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("I($)G", "").strip(), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("IG")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
     elif "Linked($)in" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Linked($)in", "").strip().replace('  ', ''), height=150)
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Linked($)in", "").strip(), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("Linkedin")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
