@@ -795,21 +795,22 @@ def northjersey_scraper():
                 except:
                     date = post['publishdate']
                     date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S %z %Z").replace(tzinfo=None)
-            
+
                 try:
                     delta = datetime.now() - date
                 except:
                     delta = 5
                 if delta < timedelta(days=3):
+                    link = post['url']
+                    res = s.get(link)
+                    soup = BeautifulSoup(res.text, 'lxml')
+                    header = soup.select_one('h1').text
                     my_date = date.strftime("%Y, %m, %d")
-                    header = post['title']
                     try:
-                        sentence = post['descripton'].split('.')
+                        sentence = soup.select_one('.gnt_ar_b_p').text.split('.')
                         sentence = sentence[0]
                     except:
                         sentence = post['descripton']
-                    link = post['url']
-                    
                     add_up(data, url, link, header, sentence, my_date)
                 else:
                     break
