@@ -127,7 +127,7 @@ if 'data1' not in st.session_state:
     except:
         st.warning('The scraper has no scraped data to display. Click on the scrape to display the latest news.', icon="⚠️")
 total_data = len(st.session_state['data1'])
-st.subheader(f'Total Data to be processed: {total_data}')
+st.subheader(f'Total Posts to be processed: {total_data}')
 
 if st.session_state['data1'].empty:
     st.subheader('No more recent Aticles')
