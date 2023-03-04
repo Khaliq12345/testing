@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+from requests import session
 from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime, timedelta
