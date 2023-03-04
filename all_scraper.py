@@ -153,6 +153,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
     item_list.append(item)
 
 def nytimes_scraper():
+    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -197,6 +198,7 @@ def nytimes_scraper():
         pass
         
 def forbes_scraper():
+    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -237,6 +239,7 @@ def forbes_scraper():
         pass
 
 def nj_scraper():
+    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -275,6 +278,7 @@ def nj_scraper():
                     pass
 
 def fangraph_scraper():
+    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -314,6 +318,7 @@ def fangraph_scraper():
                     pass
 
 def cbs_sports_scraper():
+    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -361,6 +366,7 @@ def cbs_sports_scraper():
                     pass
 
 def ringer_scraper():
+    s = session()
     today = datetime.now().date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -399,6 +405,7 @@ def ringer_scraper():
                     pass
 
 def sportsbusinessjournal_scraper():
+    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -437,6 +444,7 @@ def sportsbusinessjournal_scraper():
                     pass
 
 def yahoo_scraper():
+    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -483,6 +491,7 @@ def yahoo_scraper():
                     pass
 
 def nypost_scraper():
+    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -519,6 +528,7 @@ def nypost_scraper():
                     pass
 
 def foxsports_scraper():
+    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -569,6 +579,7 @@ def foxsports_scraper():
                     pass
 
 def insider_scraper():
+    s = session()
     today = datetime.now()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -607,6 +618,7 @@ def insider_scraper():
                     pass
 
 def tampabay_scraper():
+    s = session()
     url_2 = []
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
@@ -647,6 +659,7 @@ def tampabay_scraper():
         add_up(data, url, link, header, sentence, my_date)
 
 def sporting_news():
+    s = session()
     url_2 = []
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
@@ -689,6 +702,7 @@ def sporting_news():
             break
 
 def northjersey_scraper():
+    s = session()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -728,6 +742,7 @@ def northjersey_scraper():
                     break
 
 def theathletic_scraper():
+    s = session()
     url_2 = []
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
@@ -770,6 +785,7 @@ def theathletic_scraper():
             break
 
 def apnews_scraper():
+    s = session()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -818,6 +834,7 @@ def apnews_scraper():
                 pass
 
 def mlb_scraper():
+    s = session()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -871,7 +888,6 @@ class NewsScraper:
     def scrapers():
         post_item_list.clear()
         item_list.clear()
-        s = session()
         nytimes_scraper()
         forbes_scraper()
         nj_scraper()
