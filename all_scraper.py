@@ -803,7 +803,7 @@ def northjersey_scraper():
                         delta = timedelta(days=5)
                     if delta < timedelta(days=3):
                         link = post['url']
-                        res = s.get(link)
+                        res = requests.get(link)
                         soup = BeautifulSoup(res.text, 'lxml')
                         header = soup.select_one('h1').text
                         my_date = date.strftime("%Y, %m, %d")
