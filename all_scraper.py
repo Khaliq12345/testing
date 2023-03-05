@@ -187,7 +187,7 @@ def nytimes_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = 'https://www.nytimes.com' + link_date
                     header = post.select_one('h2').text
@@ -233,7 +233,7 @@ def forbes_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = post.select_one('.stream-item__title')['href']
                     header = post.select_one('.stream-item__title').text
@@ -280,7 +280,7 @@ def nj_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = post.select_one('a.river-item__headline-link')['href']
                     header = post.select_one('h2').text
@@ -326,7 +326,7 @@ def fangraph_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     header = post.select_one('h2').text
@@ -378,7 +378,7 @@ def cbs_sports_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = post.select_one('a')['href']
                     link = 'https://www.cbssports.com' + link
@@ -423,7 +423,7 @@ def ringer_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     header = post.select_one('h2').text
@@ -468,7 +468,7 @@ def sportsbusinessjournal_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     header = post.select_one('h2').text
@@ -521,7 +521,7 @@ def yahoo_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = post.select_one('h4 a')['href']
                     header = post.select_one('h4').text
@@ -564,7 +564,7 @@ def nypost_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = post.select_one('a')['href']
                     header = post.select_one('h3').text.strip()
@@ -621,7 +621,7 @@ def foxsports_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = post['href']
                     link = 'https://www.foxsports.com' + link
@@ -666,7 +666,7 @@ def insider_scraper():
                 try:
                     delta = today - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     link = post.select_one('h2 a')['href']
                     link = 'https://www.insider.com' + link
@@ -709,7 +709,7 @@ def tampabay_scraper():
                 try:
                     delta = datetime.now(eastern_tz).date() - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     post_link = 'https://www.tampabay.com' + post.select_one('.headline a')['href']
@@ -760,7 +760,7 @@ def sporting_news():
                 try:
                     delta = datetime.now(eastern_tz).date() - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     link = res.url
@@ -798,7 +798,7 @@ def northjersey_scraper():
                     try:
                         delta = datetime.now(eastern_tz).date() - date
                     except:
-                        delta = 5
+                        delta = timedelta(days=5)
                     if delta < timedelta(days=3):
                         link = post['url']
                         res = s.get(link)
@@ -835,7 +835,7 @@ def theathletic_scraper():
             soup = BeautifulSoup(response.text, 'lxml')
             posts = soup.select('.MuiTypography-root.MuiLink-root.MuiLink-underlineNone.MuiTypography-colorInherit')
             for post in posts:
-                post_link = post['href']
+                post_link = post_link = post['href']
                 res = s.get(post_link)
                 soup = BeautifulSoup(res.text, 'lxml')
                 try:
@@ -847,7 +847,7 @@ def theathletic_scraper():
                 try:
                     delta = datetime.now(eastern_tz).date() - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     link = res.url
@@ -900,7 +900,7 @@ def apnews_scraper():
                 try:
                     delta = datetime.now(eastern_tz).date() - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     header = post.select_one('h2').text
@@ -955,7 +955,7 @@ def mlb_scraper():
                 try:
                     delta = datetime.now(eastern_tz).date() - date
                 except:
-                    delta = 5
+                    delta = timedelta(days=5)
                 if delta < timedelta(days=3):
                     my_date = date.strftime("%Y, %m, %d")
                     header = post.select_one('h1').text.strip()
@@ -971,7 +971,7 @@ def mlb_scraper():
             else:
                 pass
 
-
+     
 class NewsScraper:
     @staticmethod
     def scrapers():
