@@ -74,9 +74,11 @@ def create_database():
     info, post = scraper.scrapers()
     df_info = pd.DataFrame(info)
     df_post = pd.DataFrame(post)
-    st.dataframe(df_post)
-    clean_post = delete_blacklisted(df_post)
-    clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
+    try:
+        clean_post = delete_blacklisted(df_post)
+        clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
+    except:
+        st.info('No more recent articles')
 
 def delete_rows(selected_rows):
     engine = st.session_state['engine']
