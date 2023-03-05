@@ -154,7 +154,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
     item_list.append(item)
 
 def nytimes_scraper():
-    today = datetime.now()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -204,7 +204,7 @@ def nytimes_scraper():
         pass
         
 def forbes_scraper():
-    today = datetime.now()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -224,10 +224,10 @@ def forbes_scraper():
             for post in posts:
                 date = post['data-date']
                 try:
-                    date = datetime.fromtimestamp(int(date) / 1000.0)
+                    date = datetime.fromtimestamp(int(date) / 1000.0).date()
                     my_date = date.strftime("%Y, %m, %d")
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
                     my_date = date.strftime("%Y, %m, %d")
                     
                 try:
@@ -250,7 +250,7 @@ def forbes_scraper():
         pass
 
 def nj_scraper():
-    today = datetime.now()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -271,10 +271,10 @@ def nj_scraper():
             for post in posts:
                 date = post.select_one('time')['datetime']
                 try:
-                    date = datetime.fromtimestamp(int(date))
+                    date = datetime.fromtimestamp(int(date)).date()
                     my_date = date.strftime("%Y, %m, %d")
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
                     my_date = date.strftime("%Y, %m, %d")           
 
                 try:
@@ -285,17 +285,17 @@ def nj_scraper():
                     link = post.select_one('a.river-item__headline-link')['href']
                     header = post.select_one('h2').text
                     try:
-                        sentence = post.select_one('.river-item__summary').text.replace('\n', ' ').split('.')
+                        sentence = post.select_one('.river-item__summary').text.replace('\n', ' ') .split('.')
                         sentence = sentence[0]
                     except:
-                        sentence = post.select_one('.river-item__summary').text.replace('\n', ' ')
+                        sentence = post.select_one('p').text
 
                     add_up(data, url, link, header, sentence, my_date)
                 else:
                     pass
 
 def fangraph_scraper():
-    today = datetime.now()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -317,10 +317,10 @@ def fangraph_scraper():
                 meta = post.select_one('.postmeta_author')
                 date = meta.find_next_sibling().text
                 try:
-                    date = datetime.strptime(date, "%B %d, %Y")
+                    date = datetime.strptime(date, "%B %d, %Y").date()
                     my_date = date.strftime("%Y, %m, %d")
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
                     my_date = date.strftime("%Y, %m, %d")             
 
                 try:
@@ -341,7 +341,7 @@ def fangraph_scraper():
                     pass
 
 def cbs_sports_scraper():
-    today = datetime.now()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -366,14 +366,14 @@ def cbs_sports_scraper():
                         date = today - timedelta(hours=int(date.replace('H ago', '')))
                         my_date = date.strftime("%Y, %m, %d")
                     except:
-                        date = datetime.strptime('20230215', "%Y%m%d")
+                        date = datetime.strptime('20230215', "%Y%m%d").date()
                         my_date = date.strftime("%Y, %m, %d")
                 elif 'D' in date:
                     try:
                         date = today - timedelta(days=int(date.replace('D ago', '')))
                         my_date = date.strftime("%Y, %m, %d")
                     except:
-                        date = datetime.strptime('20230215', "%Y%m%d")
+                        date = datetime.strptime('20230215', "%Y%m%d").date()
                         my_date = date.strftime("%Y, %m, %d")       
                 try:
                     delta = today - date
@@ -393,7 +393,7 @@ def cbs_sports_scraper():
                     pass
 
 def ringer_scraper():
-    today = datetime.now().date()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -438,7 +438,7 @@ def ringer_scraper():
                     pass
 
 def sportsbusinessjournal_scraper():
-    today = datetime.now()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -459,10 +459,10 @@ def sportsbusinessjournal_scraper():
             for post in posts:
                 date = post.select('span')[-1].text
                 try:
-                    date = datetime.strptime(date, "%A, %B %d, %Y")
+                    date = datetime.strptime(date, "%A, %B %d, %Y").date()
                     my_date = date.strftime("%Y, %m, %d")
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
                     my_date = date.strftime("%Y, %m, %d")           
 
                 try:
@@ -483,7 +483,7 @@ def sportsbusinessjournal_scraper():
                     pass
 
 def yahoo_scraper():
-    today = datetime.now()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -508,14 +508,14 @@ def yahoo_scraper():
                         date = today - timedelta(hours=int(date.replace('h ago', '')))
                         my_date = date.strftime("%Y, %m, %d")
                     except:
-                        date = datetime.strptime('20230215', "%Y%m%d")
+                        date = datetime.strptime('20230215', "%Y%m%d").date()
                         my_date = date.strftime("%Y, %m, %d")
                 elif 'd' in date:
                     try:
                         date = today - timedelta(days=int(date.replace('d ago', '')))
                         my_date = date.strftime("%Y, %m, %d")
                     except:
-                        date = datetime.strptime('20230215', "%Y%m%d")
+                        date = datetime.strptime('20230215', "%Y%m%d").date()
                         my_date = date.strftime("%Y, %m, %d")       
 
                 try:
@@ -536,7 +536,7 @@ def yahoo_scraper():
                     pass
 
 def nypost_scraper():
-    today = datetime.now()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -555,10 +555,10 @@ def nypost_scraper():
             for post in posts:
                 date = post.select_one('span').text.split('|')[0].strip()
                 try:
-                    date = datetime.strptime(date, "%B %d, %Y")
+                    date = datetime.strptime(date, "%B %d, %Y").date()
                     my_date = date.strftime("%Y, %m, %d")
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
                     my_date = date.strftime("%Y, %m, %d")             
 
                 try:
@@ -580,7 +580,7 @@ def nypost_scraper():
                     pass
 
 def foxsports_scraper():
-    today = datetime.now()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -604,17 +604,17 @@ def foxsports_scraper():
                         date = today - timedelta(hours=int(date[0]))
                         my_date = date.strftime("%Y, %m, %d")
                     except:
-                        date = datetime.strptime('20230215', "%Y%m%d")
+                        date = datetime.strptime('20230215', "%Y%m%d").date()
                         my_date = date.strftime("%Y, %m, %d")
                 elif 'D' in date:
                     try:
                         date = today - timedelta(days=int(date[0]))
                         my_date = date.strftime("%Y, %m, %d")
                     except:
-                        date = datetime.strptime('20230215', "%Y%m%d")
+                        date = datetime.strptime('20230215', "%Y%m%d").date()
                         my_date = date.strftime("%Y, %m, %d")
                 else:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
                     my_date = date.strftime("%Y, %m, %d")
 
 
@@ -637,7 +637,7 @@ def foxsports_scraper():
                     pass
 
 def insider_scraper():
-    today = datetime.now()
+    today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
@@ -657,10 +657,10 @@ def insider_scraper():
             for post in posts:
                 date = post.select_one('.tout-timestamp').text.strip()
                 try:
-                    date = datetime.fromisoformat(date[:-1])
+                    date = datetime.fromisoformat(date[:-1]).date()
                     my_date = date.strftime("%Y, %m, %d")
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
                     my_date = date.strftime("%Y, %m, %d")             
 
                 try:
@@ -702,12 +702,12 @@ def tampabay_scraper():
             for post in posts:
                 try:
                     date = post.select_one('.timestamp span')['title']
-                    date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ')
+                    date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').date()
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
                     
                 try:
-                    delta = datetime.now() - date
+                    delta = datetime.now(eastern_tz).date() - date
                 except:
                     delta = 5
                 if delta < timedelta(days=3):
@@ -754,11 +754,11 @@ def sporting_news():
                     sentence = soup.select_one('p').text.strip()
                 try:
                     date = soup.select_one('time')['datetime']
-                    date =  datetime.fromisoformat(date).replace(tzinfo=None)
+                    date =  datetime.fromisoformat(date).replace(tzinfo=None).date()
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")                    
+                    date = datetime.strptime('20230215', "%Y%m%d").date()                    
                 try:
-                    delta = datetime.now() - date
+                    delta = datetime.now(eastern_tz).date() - date
                 except:
                     delta = 5
                 if delta < timedelta(days=3):
@@ -785,35 +785,36 @@ def northjersey_scraper():
             }
             response = s.get(url,  headers=headers)
             soup = BeautifulSoup(response.text, 'lxml')
-            posts = soup.select('promo-story-thumb-small')
-            latest_post = soup.select_one('lit-story-thumb-large')
-            posts.append(latest_post)
-            for post in posts:
+            posts = soup.select_one('.articles').find_all_next()[:20]
+            for post in posts[:20]:
                 try:
-                    date = post['date-published']
-                    date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S %z %Z").replace(tzinfo=None)
-                except:
-                    date = post['publishdate']
-                    date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S %z %Z").replace(tzinfo=None)
-
-                try:
-                    delta = datetime.now() - date
-                except:
-                    delta = 5
-                if delta < timedelta(days=3):
-                    link = post['url']
-                    res = s.get(link)
-                    soup = BeautifulSoup(res.text, 'lxml')
-                    header = soup.select_one('h1').text
-                    my_date = date.strftime("%Y, %m, %d")
                     try:
-                        sentence = soup.select_one('.gnt_ar_b_p').text.split('.')
-                        sentence = sentence[0]
+                        date = post['date-published']
+                        date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S %z %Z").replace(tzinfo=None).date()
                     except:
-                        sentence = post['descripton']
-                    add_up(data, url, link, header, sentence, my_date)
-                else:
-                    break
+                        date = post['publishdate']
+                        date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S %z %Z").replace(tzinfo=None).date()
+                
+                    try:
+                        delta = datetime.now(eastern_tz).date() - date
+                    except:
+                        delta = 5
+                    if delta < timedelta(days=3):
+                        link = post['url']
+                        res = s.get(link)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        header = soup.select_one('h1').text
+                        my_date = date.strftime("%Y, %m, %d")
+                        try:
+                            sentence = soup.select_one('.gnt_ar_b_p').text.split('.')
+                            sentence = sentence[0]
+                        except:
+                            sentence = post['descripton']
+                        add_up(data, url, link, header, sentence, my_date)
+                    else:
+                        break
+                except:
+                    pass
 
 def theathletic_scraper():
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
@@ -832,19 +833,19 @@ def theathletic_scraper():
             }
             response = s.get(url,  headers=headers)
             soup = BeautifulSoup(response.text, 'lxml')
-            posts = soup.select('.sc-95dc7848-0')
+            posts = soup.select('.MuiTypography-root.MuiLink-root.MuiLink-underlineNone.MuiTypography-colorInherit')
             for post in posts:
                 post_link = post.select_one('a')['href']
                 res = s.get(post_link)
                 soup = BeautifulSoup(res.text, 'lxml')
                 try:
                     date = soup.select_one('.sc-294a6039-3.kpapNT').text
-                    date = datetime.strptime(date, "%b %d, %Y")
+                    date = datetime.strptime(date, "%b %d, %Y").date()
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
                     
                 try:
-                    delta = datetime.now() - date
+                    delta = datetime.now(eastern_tz).date() - date
                 except:
                     delta = 5
                 if delta < timedelta(days=3):
@@ -892,12 +893,12 @@ def apnews_scraper():
             if author.upper() in post.text:
                 try:
                     date = post.select_one('.Timestamp')['data-source']
-                    date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ")
+                    date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").date()
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
             
                 try:
-                    delta = datetime.now() - date
+                    delta = datetime.now(eastern_tz).date() - date
                 except:
                     delta = 5
                 if delta < timedelta(days=3):
@@ -947,12 +948,12 @@ def mlb_scraper():
             if author in post.text:
                 try:
                     date = post.select_one('.article-item__contributor-date')['data-date']
-                    date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ").date()
                 except:
-                    date = datetime.strptime('20230215', "%Y%m%d")
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
             
                 try:
-                    delta = datetime.now() - date
+                    delta = datetime.now(eastern_tz).date() - date
                 except:
                     delta = 5
                 if delta < timedelta(days=3):
@@ -962,13 +963,14 @@ def mlb_scraper():
                         sentence = post.select_one('p').text.replace('  ', '').replace('\n', ' ').split('.')
                         sentence = sentence[0]
                     except:
-                        sentence = post.select_one('p').text.replace('  ', '').replace('\n', ' ')
+                        sentence = post.select_one('p').text.replace('  ', '').replace('\n', '')
                     link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
                     
                     add_up(data, url, link, header, sentence, my_date, author)
                     break
             else:
                 pass
+
 
 class NewsScraper:
     @staticmethod
