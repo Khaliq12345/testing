@@ -78,7 +78,9 @@ def create_database():
         clean_post = delete_blacklisted(df_post)
         clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
     except:
-        st.info('No more recent articles')
+        no_data_df = pd.DataFrame(columns=['Text', 'Date', 'Post Link', 'Post key'])
+        clean_post = delete_blacklisted(no_data_df)
+        clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later  
 
 def delete_rows(selected_rows):
     engine = st.session_state['engine']
