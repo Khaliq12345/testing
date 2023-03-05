@@ -835,7 +835,7 @@ def theathletic_scraper():
             soup = BeautifulSoup(response.text, 'lxml')
             posts = soup.select('.MuiTypography-root.MuiLink-root.MuiLink-underlineNone.MuiTypography-colorInherit')
             for post in posts:
-                post_link = post.select_one('a')['href']
+                post_link = post['href']
                 res = s.get(post_link)
                 soup = BeautifulSoup(res.text, 'lxml')
                 try:
