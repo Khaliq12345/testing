@@ -993,8 +993,8 @@ class NewsScraper:
         #insider_scraper()
         #tampabay_scraper()
         #sporting_news()
-        ##northjersey_scraper()
-        theathletic_scraper()
+        northjersey_scraper()
+        ##theathletic_scraper()
         #apnews_scraper()
         #mlb_scraper()
 
