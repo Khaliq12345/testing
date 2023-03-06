@@ -808,10 +808,11 @@ def northjersey_scraper():
                         header = soup.select_one('h1').text
                         my_date = date.strftime("%Y, %m, %d")
                         try:
-                            sentence = soup.select_one('.gnt_ar_b_p').text.split('.')
-                            sentence = sentence[0]
+                            sentence = soup.select_one('.gnt_ar_b_p').text.split('FLA.', '')
+                            sentence = sentence.split('.')
+                            sentence = sentence[0]                          
                         except:
-                            sentence = post['descripton']
+                            sentence = post['descripton'] 
                         add_up(data, url, link, header, sentence, my_date)
                     else:
                         break
