@@ -932,7 +932,7 @@ def mlb_scraper():
     response = s.get('https://www.mlb.com/news',  headers=headers)
     soup = BeautifulSoup(response.text, 'lxml')
     author_names = ['David Adler', 'Bill Ladson', 'Sarah Langs', 'Andrew Simon', 'Betelhem Ashame', 'Elizabeth Muratore', 'Mark Feinsand',
-                    'Mike Lupica', 'Mike Petriello', 'Nathalie Alonso', 'Anthony DiComo', 'Bryan Hoch']
+                    'Mike Lupica', 'Mike Petriello', 'Nathalie Alonso']
     all_author = []
     for author_n in author_names:
         if author_n in soup.text:
@@ -949,7 +949,7 @@ def mlb_scraper():
         for post in posts:
             if author in post.text:
                 try:
-                    date = post.select_one('.article-item__contributor-date')['data-date']
+                    date = post.select_one('.article-item__contributor-date')['data-date'].text.strip()
                     date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ").date()
                 except:
                     date = datetime.strptime('20230215', "%Y%m%d").date()
@@ -969,9 +969,54 @@ def mlb_scraper():
                     link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
                     
                     add_up(data, url, link, header, sentence, my_date, author)
-                    break
             else:
                 pass
+
+def mlb_extra_scraper():
+    s = session()
+    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+    engine = engine
+    conn = engine.connect()
+    query = text('SELECT * FROM articles')
+    data = pd.read_sql_query(query, conn)
+    urls = ['https://www.mlb.com/yankees/news', 'https://www.mlb.com/mets/news']
+    authors = ['Bryan Hoch', 'Anthony DiComo']
+    for url in urls:
+        ua = get_random_user_agent()
+        headers = {
+            'User-Agent': ua
+        }
+        response = s.get(url,  headers=headers)
+        soup = BeautifulSoup(response.text, 'lxml')
+        posts = soup.select('article')
+        for post in posts:
+            for author in authors:
+                if author in post.text:
+                    try:
+                        date = post.select_one('.article-item__contributor-date').text.strip()
+                        date = datetime.strptime(date,"%B %d, %Y").date()
+                    except:
+                        date = datetime.strptime('20230215', "%Y%m%d").date()
+                
+                    try:
+                        delta = datetime.now(eastern_tz).date() - date
+                    except:
+                        delta = timedelta(days=5)
+                    if delta < timedelta(days=3):
+                        my_date = date.strftime("%Y, %m, %d")
+                        header = post.select_one('h1').text.strip()
+                        sentence = post.select_one('p').text.split('Fla.')[-1].replace('--', '')
+                        try:
+                            sentence = sentence.replace('  ', '').replace('\n', ' ').split('.')
+                            sentence = sentence[0]
+                        except:
+                            sentence = post.select_one('p').text.replace('  ', '').replace('\n', '')
+                        link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
+                        add_up(data, url, link, header, sentence, my_date, author)
+                else:
+                    pass 
+
+
 
      
 class NewsScraper:
@@ -997,5 +1042,6 @@ class NewsScraper:
         #theathletic_scraper()
         #apnews_scraper()
         mlb_scraper()
+        mlb_extra_scraper()
 
         return item_list, post_item_list
