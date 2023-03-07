@@ -1286,9 +1286,9 @@ class NewsScraper:
         # mlb_extra_scraper()
         courant_scraper()
         #wsj_scraper()
-        #si_scraper()
-        #sny_scraper()
-        #newsday_scraper()
+        si_scraper()
+        sny_scraper()
+        newsday_scraper()
         
 
         return item_list, post_item_list
