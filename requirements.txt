@@ -14,3 +14,4 @@ gspread-dataframe
 google
 pydrive
 playwright
+cloudscraper
