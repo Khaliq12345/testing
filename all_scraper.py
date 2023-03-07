@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from latest_user_agents import get_random_user_agent
 from sqlalchemy import create_engine, text
 import pytz
+import cloudscraper
 eastern_tz = pytz.timezone('US/Eastern')
 os.system("playwright install chromium")
 
