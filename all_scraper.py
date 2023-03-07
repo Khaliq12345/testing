@@ -1037,7 +1037,8 @@ def courant_scraper():
             }
             response = requests.get(url, headers=headers)
             soup = BeautifulSoup(response.text, 'lxml')
-            posts = soup.select('article')
+            posts_table = soup.select_one('.author-stories-feed')
+            posts = posts_table.select('article')
             for post in posts:
                 date = post.select_one('time').text.split('at')[0].strip()
                 try:
