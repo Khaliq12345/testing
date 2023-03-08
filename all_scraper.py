@@ -1245,6 +1245,7 @@ def si_scraper():
             response = scraper.get(url, headers=headers)
             soup = BeautifulSoup(response.text, 'lxml')
             posts = soup.select('.l-grid--item')
+            st.text(len(posts))
             for post in posts:
                 post_link = 'https://www.si.com' + post.select_one('phoenix-super-link')['href']
                 res = scraper.get(post_link, headers=headers)
