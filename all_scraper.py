@@ -1473,9 +1473,9 @@ class NewsScraper:
         #wsj_scraper()
         #si_scraper()
         #nydailynews_scraper()
-        # si_scraper()
+        si_scraper()
         # sny_scraper()
-        newsday_scraper()
+        #newsday_scraper()
         
 
         return item_list, post_item_list
