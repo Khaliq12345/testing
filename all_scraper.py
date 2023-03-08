@@ -1047,8 +1047,8 @@ def mlb_scraper():
                 try:
                     if author in post.text:
                         try:
-                            date = post.select_one('.article-item__contributor-date')['data-date'].text.strip()
-                            date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ").date()
+                            date = post.select_one('.article-item__contributor-date')['data-date']
+                            date = datetime.fromisoformat(date.replace("Z", "+00:00")).date()
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                     
@@ -1099,8 +1099,8 @@ def mlb_extra_scraper():
                     for author in authors:
                         if author in post.text:
                             try:
-                                date = post.select_one('.article-item__contributor-date').text.strip()
-                                date = datetime.strptime(date,"%B %d, %Y").date()
+                                date = post.select_one('.article-item__contributor-date')['data-date']
+                                date = datetime.fromisoformat(date.replace("Z", "+00:00")).date()
                             except:
                                 date = datetime.strptime('20230215', "%Y%m%d").date()
                         
@@ -1415,11 +1415,11 @@ class NewsScraper:
         # northjersey_scraper()
         # theathletic_scraper()
         # apnews_scraper()
-        # mlb_scraper()
-        # mlb_extra_scraper()
+        mlb_scraper()
+        mlb_extra_scraper()
         #courant_scraper()
         #wsj_scraper()
-        si_scraper()
+        #si_scraper()
         #sny_scraper()
         #newsday_scraper()
         
