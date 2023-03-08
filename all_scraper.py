@@ -1238,9 +1238,9 @@ def si_scraper():
     data = pd.read_sql_query(query, conn)
     urls = data['Article URL'][(data['Publication Name'] == 'Sports Illustrated') & (data['Do not scrape'] == 'N')]
     urls.dropna(inplace=True)
-    st.text(urls)
     if len(urls) > 0:
         for url in urls:
+            st.text(url)
             scraper = cloudscraper.create_scraper()
             response = scraper.get(url, headers=headers)
             soup = BeautifulSoup(response.text, 'lxml')
