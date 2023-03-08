@@ -1477,8 +1477,8 @@ class NewsScraper:
         #courant_scraper()
         #wsj_scraper()
         #si_scraper()
-        #nydailynews_scraper()
-        si_scraper()
+        nydailynews_scraper()
+        #si_scraper()
         # sny_scraper()
         #newsday_scraper()
         
