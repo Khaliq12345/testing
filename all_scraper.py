@@ -1296,6 +1296,7 @@ def si_scraper():
                 }
                 scraper = cloudscraper.create_scraper(delay=5)
                 response = scraper.get(url, headers=headers)
+                st.text(response)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.l-grid--item')
                 for post in posts:
