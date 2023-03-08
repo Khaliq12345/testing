@@ -1281,8 +1281,6 @@ def nydailynews_scraper():
                 pass
             
 def si_scraper():
-    with open('si_cookies.json', 'r') as f:
-        cookies = json.load(f)
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -1297,9 +1295,12 @@ def si_scraper():
                 headers = {
                     'User-Agent': ua
                 }
-                scraper = cloudscraper.create_scraper(sess=cookies)
-                scraper = cloudscraper.create_scraper(delay=5)
-                response = scraper.get(url, headers=headers)
+                proxies = {
+                'http': 'http://172.102.218.198:6098',
+                'http': 'http://104.239.76.236:6895',
+                }
+                scraper = cloudscraper.create_scraper()
+                response = scraper.get(url, headers=headers, proxies=proxies)
                 st.text(response)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.l-grid--item')
