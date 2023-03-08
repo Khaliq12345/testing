@@ -1311,9 +1311,9 @@ def si_scraper():
                         try:
                             delta = datetime.now(eastern_tz).date() - date
                         except:
-                            delta = timedelta(days=31)
+                            delta = timedelta(days=5)
 
-                        if delta < timedelta(days=30):
+                        if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
                             link = res.url
                             header = soup.select_one('.m-detail-header--title').text
