@@ -1429,12 +1429,14 @@ def newsday_scraper():
 
                         if delta < timedelta(days=3):
                             header = post['headline'].replace('\xa0', ' ')
-                            sentence = post['body'].split('—')[-1].strip()
                             try:
+                                sentence = post['body'].split('—')[1].strip()
                                 sentence = sentence.split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = post['body'].split('—')[-1].strip()
+                                sentence = sentence.split('.')
+                                sentence = sentence[0]
                             my_date = date.strftime("%Y, %m, %d")
                             link = post['url']
                             add_up(data, url, link, header, sentence, my_date)
