@@ -12,6 +12,7 @@ import pytz
 import cloudscraper
 eastern_tz = pytz.timezone('US/Eastern')
 os.system("playwright install chromium")
+import json
 
 hostname=st.secrets['hostname']
 dbname=st.secrets['dbname']
