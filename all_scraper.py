@@ -1280,6 +1280,8 @@ def nydailynews_scraper():
                 pass
             
 def si_scraper():
+    with open('si_cookies.json', 'r') as f:
+        cookies = json.load(f)
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -1290,10 +1292,12 @@ def si_scraper():
     if len(urls) > 0:
         for url in urls:
             try:
+            try:
                 ua = get_random_user_agent()
                 headers = {
                     'User-Agent': ua
                 }
+                scraper = cloudscraper.create_scraper(sess=cookies)
                 scraper = cloudscraper.create_scraper(delay=5)
                 response = scraper.get(url, headers=headers)
                 st.text(response)
