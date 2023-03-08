@@ -1465,7 +1465,7 @@ class NewsScraper:
         # tampabay_scraper()
         # sporting_news()
         # northjersey_scraper()
-        theathletic_scraper()
+        #theathletic_scraper()
         # apnews_scraper()
         #mlb_scraper()
         #mlb_extra_scraper()
@@ -1475,7 +1475,7 @@ class NewsScraper:
         #nydailynews_scraper()
         # si_scraper()
         # sny_scraper()
-        # newsday_scraper()
+        newsday_scraper()
         
 
         return item_list, post_item_list
