@@ -1294,7 +1294,7 @@ def si_scraper():
                 headers = {
                     'User-Agent': ua
                 }
-                scraper = cloudscraper.create_scraper()
+                scraper = cloudscraper.create_scraper(delay=5)
                 response = scraper.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.l-grid--item')
@@ -1311,9 +1311,9 @@ def si_scraper():
                         try:
                             delta = datetime.now(eastern_tz).date() - date
                         except:
-                            delta = timedelta(days=31)
+                            delta = timedelta(days=5)
 
-                        if delta < timedelta(days=30):
+                        if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
                             link = res.url
                             header = soup.select_one('.m-detail-header--title').text
@@ -1325,7 +1325,6 @@ def si_scraper():
                         pass
             except:
                 pass
-
 def sny_scraper():
     def get_page_soup(url):
         with sync_playwright() as p:
