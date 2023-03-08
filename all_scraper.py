@@ -1225,6 +1225,58 @@ def wsj_scraper():
                     except:
                         pass
             except:
+               pass
+        
+def nydailynews_scraper():
+    engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
+    engine = engine
+    conn = engine.connect()
+    query = text('SELECT * FROM articles')
+    data = pd.read_sql_query(query, conn)
+    urls = data['Article URL'][(data['Publication Name'] == 'New York Daily News') & (data['Do not scrape'] == 'N')]
+    urls.dropna(inplace=True)
+    if len(urls) > 0:
+        for url in urls:
+            try:
+                s = session()
+                ua = get_random_user_agent()
+                headers = {
+                    'User-Agent': ua
+                }
+                response = s.get(url,  headers=headers)
+                soup = BeautifulSoup(response.text, 'lxml')
+                posts = soup.select('article')
+                for post in posts:
+                    try:
+                        post_link = 'https://www.nydailynews.com' + post.select_one('a')['href']
+                        res = s.get(post_link)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        try:
+                            date = soup.select_one('time')['datetime']
+                            date = datetime.strptime(date, '%Y-%m-%d %H:%M:%S').date()
+                        except:
+                            date = datetime.strptime('20230215', "%Y%m%d").date()
+                        
+                        try:
+                            delta = datetime.now(eastern_tz).date() - date
+                        except:
+                            delta = timedelta(days=5)
+                        if delta < timedelta(days=3):
+                            my_date = date.strftime("%Y, %m, %d")
+                            link = res.url
+                            header = soup.select_one('h1').text
+                            sentence = soup.select_one('article p').text.split('Fla.')[-1].replace('—', '').strip()
+                            try:
+                                sentence = sentence.split('.')
+                                sentence = sentence[0]
+                            except:
+                                sentence = sentence
+                            add_up(data, url, link, header, sentence, my_date)
+                        else:
+                            break
+                    except:
+                        pass
+            except:
                 pass
             
 def si_scraper():
@@ -1415,13 +1467,15 @@ class NewsScraper:
         # northjersey_scraper()
         # theathletic_scraper()
         # apnews_scraper()
-        mlb_scraper()
-        mlb_extra_scraper()
+        #mlb_scraper()
+        #mlb_extra_scraper()
         #courant_scraper()
         #wsj_scraper()
         #si_scraper()
-        #sny_scraper()
-        #newsday_scraper()
+        nydailynews_scraper()
+        # si_scraper()
+        # sny_scraper()
+        # newsday_scraper()
         
 
         return item_list, post_item_list
