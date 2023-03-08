@@ -1227,7 +1227,7 @@ def wsj_scraper():
             except:
                 pass
 def si_scraper():
-    print('Great')
+    st.text('Great')
     ua = get_random_user_agent()
     headers = {
         'User-Agent': ua
