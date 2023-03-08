@@ -1240,7 +1240,6 @@ def si_scraper():
     urls.dropna(inplace=True)
     if len(urls) > 0:
         for url in urls:
-            st.text(url)
             scraper = cloudscraper.create_scraper()
             response = scraper.get(url, headers=headers)
             soup = BeautifulSoup(response.text, 'lxml')
@@ -1253,6 +1252,7 @@ def si_scraper():
                     try:
                         date = soup.select_one('time')['datetime']
                         date = datetime.fromisoformat(date).date()
+                        st.text(date)
                     except:
                         date = datetime.strptime('20230215', "%Y%m%d").date()
                     try:
