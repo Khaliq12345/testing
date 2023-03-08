@@ -1226,6 +1226,7 @@ def wsj_scraper():
                         pass
             except:
                 pass
+            
 def si_scraper():
     ua = get_random_user_agent()
     headers = {
@@ -1245,31 +1246,27 @@ def si_scraper():
             soup = BeautifulSoup(response.text, 'lxml')
             posts = soup.select('.l-grid--item')
             for post in posts:
+                post_link = 'https://www.si.com' + post.select_one('phoenix-super-link')['href']
+                res = scraper.get(post_link, headers=headers)
+                soup = BeautifulSoup(res.text, 'lxml')
                 try:
-                    post_link = 'https://www.si.com' + post.select_one('phoenix-super-link')['href']
-                    res = scraper.get(post_link, headers=headers)
-                    soup = BeautifulSoup(res.text, 'lxml')
-                    try:
-                        date = soup.select_one('time')['datetime']
-                        date = datetime.fromisoformat(date).date()
-                        st.text(date)
-                    except:
-                        date = datetime.strptime('20230215', "%Y%m%d").date()
-                    try:
-                        delta = datetime.now(eastern_tz).date() - date
-                    except:
-                        delta = timedelta(days=5)
-
-                    if delta < timedelta(days=3):
-                        my_date = date.strftime("%Y, %m, %d")
-                        link = res.url
-                        header = soup.select_one('.m-detail-header--title').text
-                        sentence = soup.select_one('.m-detail--body p').text.replace('\xa0', ' ')
-                        add_up(data, url, link, header, sentence, my_date)
-                    else:
-                        break
+                    date = soup.select_one('time')['datetime']
+                    date = datetime.fromisoformat(date).date()
                 except:
-                    pass
+                    date = datetime.strptime('20230215', "%Y%m%d").date()
+                try:
+                    delta = datetime.now(eastern_tz).date() - date
+                except:
+                    delta = timedelta(days=5)
+
+                if delta < timedelta(days=3):
+                    my_date = date.strftime("%Y, %m, %d")
+                    link = res.url
+                    header = soup.select_one('.m-detail-header--title').text
+                    sentence = soup.select_one('.m-detail--body p').text.replace('\xa0', ' ')
+                    add_up(data, url, link, header, sentence, my_date)
+                else:
+                    break
 
 def sny_scraper():
     def get_page_soup(url):
