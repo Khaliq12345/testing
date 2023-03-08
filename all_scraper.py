@@ -1227,7 +1227,6 @@ def wsj_scraper():
             except:
                 pass
 def si_scraper():
-    st.text('Great')
     ua = get_random_user_agent()
     headers = {
         'User-Agent': ua
@@ -1239,6 +1238,7 @@ def si_scraper():
     data = pd.read_sql_query(query, conn)
     urls = data['Article URL'][(data['Publication Name'] == 'Sports Illustrated') & (data['Do not scrape'] == 'N')]
     urls.dropna(inplace=True)
+    st.text(urls)
     if len(urls) > 0:
         for url in urls:
             scraper = cloudscraper.create_scraper()
