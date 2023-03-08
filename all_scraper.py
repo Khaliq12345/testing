@@ -1291,7 +1291,7 @@ def si_scraper():
     urls.dropna(inplace=True)
     if len(urls) > 0:
         for url in urls:
-            try:
+        try:
             try:
                 ua = get_random_user_agent()
                 headers = {
