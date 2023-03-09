@@ -1227,7 +1227,9 @@ def wsj_scraper():
                             except:
                                 sentence = json_data['data']['summary']
                             link = json_data['data']['canonical_url']
-                            add_up(data, url, link, header, sentence, my_date)
+                            authors = json_data['data']['byline'].split('and')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
                     except:
@@ -1471,7 +1473,7 @@ class NewsScraper:
         # cbs_sports_scraper()
         # ringer_scraper()
         # sportsbusinessjournal_scraper()
-        yahoo_scraper()
+        #yahoo_scraper()
         # nypost_scraper()
         # foxsports_scraper()
         # insider_scraper()
@@ -1483,7 +1485,7 @@ class NewsScraper:
         #mlb_scraper()
         #mlb_extra_scraper()
         # courant_scraper()
-        # wsj_scraper()
+        wsj_scraper()
         #nydailynews_scraper()
         # si_scraper()
         # sny_scraper()
