@@ -212,7 +212,8 @@ for index, row in st.session_state['data1'][:40].iterrows():
     yankees_button = col3.button("Yankees", key=f'yankee_{index}')
     mets_button = col4.button("Mets", key=f'mets_{index}')
     paywall_button = col5.button('Paywall', key=f'paywall_{index}')
-    col6.info(f'Number of Bylines: {row["Number of Bylines"]}')
+    if row["Number of Bylines"] > 1:
+        col6.info(f'Number of Bylines: {row["Number of Bylines"]}')
     
     #add $ sign to the posts
     if '<$>' not in row['Text']:
