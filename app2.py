@@ -33,7 +33,7 @@ def downlaod_commited():
     conn = engine.connect()
     query = text('SELECT * FROM commit')
     df = pd.read_sql_query(query, conn)
-    df = df.drop(['Date', 'Post Link', 'Post key'], axis=1)
+    df = df.drop(['Date', 'Post Link', 'Post key', 'Number of Bylines'], axis=1)
     csv = convert_df(df)
     return csv
 
@@ -179,7 +179,7 @@ if deselect_all_button:
 selected_rows = []
 for index, row in st.session_state['data1'][:40].iterrows():
     row_container = st.container()
-    col1, col2, col3, col4, col5 = row_container.columns([5, 3, 2, 2, 2])
+    col1, col2, col3, col4, col5, col6 = row_container.columns([5, 3, 2, 2, 2, 2])
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
     if checkbox:
         selected_rows.append(index)
@@ -212,6 +212,7 @@ for index, row in st.session_state['data1'][:40].iterrows():
     yankees_button = col3.button("Yankees", key=f'yankee_{index}')
     mets_button = col4.button("Mets", key=f'mets_{index}')
     paywall_button = col5.button('Paywall', key=f'paywall_{index}')
+    col6.text(f'Number of Bylines: {row["Number of Bylines"]}')
     
     #add $ sign to the posts
     if '<$>' not in row['Text']:
