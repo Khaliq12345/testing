@@ -528,7 +528,6 @@ def sportsbusinessjournal_scraper():
                         pass
             except:
                 pass
-
 def yahoo_scraper():
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
@@ -578,8 +577,11 @@ def yahoo_scraper():
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('p').text
-
-                            add_up(data, url, link, header, sentence, my_date)
+                            response = requests.get(link)
+                            soup = BeautifulSoup(response.text, 'lxml')
+                            authors = soup.select('.caas-author-byline-collapse a')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
                     except:
