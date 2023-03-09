@@ -199,8 +199,8 @@ def nytimes_scraper():
                         try:
                             delta = today - date
                         except:
-                            delta = timedelta(days=22)
-                        if delta < timedelta(days=20):
+                            delta = timedelta(days=5)
+                        if delta < timedelta(days=3):
                             link = 'https://www.nytimes.com' + link_date
                             header = post.select_one('h2').text
                             try:
@@ -251,8 +251,8 @@ def forbes_scraper():
                         try:
                             delta = today - date
                         except:
-                            delta = timedelta(days=11)
-                        if delta < timedelta(days=10):
+                            delta = timedelta(days=5)
+                        if delta < timedelta(days=3):
                             link = post.select_one('.stream-item__title')['href']
                             header = post.select_one('.stream-item__title').text
                             try:
@@ -304,8 +304,8 @@ def nj_scraper():
                         try:
                             delta = today - date
                         except:
-                            delta = timedelta(days=11)
-                        if delta < timedelta(days=10):
+                            delta = timedelta(days=5)
+                        if delta < timedelta(days=3):
                             link = post.select_one('a.river-item__headline-link')['href']
                             header = post.select_one('h2').text
                             try:
@@ -737,8 +737,8 @@ def insider_scraper():
                         try:
                             delta = today - date
                         except:
-                            delta = timedelta(days=55)
-                        if delta < timedelta(days=50):
+                            delta = timedelta(days=5)
+                        if delta < timedelta(days=3):
                             link = post.select_one('h2 a')['href']
                             link = 'https://www.insider.com' + link
                             header = post.select_one('h2').text.strip()
@@ -942,8 +942,8 @@ def theathletic_scraper():
                         try:
                             delta = datetime.now(eastern_tz).date() - date
                         except:
-                            delta = timedelta(days=20)
-                        if delta < timedelta(days=15):
+                            delta = timedelta(days=5)
+                        if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
                             link = res.url
                             header = soup.select_one('h1').text.strip()
@@ -1216,9 +1216,9 @@ def wsj_scraper():
                         try:
                             delta = today - date
                         except:
-                            delta = timedelta(days=11)
+                            delta = timedelta(days=5)
 
-                        if delta < timedelta(days=10):
+                        if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d") 
                             header = json_data['data']['headline']
                             try:
@@ -1268,8 +1268,8 @@ def nydailynews_scraper():
                         try:
                             delta = datetime.now(eastern_tz).date() - date
                         except:
-                            delta = timedelta(days=22)
-                        if delta < timedelta(days=20):
+                            delta = timedelta(days=5)
+                        if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
                             link = res.url
                             header = soup.select_one('h1').text
@@ -1338,6 +1338,7 @@ def si_scraper():
                         pass
             except:
                 pass
+            
 def sny_scraper():
     def get_page_soup(url):
         with sync_playwright() as p:
