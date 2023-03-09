@@ -22,7 +22,7 @@ pwd=st.secrets['pwd']
 post_item_list =[]
 item_list = []
 
-def add_up(data, url, link, header, sentence, my_date, author_name=None):
+def add_up(data, url, link, header, sentence, my_date, author_name=None, author_number = 1):
     if author_name is not None:
         author_twitter = str(data.loc[(data['Author Name'] == author_name), 'Author Twitter'].item()).replace('"', '')
         pub_twitter = str(data.loc[(data['Author Name'] == author_name), 'Publication Twitter'].item()).replace('"', '')
@@ -98,7 +98,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
         'Text': post.strip(),
         'Date': my_date,
         'Post Link': link,
-        'Post key': post_key
+        'Post key': post_key,
+        'Number of Bylines': author_number
     }
     post_item_list.append(post_item)
 
@@ -110,7 +111,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
         'Text': post.strip(),
         'Date': my_date,
         'Post Link': link,
-        'Post key': post_key
+        'Post key': post_key,
+        'Number of Bylines': author_number
     }
     post_item_list.append(post_item)
 
@@ -124,7 +126,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
         'Text': post.strip(),
         'Date': my_date,
         'Post Link': link,
-        'Post key': post_key
+        'Post key': post_key,
+        'Number of Bylines': author_number
     }
     post_item_list.append(post_item)
 
@@ -136,7 +139,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
         'Text': post.strip(),
         'Date': my_date,
         'Post Link': link,
-        'Post key': post_key
+        'Post key': post_key,
+        'Number of Bylines': author_number
     }
     post_item_list.append(post_item)
 
@@ -155,7 +159,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None):
         'publication_ig' : pub_ig,
         'publication_fb' : pub_fb,
         'publication_linkedin' : pub_linkedin,
-        'paywall' : paywall
+        'paywall' : paywall,
+        'Number of Bylines': author_number
         
     }
     item_list.append(item)
