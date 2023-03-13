@@ -31,6 +31,7 @@ def get_image(post_link):
         page.screenshot(path='image.png')
         with open('image.png', 'rb') as f:
             img_data = f.read()
+        st.text(img_data)
         browser.close()
         return img_data
 
