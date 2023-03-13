@@ -23,7 +23,18 @@ pwd=st.secrets['pwd']
 post_item_list =[]
 item_list = []
 
-def add_up(data, url, link, header, sentence, my_date, author_name=None, author_number = 1):
+def get_image(post_link):
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        page.goto(post_link, wait_until='load')
+        page.screenshot(path='image.png')
+        with open('image.png', 'rb') as f:
+            img_data = f.read()
+        browser.close()
+        return img_data
+
+def add_up(data, url, link, header, sentence, my_date, author_name=None, author_number = 1, image_data=None):
     if author_name is not None:
         author_twitter = str(data.loc[(data['Author Name'] == author_name), 'Author Twitter'].item()).replace('"', '')
         pub_twitter = str(data.loc[(data['Author Name'] == author_name), 'Publication Twitter'].item()).replace('"', '')
@@ -100,7 +111,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number
+        'Number of Bylines': author_number,
+        'Image': image_data
     }
     post_item_list.append(post_item)
 
@@ -113,7 +125,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number
+        'Number of Bylines': author_number,
+        'Image': image_data
     }
     post_item_list.append(post_item)
 
@@ -127,7 +140,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number
+        'Number of Bylines': author_number,
+        'Image': image_data
     }
     post_item_list.append(post_item)
 
@@ -140,7 +154,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number
+        'Number of Bylines': author_number,
+        'Image': image_data
     }
     post_item_list.append(post_item)
 
@@ -206,6 +221,7 @@ def nytimes_scraper():  #Done
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
                             link = json_data['url']
+                            img_data = get_image(link)
                             header = json_data['headline']
                             try:
                                 sentence = json_data['description'].split('.')
@@ -214,7 +230,7 @@ def nytimes_scraper():  #Done
                                 sentence = post.select_one('p')
                             authors = json_data['author']
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_data=img_data)
                         else:
                             break
                     except:
@@ -1502,7 +1518,7 @@ class NewsScraper:
         post_item_list.clear()
         item_list.clear()
         s = session()
-        #nytimes_scraper()
+        nytimes_scraper()
         #forbes_scraper()
         #nj_scraper()
         #fangraph_scraper()
@@ -1510,22 +1526,22 @@ class NewsScraper:
         #ringer_scraper()
         #sportsbusinessjournal_scraper()
         #yahoo_scraper()
-        nypost_scraper()
-        foxsports_scraper()
-        insider_scraper()
-        tampabay_scraper()
-        sporting_news()
-        northjersey_scraper()
-        theathletic_scraper()
-        apnews_scraper()
-        mlb_scraper()
-        mlb_extra_scraper()
-        courant_scraper()
-        wsj_scraper()
-        nydailynews_scraper()
-        si_scraper()
-        sny_scraper()
-        newsday_scraper()
+        #nypost_scraper()
+        #foxsports_scraper()
+        #insider_scraper()
+        #tampabay_scraper()
+        #sporting_news()
+        #northjersey_scraper()
+        #theathletic_scraper()
+        #apnews_scraper()
+        #mlb_scraper()
+        #mlb_extra_scraper()
+        #courant_scraper()
+        #wsj_scraper()
+        #nydailynews_scraper()
+        #si_scraper()
+        #sny_scraper()
+        #newsday_scraper()
         
 
         return item_list, post_item_list
