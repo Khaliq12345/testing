@@ -34,7 +34,7 @@ def downlaod_commited(symb):
     query = text('SELECT * FROM commit')
     df = pd.read_sql_query(query, conn)
     df = df[df['Post key'].str.contains(fr'{symb}')]
-    df = df.drop(['Date', 'Post Link', 'Post key', 'Number of Bylines'], axis=1)
+    df = df.drop(['Date', 'Post Link', 'Number of Bylines'], axis=1)
     csv = convert_df(df)
     return csv
 
