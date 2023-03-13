@@ -28,12 +28,13 @@ def delete_blacklisted(df_a):
 
     return df_a
 
-def downlaod_commited():
+def downlaod_commited(symb):
     engine = st.session_state['engine']
     conn = engine.connect()
     query = text('SELECT * FROM commit')
     df = pd.read_sql_query(query, conn)
-    df = df.drop(['Date', 'Post Link', 'Number of Bylines'], axis=1)
+    df = df[df['Post key'].str.contains(fr'{symb}')]
+    df = df.drop(['Date', 'Post Link', 'Post key', 'Number of Bylines'], axis=1)
     csv = convert_df(df)
     return csv
 
@@ -262,5 +263,8 @@ if commit_button:
 
     
 downlaod_container = st.container()
-col1, col2 = downlaod_container.columns([1, 1])
-downlaod_button = col1.download_button("Press to Download", downlaod_commited(), "posts.csv", "text/csv", key='download-csv')
+downlaod_1, downlaod_2, downlaod_3, downlaod_4 = downlaod_container.columns([1, 1, 1, 1])
+downlaod_button_1 = downlaod_1.download_button("Press to Download", downlaod_commited('Twit\(\$\)ter'), "twitter_posts.csv", "text/csv", key='twitter_download-csv')
+downlaod_button_2 = downlaod_2.download_button("Press to Download", downlaod_commited('Face\(\$\)book'), "fb_posts.csv", "text/csv", key='fb_download-csv')
+downlaod_button_3 = downlaod_3.download_button("Press to Download", downlaod_commited('I\(\$\)G'), "ig_posts.csv", "text/csv", key='ig_download-csv')
+downlaod_button_3 = downlaod_4.download_button("Press to Download", downlaod_commited('Linked\(\$\)in'), "linkedin_posts.csv", "text/csv", key='linkedin_download-csv')
