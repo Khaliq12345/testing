@@ -320,7 +320,6 @@ def nj_scraper():   #Done
                             authors = post.select_one('.article__details--byline').text
                             authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
-                            st.text(authors_num)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
