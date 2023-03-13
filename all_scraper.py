@@ -1,18 +1,17 @@
-import streamlit as st
-import os
 from playwright.sync_api import sync_playwright
 import requests
+import json
 from requests import session
 from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime, timedelta
 from latest_user_agents import get_random_user_agent
 from sqlalchemy import create_engine, text
-import pytz
 import cloudscraper
+from dateutil import tz
+import dateutil.parser
+import pytz
 eastern_tz = pytz.timezone('US/Eastern')
-os.system("playwright install chromium")
-import json
 
 hostname=st.secrets['hostname']
 dbname=st.secrets['dbname']
@@ -118,7 +117,6 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
 
     post = f'''
     '{header}' by {author_ig} for {pub_ig}: {sentence}... {paywall} {link} I($)G
-
     👉VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE⚾️
     '''
     post_key = post + '!'
@@ -165,7 +163,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
     }
     item_list.append(item)
 
-def nytimes_scraper():
+def nytimes_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -180,20 +178,24 @@ def nytimes_scraper():
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
-                response = requests.get(url)
+                scraper = cloudscraper.create_scraper()
+                response = scraper.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.css-112uytv')
                 for post in posts:
                     try:
-                        link_date = post.select_one('.css-1l4spti a')['href']
-                        date = link_date.split('/sports/baseball')
-                        date = date[0].replace('/', '')
+                        post_link = post.select_one('.css-1l4spti a')['href']
+                        post_link = 'https://www.nytimes.com' + post_link
+                        res = scraper.get(post_link)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        meta = soup.select_one('script').text
+                        json_data = json.loads(meta)
+                        date = json_data['datePublished']
                         try:
-                            date = datetime.strptime(date, "%Y%m%d")
+                            date = datetime.fromisoformat(date.replace('Z', '+00:00')).date()
                             my_date = date.strftime("%Y, %m, %d")
                         except:
-                            date = datetime.strptime('20230215', "%Y%m%d")
+                            date = datetime.strptime('20230215', "%Y%m%d").date()
                             my_date = date.strftime("%Y, %m, %d")
                             
                         try:
@@ -201,17 +203,18 @@ def nytimes_scraper():
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = 'https://www.nytimes.com' + link_date
-                            header = post.select_one('h2').text
+                            link = json_data['url']
+                            header = json_data['headline']
                             try:
-                                sentence = post.select_one('p').text.split('.')
+                                sentence = json_data['description'].split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('p').text
-
-                            add_up(data, url, link, header, sentence, my_date)
+                                sentence = post.select_one('p')
+                            authors = json_data['author']
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
-                            pass
+                            break
                     except:
                         pass
             except:
@@ -219,7 +222,7 @@ def nytimes_scraper():
     else:
         pass
         
-def forbes_scraper():
+def forbes_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -271,7 +274,7 @@ def forbes_scraper():
     else:
         pass
 
-def nj_scraper():
+def nj_scraper():    #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -313,16 +316,17 @@ def nj_scraper():
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('p').text
-
-                            add_up(data, url, link, header, sentence, my_date)
+                            authors = post.select_one('.article__details--byline').text.split('and')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
-                            pass
+                            break
                     except:
                         pass
             except:
                 pass
 
-def fangraph_scraper():
+def fangraph_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -365,8 +369,9 @@ def fangraph_scraper():
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('p').text
-
-                            add_up(data, url, link, header, sentence, my_date)
+                            authors = post.select_one('.postmeta_author').text.strip().split('and')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             pass
                     except:
@@ -374,7 +379,7 @@ def fangraph_scraper():
             except:
                 pass
 
-def cbs_sports_scraper():
+def cbs_sports_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -389,50 +394,45 @@ def cbs_sports_scraper():
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
-                response = requests.get(url)
+                s = session()
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.asset')
-
                 for post in posts:
                     try:
-                        date = post.select_one('time').text
-                        if 'H' in date:
-                            try:
-                                date = today - timedelta(hours=int(date.replace('H ago', '')))
-                                my_date = date.strftime("%Y, %m, %d")
-                            except:
-                                date = datetime.strptime('20230215', "%Y%m%d").date()
-                                my_date = date.strftime("%Y, %m, %d")
-                        elif 'D' in date:
-                            try:
-                                date = today - timedelta(days=int(date.replace('D ago', '')))
-                                my_date = date.strftime("%Y, %m, %d")
-                            except:
-                                date = datetime.strptime('20230215', "%Y%m%d").date()
-                                my_date = date.strftime("%Y, %m, %d")       
+                        post_link = post.select_one('a')['href']
+                        post_link = 'https://www.cbssports.com' + post_link
+                        res = s.get(post_link)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        date = soup.select_one('time')['datetime']
+                        try:
+                            date = datetime.strptime(date, '%Y-%m-%d %H:%M:%S %Z').date()
+                            my_date = date.strftime("%Y, %m, %d")
+                        except:
+                            date = datetime.strptime('20230215', "%Y%m%d").date()
+                            my_date = date.strftime("%Y, %m, %d")     
                         try:
                             delta = today - date
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = post.select_one('a')['href']
-                            link = 'https://www.cbssports.com' + link
-                            header = post.select_one('h3').text
+                            header = post.select_one('h3').text.strip()
                             try:
                                 sentence = post.select_one('p').text.split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('p').text
-                            add_up(data, url, link, header, sentence, my_date)
+                            authors = soup.select('.ArticleAuthor-name--link')
+                            authors_num = len(authors)
+                            add_up(data, url, post_link, header, sentence, my_date, author_number=authors_num)
                         else:
-                            pass
+                            break
                     except:
                         pass
             except:
                 pass
 
-def ringer_scraper():
+def ringer_scraper():   #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -474,16 +474,17 @@ def ringer_scraper():
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('.p-dek.c-entry-box--compact__dek').text
-
-                            add_up(data, url, link, header, sentence, my_date)
+                            authors = post.select('.c-byline__author-name')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
-                            pass
+                            break
                     except:
                         pass
             except:
                 pass
 
-def sportsbusinessjournal_scraper():
+def sportsbusinessjournal_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -498,8 +499,8 @@ def sportsbusinessjournal_scraper():
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
-                response = requests.get(url)
+                s = session()
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.article')[1:]
 
@@ -518,22 +519,26 @@ def sportsbusinessjournal_scraper():
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = post.select_one('h2 a')['href']
                             header = post.select_one('h2').text
                             try:
                                 sentence = post.select_one('.text-container .text-frame').text.strip().replace('\n', ' ').split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('.text-container .text-frame').text.strip().replace('\n', ' ')
-
-                            add_up(data, url, link, header, sentence, my_date)
+                            link = post.select_one('h2 a')['href']
+                            res = s.get(link)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            authors = soup.select('.author a')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             pass
                     except:
                         pass
             except:
                 pass
-def yahoo_scraper():
+
+def yahoo_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -594,7 +599,7 @@ def yahoo_scraper():
             except:
                 pass
 
-def nypost_scraper():
+def nypost_scraper():   #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -602,6 +607,7 @@ def nypost_scraper():
     data = pd.read_sql_query(query, conn)
     urls = data['Article URL'][(data['Publication Name'] == 'New York Post') & (data['Do not scrape'] == 'N')]
     urls.dropna(inplace=True)
+    s = session()
     if len(urls) > 0:
         for url in urls:
             try:
@@ -609,7 +615,7 @@ def nypost_scraper():
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.story.story--archive.story--i-flex')        
                 for post in posts:
@@ -634,9 +640,11 @@ def nypost_scraper():
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('p').text.strip()
-
-
-                            add_up(data, url, link, header, sentence, my_date)
+                            res = s.get(link)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            authors = soup.select('.byline__author a.meta__link')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
                     except:
@@ -644,7 +652,7 @@ def nypost_scraper():
             except:
                 pass
 
-def foxsports_scraper():
+def foxsports_scraper(): #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -659,28 +667,25 @@ def foxsports_scraper():
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
+                s = session()
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('a.news')
 
                 for post in posts:
                     try:
-                        date = post.select_one('.article-time-source').text.strip()
-                        if 'H' in date:
-                            try:
-                                date = today - timedelta(hours=int(date[0]))
-                                my_date = date.strftime("%Y, %m, %d")
-                            except:
-                                date = datetime.strptime('20230215', "%Y%m%d").date()
-                                my_date = date.strftime("%Y, %m, %d")
-                        elif 'D' in date:
-                            try:
-                                date = today - timedelta(days=int(date[0]))
-                                my_date = date.strftime("%Y, %m, %d")
-                            except:
-                                date = datetime.strptime('20230215', "%Y%m%d").date()
-                                my_date = date.strftime("%Y, %m, %d")
-                        else:
+                        link = post['href']
+                        link = 'https://www.foxsports.com' + link
+                        res = s.get(link)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        date = soup.select_one('.info-text > span:nth-child(2)').text.strip()
+                        try:
+                            est_tzinfo = tz.gettz('EST')
+                            eastern_tzinfo = tz.gettz('US/Eastern')
+                            tzinfos = {'EST': est_tzinfo, 'EDT': eastern_tzinfo}
+                            date = dateutil.parser.parse(date, tzinfos=tzinfos).date()
+                            my_date = date.strftime("%Y, %m, %d")
+                        except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                             my_date = date.strftime("%Y, %m, %d")
                         try:
@@ -696,16 +701,17 @@ def foxsports_scraper():
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('span').text.strip()
-
-                            add_up(data, url, link, header, sentence, my_date)
+                            authors = soup.select('.contributor-name')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
-                            pass
+                            break
                     except:
                         pass
             except:
                 pass
 
-def insider_scraper():
+def insider_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -720,10 +726,10 @@ def insider_scraper():
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
+                s = session()
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.river-item.featured-post')
-                    
                 for post in posts:
                     try:
                         date = post.select_one('.tout-timestamp').text.strip()
@@ -733,7 +739,6 @@ def insider_scraper():
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                             my_date = date.strftime("%Y, %m, %d")             
-
                         try:
                             delta = today - date
                         except:
@@ -747,16 +752,19 @@ def insider_scraper():
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('.tout-copy.river.body-regular').text.strip()
-
-                            add_up(data, url, link, header, sentence, my_date)
+                            res = s.get(link)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            authors = soup.select('.byline-link.byline-author-name')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
-                            pass
+                            break
                     except:
                         pass
             except:
                 pass
 
-def tampabay_scraper():
+def tampabay_scraper():  #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -799,7 +807,9 @@ def tampabay_scraper():
                             except:
                                 sentence = soup.select_one('.article__summary').text
                             link = res.url
-                            add_up(data, url, link, header, sentence, my_date)
+                            authors = soup.select('.article__byline--name-link')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
                     except:
@@ -807,7 +817,7 @@ def tampabay_scraper():
             except:
                 pass
 
-def sporting_news():
+def sporting_news():   #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -849,7 +859,11 @@ def sporting_news():
                         if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
                             link = res.url
-                            add_up(data, url, link, header, sentence, my_date)
+                            res = s.get(link)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            authors = soup.select('.author-info__description .author-name__link')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
                     except:
@@ -857,7 +871,7 @@ def sporting_news():
             except:
                 pass
 
-def northjersey_scraper():
+def northjersey_scraper():    #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -900,8 +914,10 @@ def northjersey_scraper():
                                 sentence = sentence.split('.')
                                 sentence = sentence[0]                          
                             except:
-                                sentence = post['descripton'] 
-                            add_up(data, url, link, header, sentence, my_date)
+                                sentence = post['descripton']
+                            authors = soup.select('.gnt_ar_by_a.gnt_ar_by_a__fi')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
                     except:
@@ -909,7 +925,7 @@ def northjersey_scraper():
             except:
                 pass
 
-def theathletic_scraper():
+def theathletic_scraper():    #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -952,7 +968,9 @@ def theathletic_scraper():
                                 sentence = sentence[0]
                             except:
                                 sentence = soup.select_one('.bodytext1').text.strip()
-                            add_up(data, url, link, header, sentence, my_date)
+                            authors = soup.select_one('#articleByLineString').text.split('and')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
                     except:
@@ -960,7 +978,7 @@ def theathletic_scraper():
             except:
                 pass
 
-def apnews_scraper():
+def apnews_scraper():   #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -1011,8 +1029,9 @@ def apnews_scraper():
                             except:
                                 sentence = post.select_one('p').text
                             link = 'https://apnews.com' + post.select_one('.CardHeadline a')['href']
-                            
-                            add_up(data, url, link, header, sentence, my_date, author)
+                            authors = post.select_one('.Component-bylines-0-2-142.Component-bylines-0-2-133').text.split('and')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num)                                               
                         else:
                             break
                     else:
@@ -1022,7 +1041,7 @@ def apnews_scraper():
         except:
             pass
 
-def mlb_scraper():
+def mlb_scraper():   #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -1056,10 +1075,9 @@ def mlb_scraper():
                     if author in post.text:
                         try:
                             date = post.select_one('.article-item__contributor-date')['data-date']
-                            date = datetime.fromisoformat(date.replace("Z", "+00:00")).date()
+                            date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').date()
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
-                    
                         try:
                             delta = datetime.now(eastern_tz).date() - date
                         except:
@@ -1073,10 +1091,11 @@ def mlb_scraper():
                             except:
                                 sentence = post.select_one('p').text.replace('  ', '').replace('\n', '')
                             link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
-                            
-                            add_up(data, url, link, header, sentence, my_date, author)
+                            authors = post.select_one('.article-item__contributor-byline').text.replace(' ', '').split(',')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num)
                         else:
-                            break
+                            pass
                     else:
                         pass
                 except:
@@ -1084,7 +1103,7 @@ def mlb_scraper():
         except:
             pass
 
-def mlb_extra_scraper():
+def mlb_extra_scraper():   #Done
     s = session()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
@@ -1092,7 +1111,7 @@ def mlb_extra_scraper():
     query = text('SELECT * FROM articles')
     data = pd.read_sql_query(query, conn)
     urls = ['https://www.mlb.com/yankees/news', 'https://www.mlb.com/mets/news']
-    authors = ['Bryan Hoch', 'Anthony DiComo']
+    all_authors = ['Bryan Hoch', 'Anthony DiComo']
     for url in urls:
         try:
             ua = get_random_user_agent()
@@ -1104,7 +1123,7 @@ def mlb_extra_scraper():
             posts = soup.select('article')
             for post in posts:
                 try:
-                    for author in authors:
+                    for author in all_authors:
                         if author in post.text:
                             try:
                                 date = post.select_one('.article-item__contributor-date')['data-date']
@@ -1126,7 +1145,11 @@ def mlb_extra_scraper():
                                 except:
                                     sentence = post.select_one('p').text.replace('  ', '').replace('\n', '')
                                 link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
-                                add_up(data, url, link, header, sentence, my_date, author)
+                                authors = post.select_one('.article-item__contributor-byline').text.replace(' ', '').split(',')
+                                authors_num = len(authors)
+                                add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num)               
+                            else:
+                                break
                         else:
                             pass
                 except:
@@ -1134,7 +1157,7 @@ def mlb_extra_scraper():
         except:
             pass
 
-def courant_scraper():
+def courant_scraper():   #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -1149,7 +1172,8 @@ def courant_scraper():
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
+                s = session()
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts_table = soup.select_one('.author-stories-feed')
                 posts = posts_table.select('article')
@@ -1175,8 +1199,11 @@ def courant_scraper():
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('.excerpt').text.strip()
-
-                            add_up(data, url, link, header, sentence, my_date)
+                            res = requests.get(link)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            authors = soup.select('.fn a')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
                     except:
@@ -1184,7 +1211,7 @@ def courant_scraper():
             except:
                 pass
 
-def wsj_scraper():
+def wsj_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -1237,7 +1264,7 @@ def wsj_scraper():
             except:
                pass
         
-def nydailynews_scraper():
+def nydailynews_scraper():  #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -1281,7 +1308,9 @@ def nydailynews_scraper():
                                 sentence = sentence[0]
                             except:
                                 sentence = sentence
-                            add_up(data, url, link, header, sentence, my_date)
+                            authors = soup.select('.article_byline a')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)      
                         else:
                             break
                     except:
@@ -1310,7 +1339,6 @@ def si_scraper():
                 }
                 scraper = cloudscraper.create_scraper()
                 response = scraper.get(url, headers=headers, proxies=proxies)
-                st.text(response)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.l-grid--item')
                 for post in posts:
@@ -1341,7 +1369,7 @@ def si_scraper():
             except:
                 pass
             
-def sny_scraper():
+def sny_scraper():   #Done
     def get_page_soup(url):
         with sync_playwright() as p:
             browser = p.chromium.launch()
@@ -1397,7 +1425,9 @@ def sny_scraper():
                                 sentence = soup.select_one('.article-body').text
                             link = post_link
                             my_date = date.strftime("%Y, %m, %d")
-                            add_up(data, url, link, header, sentence, my_date)                    
+                            authors = soup.select('.flex.flex-col.whitespace-no-wrap span.font-bold')
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)                    
                         else:
                             break
                     except:
@@ -1405,7 +1435,7 @@ def sny_scraper():
             except:
                 pass
 
-def newsday_scraper():  
+def newsday_scraper():  #Done
     def get_json(url):
         with sync_playwright() as p:
             browser = p.chromium.launch()
@@ -1452,7 +1482,9 @@ def newsday_scraper():
                                 sentence = post['lead']
                             my_date = date.strftime("%Y, %m, %d")
                             link = post['url']
-                            add_up(data, url, link, header, sentence, my_date)
+                            authors = post['authors']
+                            authors_num = len(authors)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)  
                         else:
                             break
                     except:
@@ -1485,7 +1517,7 @@ class NewsScraper:
         #mlb_scraper()
         #mlb_extra_scraper()
         # courant_scraper()
-        wsj_scraper()
+        # wsj_scraper()
         #nydailynews_scraper()
         # si_scraper()
         # sny_scraper()
