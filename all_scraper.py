@@ -2,6 +2,7 @@ import streamlit as st
 from playwright.sync_api import sync_playwright
 import requests
 import json
+import re
 from requests import session
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -275,7 +276,7 @@ def forbes_scraper():  #Done
     else:
         pass
 
-def nj_scraper():    #Done
+def nj_scraper():   #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -294,7 +295,6 @@ def nj_scraper():    #Done
                 response = requests.get(url)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.river-item')
-
                 for post in posts:
                     try:
                         date = post.select_one('time')['datetime']
@@ -317,7 +317,8 @@ def nj_scraper():    #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('p').text
-                            authors = post.select_one('.article__details--byline').text.split('and')
+                            authors = post.select_one('.article__details--byline').text
+                            authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
@@ -370,7 +371,8 @@ def fangraph_scraper():  #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = post.select_one('p').text
-                            authors = post.select_one('.postmeta_author').text.strip().split('and')
+                            authors = post.select_one('.postmeta_author').text.strip()
+                            authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
@@ -925,7 +927,6 @@ def northjersey_scraper():    #Done
                         pass
             except:
                 pass
-
 def theathletic_scraper():    #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
@@ -969,7 +970,8 @@ def theathletic_scraper():    #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = soup.select_one('.bodytext1').text.strip()
-                            authors = soup.select_one('#articleByLineString').text.split('and')
+                            authors = soup.select_one('#articleByLineString').text
+                            authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
@@ -1030,7 +1032,8 @@ def apnews_scraper():   #Done
                             except:
                                 sentence = post.select_one('p').text
                             link = 'https://apnews.com' + post.select_one('.CardHeadline a')['href']
-                            authors = post.select_one('.Component-bylines-0-2-142.Component-bylines-0-2-133').text.split('and')
+                            authors = post.select_one('.Component-bylines-0-2-142.Component-bylines-0-2-133').text
+                            authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num)                                               
                         else:
@@ -1211,7 +1214,6 @@ def courant_scraper():   #Done
                         pass
             except:
                 pass
-
 def wsj_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
@@ -1255,7 +1257,8 @@ def wsj_scraper():  #Done
                             except:
                                 sentence = json_data['data']['summary']
                             link = json_data['data']['canonical_url']
-                            authors = json_data['data']['byline'].split('and')
+                            authors = json_data['data']['byline']
+                            authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
