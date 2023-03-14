@@ -11,15 +11,11 @@ import cv2
 from html2image import Html2Image
 hti = Html2Image()
 
-def get_image(post_link):
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
-        page.goto(post_link, wait_until='load')
-        page.screenshot(path='image.png')
-        img1 = cv2.imread('image.png')
-        browser.close()
-        return img1
+def get_image(l):
+    hti.screenshot(url=l, save_as='image.png')
+    image_data = cv2.imread('image.png')
+
+    return image_data
 
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
