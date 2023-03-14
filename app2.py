@@ -11,6 +11,12 @@ import cv2
 from html2image import Html2Image
 hti = Html2Image()
 
+def get_image(l):
+    hti.screenshot(url=l, save_as='image.png')
+    image_data = cv2.imread('image.png')
+
+    return image_data
+
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
     dbname=st.secrets['dbname']
