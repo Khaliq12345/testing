@@ -205,9 +205,9 @@ for index, row in st.session_state['data1'][:40].iterrows():
         #if f'image_{index}' not in st.session_state:
         st.write(row['Post Link'])
         hti.screenshot(url=row['Post Link'], save_as=f'image_{index}.png')
-        #image_data = cv2.imread(f'image_{index}.png')
+        image_data = cv2.imread(f'image_{index}.png')
             #st.session_state[f'image_{index}'] = image_data
-        col2.image(f'image_{index}.png')
+        col2.image(image_data)
         #st.write('Yes')
         
     elif "Face($)book" in row["Text"]:
