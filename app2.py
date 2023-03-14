@@ -204,8 +204,8 @@ for index, row in st.session_state['data1'][:40].iterrows():
         col2.write(date_obj)
         #if f'image_{index}' not in st.session_state:
         st.write(row['Post Link'])
-        hti.screenshot(url=row['Post Link'], save_as=f'image_{index}.png')
-        image_data = cv2.imread(f'image_{index}.png')
+        hti.screenshot(url=row['Post Link'], save_as='image.png')
+        image_data = cv2.imread('image.png')
             #st.session_state[f'image_{index}'] = image_data
         col2.image(image_data)
         #st.write('Yes')
