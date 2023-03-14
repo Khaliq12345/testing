@@ -238,7 +238,7 @@ for index, row in st.session_state['data1'][:40].iterrows():
         hti.screenshot(url=row['Post Link'], save_as='image.png')
         image_data = cv2.imread('image.png')
         st.session_state[f'image_{index}'] = image_data
-    col27.image(st.session_state[f'image_{index}'])
+    col7.image(st.session_state[f'image_{index}'])
     #st.write('Yes')
     
     #add $ sign to the posts
