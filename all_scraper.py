@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from latest_user_agents import get_random_user_agent
 from sqlalchemy import create_engine, text
 import cloudscraper
+import cv2
 from dateutil import tz
 import dateutil.parser
 import pytz
@@ -29,8 +30,7 @@ def get_image(post_link):
         page = browser.new_page()
         page.goto(post_link, wait_until='load')
         page.screenshot(path='image.png')
-        with open('image.png', 'rb') as f:
-            img_data = f.read()
+        img_data = cv2.imread('image.png')
         browser.close()
         return img_data
     
@@ -221,7 +221,6 @@ def nytimes_scraper():  #Done
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
                             link = json_data['url']
-                            img_data = get_image(link)
                             header = json_data['headline']
                             try:
                                 sentence = json_data['description'].split('.')
@@ -230,7 +229,7 @@ def nytimes_scraper():  #Done
                                 sentence = post.select_one('p')
                             authors = json_data['author']
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_data=img_data)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
                     except:
@@ -653,6 +652,7 @@ def nypost_scraper():   #Done
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
                             link = post.select_one('a')['href']
+                            img_data = get_image(link)
                             header = post.select_one('h3').text.strip()
                             try:
                                 sentence = post.select_one('p').text.strip().split('.')
@@ -663,7 +663,7 @@ def nypost_scraper():   #Done
                             soup = BeautifulSoup(res.text, 'lxml')
                             authors = soup.select('.byline__author a.meta__link')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_data=img_data)
                         else:
                             break
                     except:
