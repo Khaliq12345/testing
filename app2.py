@@ -6,6 +6,15 @@ import streamlit as st
 from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
+import cv2
+from html2image import Html2Image
+hti = Html2Image()
+
+def get_image(post_link):
+    hti.screenshot(url=post_link, save_as='image.png')
+    image_data = cv2.imread('image.png')
+
+    return image_data
 
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
