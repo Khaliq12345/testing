@@ -92,7 +92,7 @@ def create_database():
     except:
         no_data_df = pd.DataFrame(columns=['Text', 'Date', 'Post Link', 'Post key'])
         clean_post = delete_blacklisted(no_data_df)
-        clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later  
+        clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later 
 
 def delete_rows(selected_rows):
     engine = st.session_state['engine']
@@ -191,7 +191,7 @@ if deselect_all_button:
 selected_rows = []
 for index, row in st.session_state['data1'][:40].iterrows():
     row_container = st.container()
-    col1, col2, col3, col4, col5, col6, col7 = row_container.columns([5, 3, 2, 2, 2, 2, 2])
+    col1, col2, col3, col4, col5, col6 = row_container.columns([5, 3, 2, 2, 2, 2])
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
     if checkbox:
         selected_rows.append(index)
@@ -204,8 +204,8 @@ for index, row in st.session_state['data1'][:40].iterrows():
         col2.write(date_obj)
         if f'image_{index}' not in st.session_state:
             st.write(row['Post Link'])
-            hti.screenshot(url=row['Post Link'], save_as='image.png')
-            image_data = cv2.imread('image.png')
+            hti.screenshot(url=row['Post Link'], save_as=f'image_{index}.png')
+            image_data = cv2.imread(f'image_{index}.png')
             st.session_state[f'image_{index}'] = image_data
         col2.image(st.session_state[f'image_{index}'])
         #st.write('Yes')     
