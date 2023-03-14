@@ -201,6 +201,7 @@ for index, row in st.session_state['data1'][:40].iterrows():
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
+        st.text(row['Post Link'])
         if f'image_{index}' not in st.session_state:
             st.session_state[f'image_{index}'] = get_image(row['Post Link'])
         col2.image(st.session_state[f'image_{index}'])
