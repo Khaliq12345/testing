@@ -9,9 +9,6 @@ latest_user_agents
 openpyxl
 sqlalchemy
 pymysql
-gspread
-gspread-dataframe
-google
-pydrive
 playwright
 cloudscraper
+opencv-python
