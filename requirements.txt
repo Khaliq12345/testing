@@ -12,3 +12,4 @@ pymysql
 playwright
 cloudscraper
 opencv-python
+html2image
