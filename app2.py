@@ -191,7 +191,7 @@ if deselect_all_button:
 selected_rows = []
 for index, row in st.session_state['data1'][:40].iterrows():
     row_container = st.container()
-    col1, col2, col3, col4, col5, col6 = row_container.columns([5, 3, 2, 2, 2, 2])
+    col1, col2, col3, col4, col5, col6, col7 = row_container.columns([5, 3, 2, 2, 2, 2, 2])
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
     if checkbox:
         selected_rows.append(index)
@@ -208,8 +208,7 @@ for index, row in st.session_state['data1'][:40].iterrows():
             image_data = cv2.imread('image.png')
             st.session_state[f'image_{index}'] = image_data
         col2.image(st.session_state[f'image_{index}'])
-        #st.write('Yes')
-        
+        #st.write('Yes')     
     elif "Face($)book" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
@@ -234,6 +233,13 @@ for index, row in st.session_state['data1'][:40].iterrows():
     paywall_button = col5.button('Paywall', key=f'paywall_{index}')
     if row["Number of Bylines"] > 1:
         col6.info(f'Number of Bylines: {row["Number of Bylines"]}')
+    if f'image_{index}' not in st.session_state:
+        st.write(row['Post Link'])
+        hti.screenshot(url=row['Post Link'], save_as='image.png')
+        image_data = cv2.imread('image.png')
+        st.session_state[f'image_{index}'] = image_data
+    col27.image(st.session_state[f'image_{index}'])
+    #st.write('Yes')
     
     #add $ sign to the posts
     if '<$>' not in row['Text']:
