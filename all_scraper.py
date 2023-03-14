@@ -1508,7 +1508,7 @@ class NewsScraper:
         #cbs_sports_scraper()
         #ringer_scraper()
         #sportsbusinessjournal_scraper()
-        yahoo_scraper()
+        #yahoo_scraper()
         #nypost_scraper()
         #foxsports_scraper()
         #insider_scraper()
