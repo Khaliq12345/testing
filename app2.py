@@ -202,9 +202,9 @@ for index, row in st.session_state['data1'][:40].iterrows():
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
-        #if f'image_{index}' not in st.session_state:
-            #st.session_state[f'image_{index}'] = get_image(row['Post Link'])
-        #col2.image(st.session_state[f'image_{index}'])
+        if f'image_{index}' not in st.session_state:
+            st.session_state[f'image_{index}'] = get_image(row['Post Link'])
+        col2.image(st.session_state[f'image_{index}'])
         
     elif "Face($)book" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
