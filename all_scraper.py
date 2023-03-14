@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 from latest_user_agents import get_random_user_agent
 from sqlalchemy import create_engine, text
 import cloudscraper
-import cv2
 from dateutil import tz
 import dateutil.parser
 import pytz
@@ -23,16 +22,6 @@ pwd=st.secrets['pwd']
 
 post_item_list =[]
 item_list = []
-
-def get_image(post_link):
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
-        page.goto(post_link, wait_until='load')
-        page.screenshot(path='image.png')
-        img_data = cv2.imread('image.png')
-        browser.close()
-        return img_data
     
 def add_up(data, url, link, header, sentence, my_date, author_name=None, author_number = 1):
     if author_name is not None:
