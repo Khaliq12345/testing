@@ -195,20 +195,16 @@ for index, row in st.session_state['data1'][:40].iterrows():
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
     if checkbox:
         selected_rows.append(index)
+    
+    img_data = get_image(row['Post Link'])
+    st.image(img_data)
 
     if "Twit($)ter" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", "").strip().replace('', ''), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
-        col2.write(date_obj)
-        if f'image_{index}' not in st.session_state:
-            st.write(row['Post Link'])
-            hti.screenshot(url=row['Post Link'], save_as=f'image_{index}.png')
-            image_data = cv2.imread(f'image_{index}.png')
-            st.session_state[f'image_{index}'] = image_data
-        col2.image(st.session_state[f'image_{index}'])
-        #st.write('Yes')     
+        col2.write(date_obj)    
     elif "Face($)book" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
