@@ -233,13 +233,6 @@ for index, row in st.session_state['data1'][:40].iterrows():
     paywall_button = col5.button('Paywall', key=f'paywall_{index}')
     if row["Number of Bylines"] > 1:
         col6.info(f'Number of Bylines: {row["Number of Bylines"]}')
-    if f'image_{index}' not in st.session_state:
-        st.write(row['Post Link'])
-        hti.screenshot(url=row['Post Link'], save_as='image.png')
-        image_data = cv2.imread('image.png')
-        st.session_state[f'image_{index}'] = image_data
-    col7.image(st.session_state[f'image_{index}'])
-    #st.write('Yes')
     
     #add $ sign to the posts
     if '<$>' not in row['Text']:
