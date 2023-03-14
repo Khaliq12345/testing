@@ -557,7 +557,6 @@ def yahoo_scraper():  #Done
                     'User-Agent': ua
                 }
                 response = requests.get(url, headers=headers)
-                response = requests.get(url)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.item-hover-trigger')
 
