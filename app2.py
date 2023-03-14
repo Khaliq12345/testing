@@ -207,7 +207,7 @@ for index, row in st.session_state['data1'][:40].iterrows():
             hti.screenshot(url=row['Post Link'], save_as='image.png')
             image_data = cv2.imread('image.png')
             st.session_state[f'image_{index}'] = image_data
-        col2.image(image_data)
+        col2.image(st.session_state[f'image_{index}'])
         #st.write('Yes')
         
     elif "Face($)book" in row["Text"]:
