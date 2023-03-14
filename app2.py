@@ -76,7 +76,6 @@ def create_database():
     info, post = scraper.scrapers()
     df_info = pd.DataFrame(info)
     df_post = pd.DataFrame(post)
-    st.dataframe(df_post)
     try:
         clean_post = delete_blacklisted(df_post)
         clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
