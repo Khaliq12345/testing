@@ -34,7 +34,7 @@ def get_image(post_link):
         browser.close()
         return img_data
     
-def add_up(data, url, link, header, sentence, my_date, author_name=None, author_number = 1, image_data=None):
+def add_up(data, url, link, header, sentence, my_date, author_name=None, author_number = 1):
     if author_name is not None:
         author_twitter = str(data.loc[(data['Author Name'] == author_name), 'Author Twitter'].item()).replace('"', '')
         pub_twitter = str(data.loc[(data['Author Name'] == author_name), 'Publication Twitter'].item()).replace('"', '')
@@ -111,8 +111,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number,
-        'Image': image_data
+        'Number of Bylines': author_number
     }
     post_item_list.append(post_item)
 
@@ -125,8 +124,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number,
-        'Image': image_data
+        'Number of Bylines': author_number
     }
     post_item_list.append(post_item)
 
@@ -140,8 +138,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number,
-        'Image': image_data
+        'Number of Bylines': author_number
     }
     post_item_list.append(post_item)
 
@@ -154,8 +151,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number,
-        'Image': image_data
+        'Number of Bylines': author_number
     }
     post_item_list.append(post_item)
 
@@ -652,7 +648,6 @@ def nypost_scraper():   #Done
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
                             link = post.select_one('a')['href']
-                            img_data = get_image(link)
                             header = post.select_one('h3').text.strip()
                             try:
                                 sentence = post.select_one('p').text.strip().split('.')
@@ -663,7 +658,7 @@ def nypost_scraper():   #Done
                             soup = BeautifulSoup(res.text, 'lxml')
                             authors = soup.select('.byline__author a.meta__link')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_data=img_data)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
                         else:
                             break
                     except:
