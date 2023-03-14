@@ -10,8 +10,8 @@ import cv2
 from html2image import Html2Image
 hti = Html2Image()
 
-def get_image(post_link):
-    hti.screenshot(url=post_link, save_as='image.png')
+def get_image(l):
+    hti.screenshot(url=l, save_as='image.png')
     image_data = cv2.imread('image.png')
 
     return image_data
@@ -201,7 +201,6 @@ for index, row in st.session_state['data1'][:40].iterrows():
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
-        st.text(row['Post Link'])
         if f'image_{index}' not in st.session_state:
             st.session_state[f'image_{index}'] = get_image(row['Post Link'])
         col2.image(st.session_state[f'image_{index}'])
