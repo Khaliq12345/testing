@@ -1518,7 +1518,7 @@ class NewsScraper:
         #northjersey_scraper()
         #theathletic_scraper()
         apnews_scraper()
-        #mlb_scraper()
+        mlb_scraper()
         #mlb_extra_scraper()
         #courant_scraper()
         #wsj_scraper()
