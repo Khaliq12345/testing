@@ -205,7 +205,7 @@ for index, row in st.session_state['data1'][:40].iterrows():
         #if f'image_{index}' not in st.session_state:
             #st.session_state[f'image_{index}'] = get_image(row['Post Link'])
         col2.image(get_image(row['Post Link']))
-        st.write('Great')
+        st.write('Yes')
         
     elif "Face($)book" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
