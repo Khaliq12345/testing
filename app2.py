@@ -1,18 +1,11 @@
 from latest_user_agents import get_random_user_agent
 import csv
 import re
-from playwright.sync_api import sync_playwright
 import pandas as pd
 import streamlit as st
 from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
-#import cv2
-from html2image import Html2Image
-hti = Html2Image()
-
-def get_image(l, saving):
-    hti.screenshot(url=l, save_as=saving)
 
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
@@ -21,6 +14,7 @@ if 'engine' not in st.session_state:
     pwd=st.secrets['pwd']
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     st.session_state['engine'] = engine
+    
 @st.cache_data
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
@@ -44,7 +38,6 @@ def downlaod_commited(symb):
     df = df.drop(['Date', 'Post Link', 'Post key', 'Number of Bylines'], axis=1)
     csv = convert_df(df)
     return csv
-
 
 def add_paywall(text, symb):
 # define the pattern to select the link
@@ -192,18 +185,12 @@ for index, row in st.session_state['data1'][:40].iterrows():
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
     if checkbox:
         selected_rows.append(index)
-
     if "Twit($)ter" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", "").strip().replace('', ''), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
-        if f'img_{index}' not in st.session_state:
-            #st.session_state[f'img_{index}'] = get_image(row['Post Link'], f'image_{index}.png')
-            st.session_state[f'img_{index}'] = get_image('https://www.mlb.com/news', 'image.png')
-        col2.image('image.png')
-
     elif "Face($)book" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
