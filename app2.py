@@ -14,7 +14,7 @@ if 'engine' not in st.session_state:
     pwd=st.secrets['pwd']
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     st.session_state['engine'] = engine
-    
+
 @st.cache_data
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
@@ -26,7 +26,6 @@ def delete_blacklisted(df_a):
     df_b = pd.read_sql_query(query, conn)
     links_to_drop = df_a['Post key'].isin(df_b['Post key'])
     df_a = df_a[~links_to_drop]
-
     return df_a
 
 def downlaod_commited(symb):
