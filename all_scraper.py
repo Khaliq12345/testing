@@ -22,6 +22,17 @@ pwd=st.secrets['pwd']
 
 post_item_list =[]
 item_list = []
+
+def remove_period(text):
+    # Split the text into words
+    words = text.split()
+    
+    # Remove any periods between the first 5 words
+    for i in range(min(len(words), 5)):
+        words[i] = words[i].replace('.', '')
+    
+    # Join the modified words back into a string
+    return ' '.join(words)
     
 def add_up(data, url, link, header, sentence, my_date, author_name=None, author_number = 1):
     if author_name is not None:
@@ -208,10 +219,10 @@ def nytimes_scraper():  #Done
                             link = json_data['url']
                             header = json_data['headline']
                             try:
-                                sentence = json_data['description'].split('.')
+                                sentence = remove_period(json_data['description']).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('p')
+                                sentence = remove_period(post.select_one('p'))
                             authors = json_data['author']
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
@@ -261,11 +272,10 @@ def forbes_scraper():  #Done
                             link = post.select_one('.stream-item__title')['href']
                             header = post.select_one('.stream-item__title').text
                             try:
-                                sentence = post.select_one('.stream-item__description').text.split('.')
+                                sentence = remove_period(post.select_one('.stream-item__description').text).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('.stream-item__description').text
-
+                                sentence = remove_period(post.select_one('.stream-item__description').text)
                             add_up(data, url, link, header, sentence, my_date)
                         else:
                             pass
@@ -313,10 +323,10 @@ def nj_scraper():   #Done
                             link = post.select_one('a.river-item__headline-link')['href']
                             header = post.select_one('h2').text
                             try:
-                                sentence = post.select_one('.river-item__summary').text.replace('\n', ' ') .split('.')
+                                sentence = remove_period(post.select_one('.river-item__summary').text.replace('\n', ' ')).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('p').text
+                                sentence = remove_period(post.select_one('p').text)
                             authors = post.select_one('.article__details--byline').text
                             authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
@@ -367,10 +377,10 @@ def fangraph_scraper():  #Done
                             link = post.select_one('h2 a')['href']
                             header = post.select_one('h2').text
                             try:
-                                sentence = post.select_one('p').text.split('.')
+                                sentence = remove_period(post.select_one('p').text).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('p').text
+                                sentence = remove_period(post.select_one('p').text)
                             authors = post.select_one('.postmeta_author').text.strip()
                             authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
@@ -421,10 +431,10 @@ def cbs_sports_scraper():  #Done
                         if delta < timedelta(days=3):
                             header = post.select_one('h3').text.strip()
                             try:
-                                sentence = post.select_one('p').text.split('.')
+                                sentence = remove_period(post.select_one('p').text).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('p').text
+                                sentence = remove_period(post.select_one('p').text)
                             authors = soup.select('.ArticleAuthor-name--link')
                             authors_num = len(authors)
                             add_up(data, url, post_link, header, sentence, my_date, author_number=authors_num)
@@ -473,10 +483,10 @@ def ringer_scraper():   #Done
                             link = post.select_one('h2 a')['href']
                             header = post.select_one('h2').text
                             try:
-                                sentence = post.select_one('.p-dek.c-entry-box--compact__dek').text.split('.')
+                                sentence = remove_period(post.select_one('.p-dek.c-entry-box--compact__dek').text).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('.p-dek.c-entry-box--compact__dek').text
+                                sentence = remove_period(post.select_one('.p-dek.c-entry-box--compact__dek').text)
                             authors = post.select('.c-byline__author-name')
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
@@ -487,7 +497,7 @@ def ringer_scraper():   #Done
             except:
                 pass
 
-def sportsbusinessjournal_scraper():  #Done
+def sportsbusinessjournal_scraper():  #Done #cu
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -524,10 +534,10 @@ def sportsbusinessjournal_scraper():  #Done
                         if delta < timedelta(days=3):
                             header = post.select_one('h2').text
                             try:
-                                sentence = post.select_one('.text-container .text-frame').text.strip().replace('\n', ' ').split('.')
+                                sentence = remove_period(post.select_one('.text-container .text-frame').text.strip().replace('\n', ' ')).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('.text-container .text-frame').text.strip().replace('\n', ' ')
+                                sentence = remove_period(post.select_one('.text-container .text-frame').text.strip().replace('\n', ' '))
                             link = post.select_one('h2 a')['href']
                             res = s.get(link)
                             soup = BeautifulSoup(res.text, 'lxml')
@@ -557,6 +567,7 @@ def yahoo_scraper():  #Done
                     'User-Agent': ua
                 }
                 response = requests.get(url, headers=headers)
+                response = requests.get(url)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.item-hover-trigger')
 
@@ -585,10 +596,10 @@ def yahoo_scraper():  #Done
                             link = post.select_one('h4 a')['href']
                             header = post.select_one('h4').text
                             try:
-                                sentence = post.select_one('p').text.split('.')
+                                sentence = remove_period(post.select_one('p').text).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('p').text
+                                sentence = remove_period(post.select_one('p').text)
                             response = requests.get(link)
                             soup = BeautifulSoup(response.text, 'lxml')
                             authors = soup.select('.caas-author-byline-collapse a')
@@ -638,10 +649,10 @@ def nypost_scraper():   #Done
                             link = post.select_one('a')['href']
                             header = post.select_one('h3').text.strip()
                             try:
-                                sentence = post.select_one('p').text.strip().split('.')
+                                sentence = remove_period(post.select_one('p').text.strip()).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('p').text.strip()
+                                sentence = remove_period(post.select_one('p').text.strip())
                             res = s.get(link)
                             soup = BeautifulSoup(res.text, 'lxml')
                             authors = soup.select('.byline__author a.meta__link')
@@ -699,10 +710,10 @@ def foxsports_scraper(): #Done
                             link = 'https://www.foxsports.com' + link
                             header = post.select_one('h3').text.strip()
                             try:
-                                sentence = post.select_one('span').text.strip().split('.')
+                                sentence = remove_period(post.select_one('span').text.strip()).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('span').text.strip()
+                                sentence = remove_period(post.select_one('span').text.strip())
                             authors = soup.select('.contributor-name')
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
@@ -750,10 +761,10 @@ def insider_scraper():  #Done
                             link = 'https://www.insider.com' + link
                             header = post.select_one('h2').text.strip()
                             try:
-                                sentence = post.select_one('.tout-copy.river.body-regular').text.strip().split('.')
+                                sentence = remove_period(post.select_one('.tout-copy.river.body-regular').text.strip()).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('.tout-copy.river.body-regular').text.strip()
+                                sentence = remove_period(post.select_one('.tout-copy.river.body-regular').text.strip())
                             res = s.get(link)
                             soup = BeautifulSoup(res.text, 'lxml')
                             authors = soup.select('.byline-link.byline-author-name')
@@ -804,10 +815,10 @@ def tampabay_scraper():  #Done
                             soup = BeautifulSoup(res.text, 'lxml')
                             header = soup.select_one('h1').text
                             try:
-                                sentence = soup.select_one('.article__summary').text.split('.')
+                                sentence = remove_period(soup.select_one('.article__summary').text).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = soup.select_one('.article__summary').text
+                                sentence = remove_period(soup.select_one('.article__summary').text)
                             link = res.url
                             authors = soup.select('.article__byline--name-link')
                             authors_num = len(authors)
@@ -845,10 +856,10 @@ def sporting_news():   #Done
                         soup = BeautifulSoup(res.text, 'lxml')
                         header = soup.select_one('h1').text.strip()
                         try:
-                            sentence = soup.select_one('p').text.strip().split('.')
+                            sentence = remove_period(soup.select_one('p').text.strip()).split('.')
                             sentence = sentence[0]
                         except:
-                            sentence = soup.select_one('p').text.strip()
+                            sentence = remove_period(soup.select_one('p').text.strip())
                         try:
                             date = soup.select_one('time')['datetime']
                             date =  datetime.fromisoformat(date).replace(tzinfo=None).date()
@@ -912,11 +923,11 @@ def northjersey_scraper():    #Done
                             header = soup.select_one('h1').text
                             my_date = date.strftime("%Y, %m, %d")
                             try:
-                                sentence = soup.select_one('.gnt_ar_b_p').text.split('FLA.', '')
+                                sentence = remove_period(soup.select_one('.gnt_ar_b_p').text)
                                 sentence = sentence.split('.')
                                 sentence = sentence[0]                          
                             except:
-                                sentence = post['descripton']
+                                sentence = remove_period(post['descripton'])
                             authors = soup.select('.gnt_ar_by_a.gnt_ar_by_a__fi')
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
@@ -926,6 +937,7 @@ def northjersey_scraper():    #Done
                         pass
             except:
                 pass
+
 def theathletic_scraper():    #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
@@ -965,10 +977,10 @@ def theathletic_scraper():    #Done
                             link = res.url
                             header = soup.select_one('h1').text.strip()
                             try:
-                                sentence = soup.select_one('.bodytext1').text.strip().split('.')
+                                sentence = remove_period(soup.select_one('.bodytext1').text.strip()).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = soup.select_one('.bodytext1').text.strip()
+                                sentence = remove_period(soup.select_one('.bodytext1').text.strip())
                             authors = soup.select_one('#articleByLineString').text
                             authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
@@ -1026,10 +1038,10 @@ def apnews_scraper():   #Done
                             my_date = date.strftime("%Y, %m, %d")
                             header = post.select_one('h2').text
                             try:
-                                sentence = post.select_one('p').text.split('.')
+                                sentence = remove_period(post.select_one('p').text).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('p').text
+                                sentence = remove_period(post.select_one('p').text)
                             link = 'https://apnews.com' + post.select_one('.CardHeadline a')['href']
                             authors = post.select_one('.Component-bylines-0-2-142.Component-bylines-0-2-133').text
                             authors = re.split(r'\s+and\s+', authors)
@@ -1089,10 +1101,10 @@ def mlb_scraper():   #Done
                             my_date = date.strftime("%Y, %m, %d")
                             header = post.select_one('h1').text.strip()
                             try:
-                                sentence = post.select_one('p').text.replace('  ', '').replace('\n', ' ').split('.')
+                                sentence = remove_period(post.select_one('p').text.replace('  ', '').replace('\n', ' ')).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('p').text.replace('  ', '').replace('\n', '')
+                                sentence = remove_period(post.select_one('p').text.replace('  ', '').replace('\n', ''))
                             link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
                             authors = post.select_one('.article-item__contributor-byline').text.replace(' ', '').split(',')
                             authors_num = len(authors)
@@ -1141,12 +1153,12 @@ def mlb_extra_scraper():   #Done
                             if delta < timedelta(days=3):
                                 my_date = date.strftime("%Y, %m, %d")
                                 header = post.select_one('h1').text.strip()
-                                sentence = post.select_one('p').text.split('Fla.')[-1].replace('--', '')
+                                sentence = post.select_one('p').text
                                 try:
-                                    sentence = sentence.replace('  ', '').replace('\n', ' ').split('.')
+                                    sentence = remove_period(sentence.replace('  ', '').replace('\n', ' ')).split('.')
                                     sentence = sentence[0]
                                 except:
-                                    sentence = post.select_one('p').text.replace('  ', '').replace('\n', '')
+                                    sentence = remove_period(post.select_one('p').text.replace('  ', '').replace('\n', ''))
                                 link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
                                 authors = post.select_one('.article-item__contributor-byline').text.replace(' ', '').split(',')
                                 authors_num = len(authors)
@@ -1198,10 +1210,10 @@ def courant_scraper():   #Done
                             header = post.select_one('.article-title').text.strip()
                             link = post.select_one('.article-title')['href']
                             try:
-                                sentence = post.select_one('.excerpt').text.strip().split('.')
+                                sentence = remove_period(post.select_one('.excerpt').text.strip()).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('.excerpt').text.strip()
+                                sentence = remove_period(post.select_one('.excerpt').text.strip())
                             res = requests.get(link)
                             soup = BeautifulSoup(res.text, 'lxml')
                             authors = soup.select('.fn a')
@@ -1213,6 +1225,7 @@ def courant_scraper():   #Done
                         pass
             except:
                 pass
+
 def wsj_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
@@ -1251,10 +1264,10 @@ def wsj_scraper():  #Done
                             my_date = date.strftime("%Y, %m, %d") 
                             header = json_data['data']['headline']
                             try:
-                                sentence = json_data['data']['summary'].split('.')
+                                sentence = remove_period(json_data['data']['summary']).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = json_data['data']['summary']
+                                sentence = remove_period(json_data['data']['summary'])
                             link = json_data['data']['canonical_url']
                             authors = json_data['data']['byline']
                             authors = re.split(r'\s+and\s+', authors)
@@ -1305,7 +1318,7 @@ def nydailynews_scraper():  #Done
                             my_date = date.strftime("%Y, %m, %d")
                             link = res.url
                             header = soup.select_one('h1').text
-                            sentence = soup.select_one('article p').text.split('Fla.')[-1].replace('—', '').strip()
+                            sentence = remove_period(soup.select_one('article p').text)
                             try:
                                 sentence = sentence.split('.')
                                 sentence = sentence[0]
@@ -1321,7 +1334,7 @@ def nydailynews_scraper():  #Done
             except:
                 pass
             
-def si_scraper():
+def si_scraper():  #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -1363,7 +1376,11 @@ def si_scraper():
                             my_date = date.strftime("%Y, %m, %d")
                             link = res.url
                             header = soup.select_one('.m-detail-header--title').text
-                            sentence = soup.select_one('.m-detail--body p').text.replace('\xa0', ' ')
+                            try:
+                                sentence = remove_period(soup.select_one('.m-detail--body p').text.replace('\xa0', ' ')).split('.')
+                                sentence = sentence[0]
+                            except:
+                                sentence = remove_period(soup.select_one('.m-detail--body p').text.replace('\xa0', ' '))
                             add_up(data, url, link, header, sentence, my_date)
                         else:
                             break
@@ -1422,10 +1439,10 @@ def sny_scraper():   #Done
                         if delta < timedelta(days=3):
                             header = soup.select_one('h1').text
                             try:
-                                sentence = sentence = soup.select_one('.article-body').text.split('.')
+                                sentence = remove_period(soup.select_one('.article-body').text).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = soup.select_one('.article-body').text
+                                sentence = remove_period(soup.select_one('.article-body').text)
                             link = post_link
                             my_date = date.strftime("%Y, %m, %d")
                             authors = soup.select('.flex.flex-col.whitespace-no-wrap span.font-bold')
@@ -1478,11 +1495,11 @@ def newsday_scraper():  #Done
                         if delta < timedelta(days=3):
                             header = post['headline'].replace('\xa0', ' ')
                             try:
-                                sentence = post['lead']
+                                sentence = remove_period(post['lead'])
                                 sentence = sentence.split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post['lead']
+                                sentence = remove_period(post['lead'])
                             my_date = date.strftime("%Y, %m, %d")
                             link = post['url']
                             authors = post['authors']
@@ -1501,30 +1518,30 @@ class NewsScraper:
         post_item_list.clear()
         item_list.clear()
         s = session()
-        #nytimes_scraper()
-        #forbes_scraper()
-        #nj_scraper()
-        #fangraph_scraper()
-        #cbs_sports_scraper()
-        #ringer_scraper()
-        #sportsbusinessjournal_scraper()
+        nytimes_scraper()
+        forbes_scraper()
+        nj_scraper()
+        fangraph_scraper()
+        cbs_sports_scraper()
+        ringer_scraper()
+        sportsbusinessjournal_scraper()
         yahoo_scraper()
-        #nypost_scraper()
-        #foxsports_scraper()
-        #insider_scraper()
-        #tampabay_scraper()
-        #sporting_news()
-        #northjersey_scraper()
-        #theathletic_scraper()
-        #apnews_scraper()
-        #mlb_scraper()
-        #mlb_extra_scraper()
-        #courant_scraper()
-        #wsj_scraper()
-        #nydailynews_scraper()
-        #si_scraper()
-        #sny_scraper()
-        #newsday_scraper()
+        nypost_scraper()
+        foxsports_scraper()
+        insider_scraper()
+        tampabay_scraper()
+        sporting_news()
+        northjersey_scraper()
+        theathletic_scraper()
+        apnews_scraper()
+        mlb_scraper()
+        mlb_extra_scraper()
+        courant_scraper()
+        wsj_scraper()
+        nydailynews_scraper()
+        si_scraper()
+        sny_scraper()
+        newsday_scraper()
         
 
         return item_list, post_item_list
