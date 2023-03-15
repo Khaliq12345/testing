@@ -229,13 +229,6 @@ for index, row in st.session_state['data1'][:40].iterrows():
     if row["Number of Bylines"] > 1:
         col6.info(f'Number of Bylines: {row["Number of Bylines"]}')
 
-    hti.screenshot(url=row["Post Link"], save_as='screenshot.png')
-    
-    # display screenshot
-    with open('screenshot.png', 'rb') as f:
-        screenshot_bytes = f.read()
-    col2.image(screenshot_bytes)
-    
     #add $ sign to the posts
     if '<$>' not in row['Text']:
         if paywall_button:
