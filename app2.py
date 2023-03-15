@@ -7,15 +7,17 @@ import streamlit as st
 from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
-import cv2
+import os
+#import cv2
 from html2image import Html2Image
+#from PIL import Image
 hti = Html2Image()
 
-def get_image(l):
-    hti.screenshot(url=l, save_as='image.png')
-    image_data = cv2.imread('image.png')
+#def get_image(l):
+    #hti.screenshot(url=l, save_as='image.png')
+    #image_data = cv2.imread('image.png')
 
-    return image_data
+    #return image_data
 
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
@@ -195,9 +197,6 @@ for index, row in st.session_state['data1'][:40].iterrows():
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
     if checkbox:
         selected_rows.append(index)
-    
-    img_data = get_image(row['Post Link'])
-    st.image(img_data)
 
     if "Twit($)ter" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", "").strip().replace('', ''), height=150)
@@ -229,6 +228,13 @@ for index, row in st.session_state['data1'][:40].iterrows():
     paywall_button = col5.button('Paywall', key=f'paywall_{index}')
     if row["Number of Bylines"] > 1:
         col6.info(f'Number of Bylines: {row["Number of Bylines"]}')
+
+    # take screenshot of URL
+    screenshot_path = os.path.join(os.getcwd(), f'screenshot_{index}.png')
+    hti.screenshot(url=row["Post Link"], save_as=screenshot_path)
+    
+    # display screenshot
+    col2.image(screenshot_path)
     
     #add $ sign to the posts
     if '<$>' not in row['Text']:
