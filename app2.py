@@ -235,7 +235,7 @@ for index, row in st.session_state['data1'][:40].iterrows():
     
     # display screenshot
     filename = f'screenshot_{index}.png'
-    col2.image(filename)
+    col2.image(filename, output_format='PNG', output_width=400, output_path=os.path.dirname(screenshot_path))
     
     #add $ sign to the posts
     if '<$>' not in row['Text']:
