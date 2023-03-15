@@ -234,8 +234,9 @@ for index, row in st.session_state['data1'][:40].iterrows():
     hti.screenshot(url=row["Post Link"], save_as=screenshot_path)
     
     # display screenshot
-    filename = f'screenshot_{index}.png'
-    col2.image(filename, output_format='PNG', output_width=400, output_path=os.path.dirname(screenshot_path))
+    with open(screenshot_path, 'rb') as f:
+        screenshot_bytes = f.read()
+    col2.image(screenshot_bytes, output_format='PNG')
     
     #add $ sign to the posts
     if '<$>' not in row['Text']:
