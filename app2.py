@@ -229,14 +229,12 @@ for index, row in st.session_state['data1'][:40].iterrows():
     if row["Number of Bylines"] > 1:
         col6.info(f'Number of Bylines: {row["Number of Bylines"]}')
 
-    # take screenshot of URL
-    screenshot_path = os.path.join(os.getcwd(), f'screenshot_{index}.png')
-    hti.screenshot(url=row["Post Link"], save_as=screenshot_path)
+    hti.screenshot(url=row["Post Link"], save_as='screenshot.png')
     
     # display screenshot
-    with open(screenshot_path, 'rb') as f:
+    with open('screenshot.png', 'rb') as f:
         screenshot_bytes = f.read()
-    col2.image(screenshot_bytes, output_format='PNG')
+    col2.image(screenshot_bytes)
     
     #add $ sign to the posts
     if '<$>' not in row['Text']:
