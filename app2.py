@@ -199,9 +199,10 @@ for index, row in st.session_state['data1'][:40].iterrows():
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
-        #if f'img_{index}' not in st.session_state:
+        if f'img_{index}' not in st.session_state:
             #st.session_state[f'img_{index}'] = get_image(row['Post Link'], f'image_{index}.png')
-        #col2.image(f'image_{index}.png')
+            st.session_state[f'img_{index}'] = get_image('https://www.mlb.com/news', 'image.png')
+        col2.image('image.png')
 
     elif "Face($)book" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
