@@ -130,6 +130,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
 
     post = f'''
     '{header}' by {author_ig} for {pub_ig}: {sentence}... {paywall} {link} I($)G
+    
     👉VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE⚾️
     '''
     post_key = post + '!'
@@ -1518,30 +1519,30 @@ class NewsScraper:
         post_item_list.clear()
         item_list.clear()
         s = session()
-        nytimes_scraper()
-        forbes_scraper()
-        nj_scraper()
-        fangraph_scraper()
-        cbs_sports_scraper()
-        ringer_scraper()
-        sportsbusinessjournal_scraper()
+        # nytimes_scraper()
+        # forbes_scraper()
+        # nj_scraper()
+        # fangraph_scraper()
+        # cbs_sports_scraper()
+        # ringer_scraper()
+        # sportsbusinessjournal_scraper()
         yahoo_scraper()
-        nypost_scraper()
-        foxsports_scraper()
-        insider_scraper()
-        tampabay_scraper()
-        sporting_news()
-        northjersey_scraper()
-        theathletic_scraper()
-        apnews_scraper()
-        mlb_scraper()
-        mlb_extra_scraper()
-        courant_scraper()
-        wsj_scraper()
-        nydailynews_scraper()
-        si_scraper()
-        sny_scraper()
-        newsday_scraper()
+        # nypost_scraper()
+        # foxsports_scraper()
+        # insider_scraper()
+        # tampabay_scraper()
+        # sporting_news()
+        # northjersey_scraper()
+        # theathletic_scraper()
+        # apnews_scraper()
+        # mlb_scraper()
+        # mlb_extra_scraper()
+        # courant_scraper()
+        # wsj_scraper()
+        # nydailynews_scraper()
+        # si_scraper()
+        # sny_scraper()
+        # newsday_scraper()
         
 
         return item_list, post_item_list
