@@ -197,7 +197,7 @@ for index, row in st.session_state['data1'][:40].iterrows():
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
     elif "I($)G" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("I($)G", "").strip(), height=150)
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("I($)G", ""), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("IG")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
