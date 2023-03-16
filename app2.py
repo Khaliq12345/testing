@@ -113,7 +113,79 @@ def add_rows_to_new_database(selected_rows):
     st.experimental_rerun()
 
 def main():
-    pass
+    selected_rows = []
+    for index, row in st.session_state['data1'][:40].iterrows():
+        row_container = st.container()
+        col1, col2, col3, col4, col5, col6 = row_container.columns([5, 3, 2, 2, 2, 2])
+        checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
+        if checkbox:
+            selected_rows.append(index)
+        if "Twit($)ter" in row["Text"]:
+            edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", "").strip().replace('', ''), height=150)
+            st.session_state['data2'].at[index, 'Text'] = edited_text
+            col2.write("Twitter")
+            date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
+            col2.write(date_obj)
+        elif "Face($)book" in row["Text"]:
+            edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
+            st.session_state['data2'].at[index, 'Text'] = edited_text
+            col2.write("Facebook")
+            date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
+            col2.write(date_obj)
+        elif "I($)G" in row["Text"]:
+            edited_text = col1.text_area(f'post_{index}',row["Text"].replace("I($)G", ""), height=150)
+            st.session_state['data2'].at[index, 'Text'] = edited_text
+            col2.write("IG")
+            date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
+            col2.write(date_obj)
+        elif "Linked($)in" in row["Text"]:
+            edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Linked($)in", "").strip(), height=150)
+            st.session_state['data2'].at[index, 'Text'] = edited_text
+            col2.write("Linkedin")
+            date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
+            col2.write(date_obj)
+        col1.write('---------------------------------------')
+        yankees_button = col3.button("Yankees", key=f'yankee_{index}')
+        mets_button = col4.button("Mets", key=f'mets_{index}')
+        paywall_button = col5.button('Paywall', key=f'paywall_{index}')
+        if row["Number of Bylines"] > 1:
+            col6.info(f'Number of Bylines: {row["Number of Bylines"]}')
+
+        #add $ sign to the posts
+        if '<$>' not in row['Text']:
+            if paywall_button:
+                st.session_state['data1'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
+                st.session_state['data2'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
+                st.experimental_rerun()
+        else:
+            if paywall_button:
+                st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('<$>', '')
+                st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('<$>', '')
+                st.experimental_rerun()
+
+        #add #Yankees hashtags to the post
+        if '#Yankees' not in row['Text']:
+            if yankees_button:
+                st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
+                st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
+                st.experimental_rerun()           
+        else:
+            if yankees_button:
+                st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+                st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+                st.experimental_rerun()
+                
+        # Add #Mets hashtags to post
+        if '#Mets' not in row['Text']:
+            if mets_button:
+                st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
+                st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
+                st.experimental_rerun()
+        else:
+            if mets_button:
+                st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
+                st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
+                st.experimental_rerun()
 
 st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
 st.title("Latest News Extractor")
@@ -172,80 +244,6 @@ col4.markdown('</div>', unsafe_allow_html=True)
 
 if "default_checkbox_value" not in st.session_state:
     st.session_state["default_checkbox_value"] = False
-
-selected_rows = []
-for index, row in st.session_state['data1'][:40].iterrows():
-    row_container = st.container()
-    col1, col2, col3, col4, col5, col6 = row_container.columns([5, 3, 2, 2, 2, 2])
-    checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
-    if checkbox:
-        selected_rows.append(index)
-    if "Twit($)ter" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", "").strip().replace('', ''), height=150)
-        st.session_state['data2'].at[index, 'Text'] = edited_text
-        col2.write("Twitter")
-        date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
-        col2.write(date_obj)
-    elif "Face($)book" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
-        st.session_state['data2'].at[index, 'Text'] = edited_text
-        col2.write("Facebook")
-        date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
-        col2.write(date_obj)
-    elif "I($)G" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("I($)G", ""), height=150)
-        st.session_state['data2'].at[index, 'Text'] = edited_text
-        col2.write("IG")
-        date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
-        col2.write(date_obj)
-    elif "Linked($)in" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Linked($)in", "").strip(), height=150)
-        st.session_state['data2'].at[index, 'Text'] = edited_text
-        col2.write("Linkedin")
-        date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
-        col2.write(date_obj)
-    col1.write('---------------------------------------')
-    yankees_button = col3.button("Yankees", key=f'yankee_{index}')
-    mets_button = col4.button("Mets", key=f'mets_{index}')
-    paywall_button = col5.button('Paywall', key=f'paywall_{index}')
-    if row["Number of Bylines"] > 1:
-        col6.info(f'Number of Bylines: {row["Number of Bylines"]}')
-
-    #add $ sign to the posts
-    if '<$>' not in row['Text']:
-        if paywall_button:
-            st.session_state['data1'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
-            st.session_state['data2'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
-            st.experimental_rerun()
-    else:
-        if paywall_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('<$>', '')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('<$>', '')
-            st.experimental_rerun()
-
-    #add #Yankees hashtags to the post
-    if '#Yankees' not in row['Text']:
-        if yankees_button:
-            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
-            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
-            st.experimental_rerun()           
-    else:
-        if yankees_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
-            st.experimental_rerun()
-            
-    # Add #Mets hashtags to post
-    if '#Mets' not in row['Text']:
-        if mets_button:
-            st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
-            st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
-            st.experimental_rerun()
-    else:
-        if mets_button:
-            st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
-            st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
-            st.experimental_rerun()
 
 # Add buttons to the container
 button2_container = st.container()
