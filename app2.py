@@ -112,12 +112,6 @@ def add_rows_to_new_database(selected_rows):
     st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
 
-def select_all_checkbox():
-    st.session_state["default_checkbox_value"] = True
-
-def deselect_all_checkbox():
-    st.session_state["default_checkbox_value"] = False
-
 def main():
     pass
 
@@ -153,8 +147,8 @@ button_container = st.container()
 
 # Add buttons to the container
 col1, col2, col3, col4 = button_container.columns([1, 1, 1, 1])
-del_button = col1.button("Delete Rows")
-commit_button = col2.button("Commit Rows")
+del_button = col1.button("Delete Rows", key='del_button')
+commit_button = col2.button("Commit Rows", key='commit_button')
 select_all_button = col3.button('Select all')
 deselect_all_button = col4.button('Deselect all')
 
@@ -177,6 +171,10 @@ col4.markdown(f'<div style="{button_container_style}">', unsafe_allow_html=True)
 col4.markdown('</div>', unsafe_allow_html=True)
 
 if "default_checkbox_value" not in st.session_state:
+    st.session_state["default_checkbox_value"] = False
+if select_all_button:
+    st.session_state["default_checkbox_value"] = True
+if deselect_all_button:
     st.session_state["default_checkbox_value"] = False
 
 selected_rows = []
@@ -255,18 +253,11 @@ for index, row in st.session_state['data1'][:40].iterrows():
 
 # Add buttons to the container
 button2_container = st.container()
-col1, col2, col3, col4 = button2_container.columns([1, 1, 1, 1])
-del_button2 = col1.button("Delete2 Rows")
-commit_button2 = col2.button("Commit2 Rows")
-select_all_button2 = col3.button('Select2 all')
-deselect_all_button2 = col4.button('Deselect2 all')
+col1, col2 = button2_container.columns([1, 1])
+del_button2 = col1.button("Delete Rows", key='del_button2')
+commit_button2 = col2.button("Commit Rows", key='commit_button2')
 
-if select_all_button or select_all_button2:
-    select_all_checkbox()
-if deselect_all_button or deselect_all_button2:
-    deselect_all_checkbox()
-
-        # Add a button to delete selected rows
+# Add a button to delete selected rows
 if del_button or del_button2:
     delete_rows(selected_rows)
 
