@@ -252,11 +252,11 @@ for index, row in st.session_state['data1'][:40].iterrows():
             st.experimental_rerun()
 
         # Add a button to delete selected rows
-if del_button:
+if del_button or del_button2:
     delete_rows(selected_rows)
 
 # Add a button to add selected rows to new database
-if commit_button:
+if commit_button or commit_button2:
     add_rows_to_new_database(selected_rows)
 
 # Add buttons to the container
