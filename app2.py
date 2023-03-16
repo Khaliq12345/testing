@@ -259,6 +259,12 @@ if del_button:
 if commit_button:
     add_rows_to_new_database(selected_rows)
 
+# Add buttons to the container
+col1, col2, col3, col4 = button2_container.columns([1, 1, 1, 1])
+del_button = col1.button("Delete Rows")
+commit_button = col2.button("Commit Rows")
+select_all_button = col3.button('Select all')
+deselect_all_button = col4.button('Deselect all')
     
 downlaod_container = st.container()
 downlaod_1, downlaod_2, downlaod_3, downlaod_4 = downlaod_container.columns([1, 1, 1, 1])
