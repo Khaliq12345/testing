@@ -260,6 +260,7 @@ if commit_button:
     add_rows_to_new_database(selected_rows)
 
 # Add buttons to the container
+button2_container = st.container()
 col1, col2, col3, col4 = button2_container.columns([1, 1, 1, 1])
 del_button = col1.button("Delete Rows")
 commit_button = col2.button("Commit Rows")
