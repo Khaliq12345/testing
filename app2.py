@@ -172,9 +172,9 @@ col4.markdown('</div>', unsafe_allow_html=True)
 
 if "default_checkbox_value" not in st.session_state:
     st.session_state["default_checkbox_value"] = False
-if select_all_button:
+if select_all_button or select_all_button2:
     st.session_state["default_checkbox_value"] = True
-if deselect_all_button:
+if deselect_all_button or deselect_all_button2:
     st.session_state["default_checkbox_value"] = False
 
 selected_rows = []
