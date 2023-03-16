@@ -131,7 +131,7 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
     post = f'''
     '{header}' by {author_ig} for {pub_ig}: {sentence}... {paywall} {link} I($)G
     
-    👉VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE⚾️
+👉VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE⚾️
     '''
     post_key = post + '!'
     post_item = {
