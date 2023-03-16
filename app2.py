@@ -112,6 +112,12 @@ def add_rows_to_new_database(selected_rows):
     st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
 
+def select_all_checkbox():
+    st.session_state["default_checkbox_value"] = True
+
+def deselect_all_checkbox():
+    st.session_state["default_checkbox_value"] = False
+
 def main():
     pass
 
@@ -256,9 +262,9 @@ select_all_button2 = col3.button('Select2 all')
 deselect_all_button2 = col4.button('Deselect2 all')
 
 if select_all_button or select_all_button2:
-    st.session_state["default_checkbox_value"] = True
+    select_all_checkbox()
 if deselect_all_button or deselect_all_button2:
-    st.session_state["default_checkbox_value"] = False
+    deselect_all_checkbox()
 
         # Add a button to delete selected rows
 if del_button or del_button2:
