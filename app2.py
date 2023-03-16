@@ -255,8 +255,6 @@ commit_button2 = col2.button("Commit2 Rows")
 select_all_button2 = col3.button('Select2 all')
 deselect_all_button2 = col4.button('Deselect2 all')
 
-if "default_checkbox_value" not in st.session_state:
-    st.session_state["default_checkbox_value"] = False
 if select_all_button or select_all_button2:
     st.session_state["default_checkbox_value"] = True
 if deselect_all_button or deselect_all_button2:
