@@ -121,6 +121,7 @@ st.warning('Please click on the scrape button to refresh the page, especially if
 
 scrape_button = st.button('Scrape')
 if scrape_button:
+    st.session_state['engine'].dispose()
     for key in st.session_state.keys():
         del st.session_state[key]
     create_database()
