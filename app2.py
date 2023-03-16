@@ -172,10 +172,6 @@ col4.markdown('</div>', unsafe_allow_html=True)
 
 if "default_checkbox_value" not in st.session_state:
     st.session_state["default_checkbox_value"] = False
-if select_all_button:
-    st.session_state["default_checkbox_value"] = True
-if deselect_all_button:
-    st.session_state["default_checkbox_value"] = False
 
 selected_rows = []
 for index, row in st.session_state['data1'][:40].iterrows():
@@ -261,9 +257,9 @@ deselect_all_button2 = col4.button('Deselect2 all')
 
 if "default_checkbox_value" not in st.session_state:
     st.session_state["default_checkbox_value"] = False
-if select_all_button2:
+if select_all_button or select_all_button2:
     st.session_state["default_checkbox_value"] = True
-if deselect_all_button2:
+if deselect_all_button or deselect_all_button2:
     st.session_state["default_checkbox_value"] = False
 
         # Add a button to delete selected rows
