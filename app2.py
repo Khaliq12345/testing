@@ -254,10 +254,10 @@ for index, row in st.session_state['data1'][:40].iterrows():
 # Add buttons to the container
 button2_container = st.container()
 col1, col2, col3, col4 = button2_container.columns([1, 1, 1, 1])
-del_button2 = col1.button("Delete Rows")
-commit_button2 = col2.button("Commit Rows")
-select_all_button2 = col3.button('Select all')
-deselect_all_button2 = col4.button('Deselect all')
+del_button2 = col1.button("Delete2 Rows")
+commit_button2 = col2.button("Commit2 Rows")
+select_all_button2 = col3.button('Select2 all')
+deselect_all_button2 = col4.button('Deselect2 all')
 
         # Add a button to delete selected rows
 if del_button or del_button2:
