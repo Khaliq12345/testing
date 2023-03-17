@@ -135,6 +135,8 @@ if 'data1' not in st.session_state:
         st.session_state['data2'] = df2
     except:
         st.warning('The scraper has no scraped data to display. Click on the scrape to display the latest news.', icon="⚠️")
+        st.stop()
+        
 total_data = len(st.session_state['data1'])
 st.subheader(f'Total Posts to be processed: {total_data}')
 
