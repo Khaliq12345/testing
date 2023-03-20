@@ -6,6 +6,11 @@ import streamlit as st
 from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
+from html2image import Html2Image
+hti = Html2Image()
+
+def get_image(link, image):
+    hti.screenshot(url=link, save_as=f'{image}.png')
 
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
@@ -193,6 +198,10 @@ for index, row in st.session_state['data1'][:5].iterrows():
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
+        if f'image_{index}' not in st.session_state:
+            st.session_state[f'image_{index}'] = get_image(row['Post Link'], f'image_{index}')
+        col2.image(f'image_{index}.png')
+
     elif "Face($)book" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
         st.session_state['data2'].at[index, 'Text'] = edited_text
