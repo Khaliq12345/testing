@@ -15,7 +15,8 @@ def get_image(link, image):
         browser = p.chromium.launch()
         page = browser.new_page()
         page.goto(link)
-        page.screenshot(path=f"{image}.png")
+        page.screenshot(path=f"{image}.jpeg", type= 'jpeg', quality= 10, clip= (500, 500),
+        animation= 'disabled')
         browser.close()
 
 if 'engine' not in st.session_state:
