@@ -181,7 +181,7 @@ if deselect_all_button:
     st.session_state["default_checkbox_value"] = False
 
 selected_rows = []
-for index, row in st.session_state['data1'][:40].iterrows():
+for index, row in st.session_state['data1'][:5].iterrows():
     row_container = st.container()
     col1, col2, col3, col4, col5, col6 = row_container.columns([5, 3, 2, 2, 2, 2])
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
