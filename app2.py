@@ -8,9 +8,15 @@ from sqlalchemy import create_engine, text
 from datetime import datetime
 from html2image import Html2Image
 hti = Html2Image()
+from playwright.sync_api import sync_playwright
 
 def get_image(link, image):
-    hti.screenshot(url=link, save_as=f'{image}.png')
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        page.goto(link)
+        page.screenshot(path=f"{image}.png")
+        browser.close()
 
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
