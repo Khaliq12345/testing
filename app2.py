@@ -192,6 +192,11 @@ if select_all_button:
 if deselect_all_button:
     st.session_state["default_checkbox_value"] = False
 
+for index, row in st.session_state['data1'][:40].iterrows():
+        if f'image_{index}' not in st.session_state:
+            if "Twit($)ter" in row["Text"]:
+                st.session_state[f'image_{index}'] = get_image(row['Post Link'], f'image_{index}')
+
 selected_rows = []
 for index, row in st.session_state['data1'][:40].iterrows():
     row_container = st.container()
@@ -205,8 +210,6 @@ for index, row in st.session_state['data1'][:40].iterrows():
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
-        if f'image_{index}' not in st.session_state:
-            st.session_state[f'image_{index}'] = get_image(row['Post Link'], f'image_{index}')
         col2.image(f'image_{index}.png')
 
     elif "Face($)book" in row["Text"]:
