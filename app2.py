@@ -15,8 +15,11 @@ def get_image(link, image):
         browser = p.chromium.launch()
         page = browser.new_page()
         page.set_viewport_size({"width": 2000, "height": 2080})
-        page.goto(link, timeout= 100000)
-        page.screenshot(path=f"{image}", type= 'jpeg', animations= 'disabled')
+        try:
+            page.goto(link, timeout= 100000)
+            page.screenshot(path=f"{image}", type= 'jpeg', animations= 'disabled')
+        except:
+            pass
         browser.close()
 
 if 'engine' not in st.session_state:
@@ -210,7 +213,10 @@ for index, row in st.session_state['data1'][:20].iterrows():
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
-        col2.image(f'image_{index}.jpeg')
+        try:
+            col2.image(f'image_{index}.jpeg')
+        except:
+            st.warning('Page was unable to load for the screenshot')
 
     elif "Face($)book" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
