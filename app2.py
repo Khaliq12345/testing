@@ -14,7 +14,7 @@ def get_image(link, image):
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
-        page.set_viewport_size({"width": 1000, "height": 1080})
+        page.set_viewport_size({"width": 2000, "height": 2080})
         page.goto(link)
         page.screenshot(path=f"{image}", type= 'jpeg', quality= 10, animations= 'disabled')
         browser.close()
