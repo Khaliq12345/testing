@@ -15,7 +15,7 @@ def get_image(link, image):
         browser = p.chromium.launch()
         page = browser.new_page()
         page.goto(link)
-        screenshot_options = {'path': f"{image}.jpeg", 'clip': {'x': 0, 'y': 0, 'width': 800, 'height': 1200}}
+        screenshot_options = {'path': f"{image}.jpeg", 'clip': {'x': 0, 'y': 0, 'width': 800, 'height': 200}}
         page.screenshot(**screenshot_options)
         browser.close()
 
