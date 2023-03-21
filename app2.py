@@ -15,7 +15,7 @@ def get_image(link, image):
         browser = p.chromium.launch()
         page = browser.new_page()
         page.goto(link)
-        page.screenshot(path=f"{image}.jpeg", type= 'jpeg', quality= 10, 
+        page.screenshot(path=f"{image}", type= 'jpeg', quality= 10, 
         animations= 'disabled')
         browser.close()
 
@@ -195,7 +195,7 @@ if deselect_all_button:
 for index, row in st.session_state['data1'][:40].iterrows():
         if f'image_{index}' not in st.session_state:
             if "Twit($)ter" in row["Text"]:
-                st.session_state[f'image_{index}'] = get_image(row['Post Link'], f'image_{index}')
+                st.session_state[f'image_{index}'] = get_image(row['Post Link'], f'image_{index}.jpeg')
 
 selected_rows = []
 for index, row in st.session_state['data1'][:40].iterrows():
@@ -210,7 +210,7 @@ for index, row in st.session_state['data1'][:40].iterrows():
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
-        col2.image(f'image_{index}.png')
+        col2.image(f'image_{index}.jpeg')
 
     elif "Face($)book" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
