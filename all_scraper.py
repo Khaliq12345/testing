@@ -1523,7 +1523,7 @@ class NewsScraper:
         s = session()
         nytimes_scraper()
         #forbes_scraper()
-        # nj_scraper()
+        nj_scraper()
         # fangraph_scraper()
         # cbs_sports_scraper()
         # ringer_scraper()
