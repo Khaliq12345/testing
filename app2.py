@@ -16,7 +16,7 @@ def get_image(link, image):
         page = browser.new_page()
         page.set_viewport_size({"width": 2000, "height": 2080})
         page.goto(link)
-        page.screenshot(path=f"{image}", type= 'jpeg', quality= 10, animations= 'disabled')
+        page.screenshot(path=f"{image}", type= 'jpeg', animations= 'disabled')
         browser.close()
 
 if 'engine' not in st.session_state:
