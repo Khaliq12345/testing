@@ -15,7 +15,7 @@ def get_image(link, image):
         browser = p.chromium.launch()
         page = browser.new_page()
         page.set_viewport_size({"width": 2000, "height": 2080})
-        page.goto(link)
+        page.goto(link, wait_until='networkidle', timeout= 100000)
         page.screenshot(path=f"{image}", type= 'jpeg', animations= 'disabled')
         browser.close()
 
