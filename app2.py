@@ -16,7 +16,7 @@ def get_image(link, image):
         page = browser.new_page()
         page.set_viewport_size({"width": 2000, "height": 2080})
         try:
-            page.goto(link, timeout= 100000)
+            page.goto(link)
             page.screenshot(path=f"{image}", type= 'jpeg', animations= 'disabled')
         except:
             pass
