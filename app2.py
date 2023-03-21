@@ -192,13 +192,13 @@ if select_all_button:
 if deselect_all_button:
     st.session_state["default_checkbox_value"] = False
 
-for index, row in st.session_state['data1'][:40].iterrows():
+for index, row in st.session_state['data1'][:20].iterrows():
         if f'image_{index}' not in st.session_state:
             if "Twit($)ter" in row["Text"]:
                 st.session_state[f'image_{index}'] = get_image(row['Post Link'], f'image_{index}.jpeg')
 
 selected_rows = []
-for index, row in st.session_state['data1'][:40].iterrows():
+for index, row in st.session_state['data1'][:20].iterrows():
     row_container = st.container()
     col1, col2, col3, col4, col5, col6 = row_container.columns([5, 3, 2, 2, 2, 2])
     checkbox = col1.checkbox("check_box", key=f'box_{index}', value=st.session_state["default_checkbox_value"])
