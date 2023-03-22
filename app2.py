@@ -7,14 +7,16 @@ import streamlit as st
 from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
-from html2image import Html2Image
-hti = Html2Image()
 from playwright.sync_api import sync_playwright
+from urllib.parse import urlencode
+from urllib.request import urlretrieve
 
-hti = Html2Image()
 def get_image(link, image):
     try:
-        hti.screenshot(url=link, save_as=f'{image}.jpeg')
+        params = urlencode(dict(access_key=st.secrets.SCREENSHOT_API,
+                        url=link, 
+                        quality= 10, width=1920, height= 2000, wait_until='page_loaded'))
+        urlretrieve("https://api.apiflash.com/v1/urltoimage?" + params, f"{image}.jpeg")
     except:
         pass
 
