@@ -7,15 +7,6 @@ import streamlit as st
 from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
-from playwright.sync_api import sync_playwright
-from urllib.parse import urlencode
-from urllib.request import urlretrieve
-
-def get_image(link, image):
-    params = urlencode(dict(access_key=st.secrets.SCREENSHOT_API,
-                    url=link, 
-                    quality= 10, width=1920, height= 2000, wait_until='page_loaded'))
-    urlretrieve("https://api.apiflash.com/v1/urltoimage?" + params, f"{image}")
 
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
@@ -103,10 +94,6 @@ def delete_rows(selected_rows):
         if index in selected_rows:
             st.session_state['data1'] = st.session_state['data1'].drop(index)
             st.session_state['data2'] = st.session_state['data2'].drop(index)
-            try:
-                os.remove(f'image_{index}.jpeg')
-            except FileNotFoundError:
-                pass
     st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
 
@@ -123,10 +110,6 @@ def add_rows_to_new_database(selected_rows):
         if index in selected_rows:
             st.session_state['data1'] = st.session_state['data1'].drop(index)
             st.session_state['data2'] = st.session_state['data2'].drop(index)
-            try:
-                os.remove(f'image_{index}.jpeg')
-            except FileNotFoundError:
-                pass
     st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
 
@@ -198,11 +181,6 @@ if select_all_button:
 if deselect_all_button:
     st.session_state["default_checkbox_value"] = False
 
-for index, row in st.session_state['data1'][:20].iterrows():
-        if f'image_{index}' not in st.session_state:
-            if "Twit($)ter" in row["Text"]:
-                st.session_state[f'image_{index}'] = get_image(row['Post Link'], f'image_{index}.jpeg')
-
 selected_rows = []
 for index, row in st.session_state['data1'][:20].iterrows():
     row_container = st.container()
@@ -216,10 +194,6 @@ for index, row in st.session_state['data1'][:20].iterrows():
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
-        try:
-            col2.image(f'image_{index}.jpeg')
-        except:
-            st.warning('Page was unable to load for the screenshot')
 
     elif "Face($)book" in row["Text"]:
         edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
