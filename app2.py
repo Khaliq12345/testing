@@ -11,17 +11,12 @@ from html2image import Html2Image
 hti = Html2Image()
 from playwright.sync_api import sync_playwright
 
+hti = Html2Image()
 def get_image(link, image):
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
-        page.set_viewport_size({"width": 2000, "height": 2080})
-        try:
-            page.goto(link)
-            page.screenshot(path=f"{image}", type= 'jpeg', animations= 'disabled')
-        except:
-            pass
-        browser.close()
+    try:
+        hti.screenshot(url=link, save_as=f'{image}.jpeg')
+    except:
+        pass
 
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
