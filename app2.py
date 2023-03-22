@@ -16,7 +16,7 @@ def get_image(link, image):
         params = urlencode(dict(access_key=st.secrets.SCREENSHOT_API,
                         url=link, 
                         quality= 10, width=1920, height= 2000, wait_until='page_loaded'))
-        urlretrieve("https://api.apiflash.com/v1/urltoimage?" + params, f"{image}.jpeg")
+        urlretrieve("https://api.apiflash.com/v1/urltoimage?" + params, f"{image}")
     except:
         pass
 
