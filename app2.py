@@ -318,8 +318,8 @@ if send:
     send_to_gsheet(commited_data('Face\(\$\)book'), st.secrets['fb_sheet'])
     send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
     send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
-    engine = st.session_state['engine']
-    selected_df = pd.DataFrame()
+    #engine = st.session_state['engine']
+    #selected_df = pd.DataFrame()
     #clean_selected_df = clean_data(selected_df)
     #saving to commit database for the next step
-    selected_df.to_sql(name='commit', con=engine, schema='hardball2019_bbwaa', if_exists='replace', index=False)
+    #selected_df.to_sql(name='commit', con=engine, schema='hardball2019_bbwaa', if_exists='replace', index=False)
