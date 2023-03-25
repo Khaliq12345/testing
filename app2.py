@@ -316,13 +316,16 @@ if commit_button or commit_button2:
 #new
 to_gsheet = st.container()
 gsheet_1, gsheet_2 = to_gsheet.columns([1, 1])
-send = gsheet_1.button('Send to Committed data to Google Sheet')
-if send:
+send_button = gsheet_1.button('Send Committed data to Google Sheet')
+if send_button:
     send_to_gsheet(commited_data('Twit\(\$\)ter'), st.secrets['twitter_sheet'])
     send_to_gsheet(commited_data('Face\(\$\)book'), st.secrets['fb_sheet'])
     send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
     send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
-    #clear_commit()
+
+clear_commit_button = gsheet_2.button('Clear committed data')
+if clear_commit_button:
+    clear_commit()
     
 downlaod_container = st.container()
 downlaod_1, downlaod_2, downlaod_3, downlaod_4 = downlaod_container.columns([1, 1, 1, 1])
