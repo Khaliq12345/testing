@@ -157,6 +157,7 @@ def clear_commit():
     conn = engine.connect()
     query = text('TRUNCATE TABLE commit')
     df = pd.read_sql_query(query, conn)
+    return df
 
 def main():
     pass
