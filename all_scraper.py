@@ -143,7 +143,7 @@ def add_up(data, url, link, header, sentence, my_date, image_url=None, author_na
         'Text': 'None',
         'Date': 'None',
         'Post Link': 'None',
-        'Post Key': 'None',
+        'Post key': 'None',
         'Number of Bylines': 0,
         'Image url': 'None'
         }
@@ -152,7 +152,7 @@ def add_up(data, url, link, header, sentence, my_date, image_url=None, author_na
             'Text': post.strip(),
             'Date': my_date,
             'Post Link': link,
-            'Post Key': post_key,
+            'Post key': post_key,
             'Number of Bylines': author_number,
             'Image url': image_url
         }
