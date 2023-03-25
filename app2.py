@@ -153,10 +153,9 @@ def add_rows_to_new_database(selected_rows):
     st.experimental_rerun()
 
 def clear_commit():
-    engine = st.session_state['engine']
-    with engine.connect() as con:
-        con.execution_options(autocommit=True).execute(text("TRUNCATE TABLE commit"))
-    st.success('Table truncated!')
+    conn = engine.connect()
+    query = text('TRUNCATE TABLE commit')
+    df = pd.read_sql_query(query, conn)
 
 def main():
     pass
