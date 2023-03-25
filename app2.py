@@ -323,3 +323,7 @@ if send:
     send_to_gsheet(commited_data('Face\(\$\)book'), st.secrets['fb_sheet'])
     send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
     send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
+
+    engine = st.session_state['engine']
+    empty_df = pd.DataFrame(columns=['Text', 'Date', 'Post Link', 'Post key', 'Number of Bylines', 'Image url'])
+    empty_df.to_sql(name='commit', con=engine, schema='hardball2019_bbwaa', if_exists='replace', index=False)  
