@@ -18,7 +18,7 @@ from pydrive.drive import GoogleDrive
 scopes = ['https://www.googleapis.com/auth/spreadsheets',
           'https://www.googleapis.com/auth/drive']
 def send_to_gsheet(df):
-    credentials = Credentials.from_service_account_file(st.secrets["gcp_service_account"], scopes=scopes)
+    credentials = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scopes)
     gc = gspread.authorize(credentials)
     gauth = GoogleAuth()
     drive = GoogleDrive(gauth)
