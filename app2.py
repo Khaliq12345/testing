@@ -146,9 +146,6 @@ def add_rows_to_new_database(selected_rows):
     st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
 
-def main():
-    pass
-
 st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
 st.title("Latest News Extractor")
 st.warning('Please click on the scrape button to refresh the page, especially if you have just loaded it. The displayed data may have been removed or finalized.')
