@@ -314,6 +314,7 @@ if del_button or del_button2:
 # Add a button to add selected rows to new database
 if commit_button or commit_button2:
     add_rows_to_new_database(selected_rows)
+    clear_commit()
     
 downlaod_container = st.container()
 downlaod_1, downlaod_2, downlaod_3, downlaod_4 = downlaod_container.columns([1, 1, 1, 1])
@@ -332,5 +333,4 @@ if send:
     send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
     send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
     st.write('Good')
-    clear_commit()
     st.write('Great')
