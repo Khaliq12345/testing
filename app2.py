@@ -155,7 +155,7 @@ def add_rows_to_new_database(selected_rows):
 def clear_commit():
     engine = st.session_state['engine']
     with engine.connect() as con:
-        con.execution_options(autocommit=True).execute("TRUNCATE TABLE foo;")
+        con.execution_options(autocommit=True).execute(text("TRUNCATE TABLE commit"))
 
 def main():
     pass
