@@ -140,12 +140,12 @@ def add_up(data, url, link, header, sentence, my_date, image_url=None, author_na
     post_key = post + '!'
     if image_url == None:
         post_item = {
-        'Text': None,
-        'Date': None,
-        'Post Link': None,
-        'Post key': None,
-        'Number of Bylines': None,
-        'Image url': None
+        'Text': 'None',
+        'Date': 'None',
+        'Post Link': 'None',
+        'Post key': 'None',
+        'Number of Bylines': 'None',
+        'Image url': 'None'
         }
     else:
         post_item = {
