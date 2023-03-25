@@ -315,6 +315,9 @@ if del_button or del_button2:
 if commit_button or commit_button2:
     add_rows_to_new_database(selected_rows)
 
+#new
+to_gsheet = st.container()
+gsheet_1, gsheet_2 = to_gsheet.columns([1, 1])
 send = gsheet_1.button('Send to Committed data to Google Sheet')
 if send:
     clear_commit()
@@ -326,9 +329,3 @@ downlaod_button_2 = downlaod_2.download_button("Press to Download Facebook Posts
 downlaod_button_3 = downlaod_3.download_button("Press to Download Instagram Posts", downlaod_commited('I\(\$\)G'), "ig_posts.csv", "text/csv", key='ig_download-csv')
 downlaod_button_4 = downlaod_4.download_button("Press to Download LinkedIn Posts", downlaod_commited('Linked\(\$\)in'), "linkedin_posts.csv", "text/csv", key='linkedin_download-csv')
 
-#new
-to_gsheet = st.container()
-gsheet_1, gsheet_2 = to_gsheet.columns([1, 1])
-send = gsheet_1.button('Send to Committed data to Google Sheet')
-if send:
-    clear_commit()
