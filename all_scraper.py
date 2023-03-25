@@ -1,3 +1,5 @@
+import os
+os.system("playwright install chromium")
 import streamlit as st
 from playwright.sync_api import sync_playwright
 import requests
@@ -15,10 +17,10 @@ import dateutil.parser
 import pytz
 eastern_tz = pytz.timezone('US/Eastern')
 
-hostname="162.240.57.245"
-dbname="hardball2019_bbwaa"
-uname="hardball2019_scraper"
-pwd="Bbo549ahhN;Y"
+hostname=st.secrets['hostname']
+dbname=st.secrets['dbname']
+uname=st.secrets['uname']
+pwd=st.secrets['pwd']
 
 post_item_list =[]
 item_list = []
@@ -33,8 +35,13 @@ def remove_period(text):
     
     # Join the modified words back into a string
     return ' '.join(words)
+<<<<<<< HEAD
+    
+def add_up(data, url, link, header, sentence, my_date, image_url=None, author_name=None, author_number = 1):
+=======
 
 def add_up(data, url, link, header, sentence, my_date, image_url=None, author_name=None, author_number = 1):
+>>>>>>> f9c70d08f58ca3b252418de345e4982168a7d5a3
     if author_name is not None:
         author_twitter = str(data.loc[(data['Author Name'] == author_name), 'Author Twitter'].item()).replace('"', '')
         pub_twitter = str(data.loc[(data['Author Name'] == author_name), 'Publication Twitter'].item()).replace('"', '')
@@ -132,8 +139,13 @@ def add_up(data, url, link, header, sentence, my_date, image_url=None, author_na
 
     post = f'''
     '{header}' by {author_ig} for {pub_ig}: {sentence}... {paywall} {link} I($)G
+<<<<<<< HEAD
+
+    👉VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE⚾️
+=======
 
 👉VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE⚾️
+>>>>>>> f9c70d08f58ca3b252418de345e4982168a7d5a3
     '''
     post_key = post + '!'
     if image_url == None:
@@ -1627,9 +1639,14 @@ def newsday_scraper():  #Done
                         pass
             except:
                 pass
+<<<<<<< HEAD
+  
+            
+=======
 
 
 
+>>>>>>> f9c70d08f58ca3b252418de345e4982168a7d5a3
 class NewsScraper:
     @staticmethod
     def scrapers():
