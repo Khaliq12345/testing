@@ -11,5 +11,7 @@ sqlalchemy
 pymysql
 playwright
 cloudscraper
-opencv-python
-html2image
+gspread
+gspread_dataframe
+pydrive
+google

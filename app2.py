@@ -7,6 +7,26 @@ import streamlit as st
 from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
+#new
+import gspread
+from gspread_dataframe import set_with_dataframe
+from google.oauth2.service_account import Credentials
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+
+#new
+scopes = ['https://www.googleapis.com/auth/spreadsheets',
+          'https://www.googleapis.com/auth/drive']
+def send_to_gsheet(df):
+    credentials = Credentials.from_service_account_file(st.secrets["gcp_service_account"], scopes=scopes)
+    gc = gspread.authorize(credentials)
+    gauth = GoogleAuth()
+    drive = GoogleDrive(gauth)
+    gs = gc.open_by_key(st.secrets["twitter_sheet"])
+    worksheet1 = gs.worksheet('Sheet1')
+    worksheet1.clear()
+    set_with_dataframe(worksheet=worksheet1, dataframe=df, include_index=False,
+    include_column_header=True, resize=True)
 
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
@@ -29,15 +49,28 @@ def delete_blacklisted(df_a):
     df_a = df_a[~links_to_drop]
     return df_a
 
+#new
 def downlaod_commited(symb):
     engine = st.session_state['engine']
     conn = engine.connect()
     query = text('SELECT * FROM commit')
     df = pd.read_sql_query(query, conn)
     df = df[df['Post key'].str.contains(fr'{symb}')]
-    df = df.drop(['Date', 'Post Link', 'Post key', 'Number of Bylines'], axis=1)
+    df = df.drop(['Date', 'Post Link', 'Post key', 'Number of Bylines','Image url'], axis=1)
     csv = convert_df(df)
     return csv
+#new
+def commited_data(symb):
+    engine = st.session_state['engine']
+    conn = engine.connect()
+    query = text('SELECT * FROM commit')
+    df = pd.read_sql_query(query, conn)
+    df = df[df['Post key'].str.contains(fr'{symb}')]
+    if symb == 'I\(\$\)G':
+        df = df.drop(['Date', 'Post key', 'Number of Bylines'], axis=1)
+    else:
+        df = df.drop(['Date', 'Post key', 'Number of Bylines', 'Image url'], axis=1)
+    return df
 
 def add_paywall(text, symb):
 # define the pattern to select the link
@@ -275,3 +308,10 @@ downlaod_button_1 = downlaod_1.download_button("Press to Download Twitter Posts"
 downlaod_button_2 = downlaod_2.download_button("Press to Download Facebook Posts", downlaod_commited('Face\(\$\)book'), "fb_posts.csv", "text/csv", key='fb_download-csv')
 downlaod_button_3 = downlaod_3.download_button("Press to Download Instagram Posts", downlaod_commited('I\(\$\)G'), "ig_posts.csv", "text/csv", key='ig_download-csv')
 downlaod_button_3 = downlaod_4.download_button("Press to Download LinkedIn Posts", downlaod_commited('Linked\(\$\)in'), "linkedin_posts.csv", "text/csv", key='linkedin_download-csv')
+
+#new
+to_gsheet = st.container()
+gsheet_1, gsheet_2 = to_gsheet.columns([1, 1])
+twitter_gsheet = gsheet_1.button('Send to Twitter Sheet')
+if twitter_gsheet:
+    send_to_gsheet(commited_data('Twit\(\$\)ter'))
