@@ -156,7 +156,7 @@ def clear_commit():
     engine = st.session_state['engine']
     with engine.connect() as con:
         con.execution_options(autocommit=True).execute(text("TRUNCATE TABLE commit"))
-    st.experimental_rerun()
+    st.success('Table truncated!')
 
 def main():
     pass
