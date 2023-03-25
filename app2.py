@@ -45,8 +45,6 @@ def delete_blacklisted(df_a):
     conn = engine.connect()
     query = text('SELECT * FROM black_list')
     df_b = pd.read_sql_query(query, conn)
-    st.write(df_a.columns)
-    st.write(df_b.columns)
     links_to_drop = df_a['Post key'].isin(df_b['Post key'])
     df_a = df_a[~links_to_drop]
     return df_a
@@ -147,6 +145,9 @@ def add_rows_to_new_database(selected_rows):
             st.session_state['data2'] = st.session_state['data2'].drop(index)
     st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
+
+def main():
+    pass
 
 st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
 st.title("Latest News Extractor")
