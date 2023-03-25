@@ -314,6 +314,9 @@ if del_button or del_button2:
 # Add a button to add selected rows to new database
 if commit_button or commit_button2:
     add_rows_to_new_database(selected_rows)
+
+send = gsheet_1.button('Send to Committed data to Google Sheet')
+if send:
     clear_commit()
     
 downlaod_container = st.container()
