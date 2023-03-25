@@ -45,8 +45,6 @@ def delete_blacklisted(df_a):
     conn = engine.connect()
     query = text('SELECT * FROM black_list')
     df_b = pd.read_sql_query(query, conn)
-    st.dataframe(df_a['Post key'])
-    st.dataframe(df_b['Post key'])
     links_to_drop = df_a['Post key'].isin(df_b['Post key'])
     df_a = df_a[~links_to_drop]
     return df_a
