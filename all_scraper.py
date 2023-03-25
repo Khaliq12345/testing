@@ -144,7 +144,7 @@ def add_up(data, url, link, header, sentence, my_date, image_url=None, author_na
         'Date': 'None',
         'Post Link': 'None',
         'Post key': 'None',
-        'Number of Bylines': 'None',
+        'Number of Bylines': 0,
         'Image url': 'None'
         }
     else:

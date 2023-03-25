@@ -26,7 +26,7 @@ def send_to_gsheet(df, sheet_key):
     worksheet1 = gs.worksheet('Sheet1')
     worksheet1.clear()
     set_with_dataframe(worksheet=worksheet1, dataframe=df, include_index=False,
-    include_column_header=True, resize=True)
+    include_column_header=False)
 
 if 'engine' not in st.session_state:
     hostname=st.secrets['hostname']
