@@ -1,4 +1,5 @@
 from latest_user_agents import get_random_user_agent
+import numpy as np
 import os
 import csv
 import re
@@ -72,7 +73,7 @@ def commited_data(symb):
     else:
         df = df.drop(['Date', 'Post key', 'Number of Bylines', 'Image url'], axis=1)
         df.rename(columns={'Text': 'Update_Text', 'Post Link': 'Update_URL'}, inplace=True)
-        df['Update_Image'] = []
+        df['Update_Image'] = np.nan
 
     return df
 
