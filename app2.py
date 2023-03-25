@@ -325,9 +325,3 @@ if send:
     send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
     send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
     #empty the database
-    engine = st.session_state['engine']
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    session.execute(text('''TRUNCATE TABLE commit'''))
-    session.commit()
-    session.close()
