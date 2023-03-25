@@ -17,12 +17,12 @@ from pydrive.drive import GoogleDrive
 #new
 scopes = ['https://www.googleapis.com/auth/spreadsheets',
           'https://www.googleapis.com/auth/drive']
-def send_to_gsheet(df):
+def send_to_gsheet(df, sheet_key):
     credentials = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scopes)
     gc = gspread.authorize(credentials)
     gauth = GoogleAuth()
     drive = GoogleDrive(gauth)
-    gs = gc.open_by_key(st.secrets["twitter_sheet"])
+    gs = gc.open_by_key(sheet_key)
     worksheet1 = gs.worksheet('Sheet1')
     worksheet1.clear()
     set_with_dataframe(worksheet=worksheet1, dataframe=df, include_index=False,
@@ -311,7 +311,16 @@ downlaod_button_3 = downlaod_4.download_button("Press to Download LinkedIn Posts
 
 #new
 to_gsheet = st.container()
-gsheet_1, gsheet_2 = to_gsheet.columns([1, 1])
+gsheet_1, gsheet_2, gsheet_3, gsheet_4 = to_gsheet.columns([1, 1, 1, 1])
 twitter_gsheet = gsheet_1.button('Send to Twitter Sheet')
+fb_gsheet = gsheet_2.button('Send to Facebook Sheet')
+ig_gsheet = gsheet_3.button('Send to Instagram Sheet')
+linkedin_gsheet = gsheet_4.button('Send to Linkedin Sheet')
 if twitter_gsheet:
-    send_to_gsheet(commited_data('Twit\(\$\)ter'))
+    send_to_gsheet(commited_data('Twit\(\$\)ter'), st.secrets['twitter_sheet'])
+elif fb_gsheet:
+    send_to_gsheet(commited_data('Face\(\$\)book'), st.secrets['fb_sheet'])
+elif ig_gsheet:
+    send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
+elif linkedin_gsheet:
+    send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
