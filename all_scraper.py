@@ -1,5 +1,3 @@
-import os
-os.system("playwright install chromium")
 import streamlit as st
 from playwright.sync_api import sync_playwright
 import requests
@@ -17,10 +15,10 @@ import dateutil.parser
 import pytz
 eastern_tz = pytz.timezone('US/Eastern')
 
-hostname=st.secrets['hostname']
-dbname=st.secrets['dbname']
-uname=st.secrets['uname']
-pwd=st.secrets['pwd']
+hostname="162.240.57.245"
+dbname="hardball2019_bbwaa"
+uname="hardball2019_scraper"
+pwd="Bbo549ahhN;Y"
 
 post_item_list =[]
 item_list = []
@@ -35,8 +33,8 @@ def remove_period(text):
     
     # Join the modified words back into a string
     return ' '.join(words)
-    
-def add_up(data, url, link, header, sentence, my_date, author_name=None, author_number = 1):
+
+def add_up(data, url, link, header, sentence, my_date, image_url=None, author_name=None, author_number = 1):
     if author_name is not None:
         author_twitter = str(data.loc[(data['Author Name'] == author_name), 'Author Twitter'].item()).replace('"', '')
         pub_twitter = str(data.loc[(data['Author Name'] == author_name), 'Publication Twitter'].item()).replace('"', '')
@@ -113,7 +111,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number
+        'Number of Bylines': author_number,
+        'Image url': image_url
     }
     post_item_list.append(post_item)
 
@@ -126,23 +125,35 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number
+        'Number of Bylines': author_number,
+        'Image url': image_url
     }
     post_item_list.append(post_item)
 
     post = f'''
     '{header}' by {author_ig} for {pub_ig}: {sentence}... {paywall} {link} I($)G
-    
+
 👉VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE⚾️
     '''
     post_key = post + '!'
-    post_item = {
-        'Text': post.strip(),
-        'Date': my_date,
-        'Post Link': link,
-        'Post key': post_key,
-        'Number of Bylines': author_number
-    }
+    if image_url == None:
+        post_item = {
+        'Text': None,
+        'Date': None,
+        'Post Link': None,
+        'Post key': None,
+        'Number of Bylines': None,
+        'Image url': None
+        }
+    else:
+        post_item = {
+            'Text': post.strip(),
+            'Date': my_date,
+            'Post Link': link,
+            'Post key': post_key,
+            'Number of Bylines': author_number,
+            'Image url': image_url
+        }
     post_item_list.append(post_item)
 
     post = f'''
@@ -154,7 +165,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
-        'Number of Bylines': author_number
+        'Number of Bylines': author_number,
+        'Image url': image_url
     }
     post_item_list.append(post_item)
 
@@ -174,7 +186,8 @@ def add_up(data, url, link, header, sentence, my_date, author_name=None, author_
         'publication_fb' : pub_fb,
         'publication_linkedin' : pub_linkedin,
         'paywall' : paywall,
-        'Number of Bylines': author_number
+        'Number of Bylines': author_number,
+        'Image url': image_url
         
     }
     item_list.append(item)
@@ -222,13 +235,17 @@ def nytimes_scraper():  #Done
                             link = json_data['url']
                             header = json_data['headline']
                             try:
+                                image_url = json_data['image'][0]['url']
+                            except:
+                                image_url = None
+                            try:
                                 sentence = remove_period(json_data['description']).split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('p'))
                             authors = json_data['author']
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
                             break
                     except:
@@ -253,8 +270,8 @@ def forbes_scraper():  #Done
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
-                response = requests.get(url)
+                s = session()
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('article')
                 for post in posts:
@@ -279,7 +296,13 @@ def forbes_scraper():  #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('.stream-item__description').text)
-                            add_up(data, url, link, header, sentence, my_date)
+                            res = s.get(link, headers=headers)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            try:
+                                image_url = soup.select_one('progressive-image')['src']
+                            except:
+                                image_url = None
+                            add_up(data, url, link, header, sentence, my_date, image_url=image_url)
                         else:
                             pass
                     except:
@@ -304,8 +327,8 @@ def nj_scraper():   #Done
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
-                response = requests.get(url)
+                s = session()
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.river-item')
                 for post in posts:
@@ -316,7 +339,7 @@ def nj_scraper():   #Done
                             my_date = date.strftime("%Y, %m, %d")
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
-                            my_date = date.strftime("%Y, %m, %d")           
+                            my_date = date.strftime("%Y, %m, %d")          
 
                         try:
                             delta = today - date
@@ -330,10 +353,16 @@ def nj_scraper():   #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('p').text)
+                            res = s.get(link, headers=headers)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            try:
+                                image_url = soup.select_one('figure div img')['src']
+                            except:
+                                image_url = None
                             authors = post.select_one('.article__details--byline').text
                             authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
                             break
                     except:
@@ -356,8 +385,8 @@ def fangraph_scraper():  #Done
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
-                response = requests.get(url)
+                s = session()
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.post')
 
@@ -380,16 +409,20 @@ def fangraph_scraper():  #Done
                             link = post.select_one('h2 a')['href']
                             header = post.select_one('h2').text
                             try:
-                                sentence = remove_period(post.select_one('p').text).split('.')
+                                sentence = post.select_one('p').text.split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = remove_period(post.select_one('p').text)
+                                sentence = post.select_one('p').text
+                            try:
+                                image_url = post.select_one('figure img')['src']
+                            except:
+                                image_url = None
                             authors = post.select_one('.postmeta_author').text.strip()
                             authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
-                            pass
+                            break
                     except:
                         pass
             except:
@@ -438,9 +471,13 @@ def cbs_sports_scraper():  #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('p').text)
+                            try:
+                                image_url = soup.select_one('.Article-featuredImageImg.is-lazy-image')['data-lazy']
+                            except:
+                                image_url = None
                             authors = soup.select('.ArticleAuthor-name--link')
                             authors_num = len(authors)
-                            add_up(data, url, post_link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, post_link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
                             break
                     except:
@@ -463,8 +500,8 @@ def ringer_scraper():   #Done
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
-                response = requests.get(url)
+                s = session()
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.c-compact-river__entry ')
 
@@ -490,9 +527,15 @@ def ringer_scraper():   #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('.p-dek.c-entry-box--compact__dek').text)
+                            res = s.get(link, headers=headers)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            try:
+                                image_url= soup.select_one('.e-image__image')['data-original']
+                            except:
+                                image_url= None
                             authors = post.select('.c-byline__author-name')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
                             break
                     except:
@@ -544,11 +587,15 @@ def sportsbusinessjournal_scraper():  #Done #cu
                             link = post.select_one('h2 a')['href']
                             res = s.get(link)
                             soup = BeautifulSoup(res.text, 'lxml')
+                            try:
+                                image_url = soup.select_one('div.img img')['src']
+                            except:
+                                image_url = None
                             authors = soup.select('.author a')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
-                            pass
+                            break
                     except:
                         pass
             except:
@@ -603,11 +650,15 @@ def yahoo_scraper():  #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('p').text)
+                            try:
+                                image_url = post.select_one('div img')['data-wf-src']
+                            except:
+                                image_url = None
                             response = requests.get(link)
                             soup = BeautifulSoup(response.text, 'lxml')
                             authors = soup.select('.caas-author-byline-collapse a')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
                             break
                     except:
@@ -623,7 +674,6 @@ def nypost_scraper():   #Done
     data = pd.read_sql_query(query, conn)
     urls = data['Article URL'][(data['Publication Name'] == 'New York Post') & (data['Do not scrape'] == 'N')]
     urls.dropna(inplace=True)
-    s = session()
     if len(urls) > 0:
         for url in urls:
             try:
@@ -631,6 +681,7 @@ def nypost_scraper():   #Done
                 headers = {
                     'User-Agent': ua
                 }
+                s = session()
                 response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.story.story--archive.story--i-flex')        
@@ -656,11 +707,15 @@ def nypost_scraper():   #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('p').text.strip())
-                            res = s.get(link)
+                            res = s.get(link, headers=headers)
+                            try:
+                                image_url = soup.select_one('figure img')['src']
+                            except:
+                                image_url = None
                             soup = BeautifulSoup(res.text, 'lxml')
                             authors = soup.select('.byline__author a.meta__link')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
                             break
                     except:
@@ -717,9 +772,13 @@ def foxsports_scraper(): #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('span').text.strip())
+                            try:
+                                image_url = post.select_one('img')['src']
+                            except:
+                                image_url = None
                             authors = soup.select('.contributor-name')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
                             break
                     except:
@@ -768,11 +827,15 @@ def insider_scraper():  #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('.tout-copy.river.body-regular').text.strip())
-                            res = s.get(link)
+                            res = s.get(link, headers=headers)
                             soup = BeautifulSoup(res.text, 'lxml')
+                            try:
+                                image_url = soup.select_one('figure div img')['src']
+                            except:
+                                image_url = None
                             authors = soup.select('.byline-link.byline-author-name')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
                             break
                     except:
@@ -814,7 +877,7 @@ def tampabay_scraper():  #Done
                         if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
                             post_link = 'https://www.tampabay.com' + post.select_one('.headline a')['href']
-                            res = s.get(post_link)
+                            res = s.get(post_link, headers=headers)
                             soup = BeautifulSoup(res.text, 'lxml')
                             header = soup.select_one('h1').text
                             try:
@@ -823,9 +886,13 @@ def tampabay_scraper():  #Done
                             except:
                                 sentence = remove_period(soup.select_one('.article__summary').text)
                             link = res.url
+                            try:
+                                image_url = soup.select_one('picture source')['srcset']
+                            except:
+                                image_url = None
                             authors = soup.select('.article__byline--name-link')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, image_url= image_url, author_number=authors_num)
                         else:
                             break
                     except:
@@ -875,11 +942,15 @@ def sporting_news():   #Done
                         if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
                             link = res.url
-                            res = s.get(link)
+                            res = s.get(link, headers=headers)
                             soup = BeautifulSoup(res.text, 'lxml')
+                            try:
+                                image_url = soup.select_one('picture img')['src']
+                            except:
+                                image_url = None
                             authors = soup.select('.author-info__description .author-name__link')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, image_url= image_url, author_number=authors_num)
                         else:
                             break
                     except:
@@ -921,7 +992,7 @@ def northjersey_scraper():    #Done
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
                             link = post['url']
-                            res = requests.get(link)
+                            res = requests.get(link, headers=headers)
                             soup = BeautifulSoup(res.text, 'lxml')
                             header = soup.select_one('h1').text
                             my_date = date.strftime("%Y, %m, %d")
@@ -931,9 +1002,13 @@ def northjersey_scraper():    #Done
                                 sentence = sentence[0]                          
                             except:
                                 sentence = remove_period(post['descripton'])
+                            try:
+                                image_url = soup.select_one('img.gnt_em_gl_i')['src']
+                            except:
+                                image_url = None
                             authors = soup.select('.gnt_ar_by_a.gnt_ar_by_a__fi')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, image_url= image_url, author_number=authors_num)
                         else:
                             break
                     except:
@@ -941,7 +1016,7 @@ def northjersey_scraper():    #Done
             except:
                 pass
 
-def theathletic_scraper():    #Done
+def theathletic_scraper():  #Done
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -963,7 +1038,7 @@ def theathletic_scraper():    #Done
                 for post in posts:
                     try:
                         post_link = post_link = post['href']
-                        res = s.get(post_link)
+                        res = s.get(post_link, headers=headers)
                         soup = BeautifulSoup(res.text, 'lxml')
                         try:
                             date = soup.select_one('.sc-294a6039-3.kpapNT').text
@@ -984,10 +1059,14 @@ def theathletic_scraper():    #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(soup.select_one('.bodytext1').text.strip())
+                            try:
+                                image_url = soup.select_one('meta[property="og:image"]')['content']
+                            except:
+                                image_url = None
                             authors = soup.select_one('#articleByLineString').text
                             authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, image_url= image_url, author_number=authors_num)
                         else:
                             break
                     except:
@@ -1046,10 +1125,16 @@ def apnews_scraper():   #Done
                             except:
                                 sentence = remove_period(post.select_one('p').text)
                             link = 'https://apnews.com' + post.select_one('.CardHeadline a')['href']
+                            res = s.get(link, headers=headers)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            try:
+                                image_url = soup.select_one('meta[property="og:image"]')['content']
+                            except:
+                                image_url = None
                             authors = post.select_one('.Component-bylines-0-2-142.Component-bylines-0-2-133').text
                             authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num)                                               
+                            add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num, image_url=image_url)                                               
                         else:
                             break
                     else:
@@ -1109,9 +1194,13 @@ def mlb_scraper():   #Done
                             except:
                                 sentence = remove_period(post.select_one('p').text.replace('  ', '').replace('\n', ''))
                             link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
+                            try:
+                                image_url = post.select_one('.p-image__image img')['data-srcset'].split(' ')[0]
+                            except:
+                                image_url = None
                             authors = post.select_one('.article-item__contributor-byline').text.replace(' ', '').split(',')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num, image_url=image_url)
                         else:
                             pass
                     else:
@@ -1163,9 +1252,13 @@ def mlb_extra_scraper():   #Done
                                 except:
                                     sentence = remove_period(post.select_one('p').text.replace('  ', '').replace('\n', ''))
                                 link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
+                                try:
+                                    image_url = post.select_one('.p-image__image img')['data-srcset'].split(' ')[0]
+                                except:
+                                    image_url = None 
                                 authors = post.select_one('.article-item__contributor-byline').text.replace(' ', '').split(',')
                                 authors_num = len(authors)
-                                add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num)               
+                                add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num, image_url=image_url)               
                             else:
                                 break
                         else:
@@ -1219,9 +1312,13 @@ def courant_scraper():   #Done
                                 sentence = remove_period(post.select_one('.excerpt').text.strip())
                             res = requests.get(link)
                             soup = BeautifulSoup(res.text, 'lxml')
+                            try:
+                                image_url = soup.select_one('.image-wrapper img')['data-src']
+                            except:
+                                image_url = None
                             authors = soup.select('.fn a')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
                             break
                     except:
@@ -1272,10 +1369,14 @@ def wsj_scraper():  #Done
                             except:
                                 sentence = remove_period(json_data['data']['summary'])
                             link = json_data['data']['canonical_url']
+                            try:
+                                image_url = json_data['data']['image']['M']['url']
+                            except:
+                                image_url = None
                             authors = json_data['data']['byline']
                             authors = re.split(r'\s+and\s+', authors)
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
                             break
                     except:
@@ -1305,7 +1406,7 @@ def nydailynews_scraper():  #Done
                 for post in posts:
                     try:
                         post_link = 'https://www.nydailynews.com' + post.select_one('a')['href']
-                        res = s.get(post_link)
+                        res = s.get(post_link, headers=headers)
                         soup = BeautifulSoup(res.text, 'lxml')
                         try:
                             date = soup.select_one('time')['datetime']
@@ -1327,9 +1428,13 @@ def nydailynews_scraper():  #Done
                                 sentence = sentence[0]
                             except:
                                 sentence = sentence
+                            try:
+                                image_url = soup.select_one('figure picture img')['src']
+                            except:
+                                image_url = None
                             authors = soup.select('.article_byline a')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)      
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)      
                         else:
                             break
                     except:
@@ -1448,9 +1553,13 @@ def sny_scraper():   #Done
                                 sentence = remove_period(soup.select_one('.article-body').text)
                             link = post_link
                             my_date = date.strftime("%Y, %m, %d")
+                            try:
+                                image_url = post.select_one('.article-brief-image.image-container-wide.w-full.relative.overflow-hidden div img')['src']
+                            except:
+                                image_url = None
                             authors = soup.select('.flex.flex-col.whitespace-no-wrap span.font-bold')
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)                    
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)                    
                         else:
                             break
                     except:
@@ -1505,45 +1614,52 @@ def newsday_scraper():  #Done
                                 sentence = remove_period(post['lead'])
                             my_date = date.strftime("%Y, %m, %d")
                             link = post['url']
+                            try:
+                                image_url = post['topElement']['baseUrl']
+                            except:
+                                image_url = None
                             authors = post['authors']
                             authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num)  
+                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)  
                         else:
                             break
                     except:
                         pass
             except:
                 pass
-            
+
+
+
 class NewsScraper:
     @staticmethod
     def scrapers():
         post_item_list.clear()
         item_list.clear()
         s = session()
-        nytimes_scraper()
-        forbes_scraper()
-        nj_scraper()
-        fangraph_scraper()
-        cbs_sports_scraper()
-        ringer_scraper()
-        sportsbusinessjournal_scraper()
+        # nytimes_scraper()
+        # forbes_scraper()
+        # nj_scraper()
+        # fangraph_scraper()
+        # cbs_sports_scraper()
+        # ringer_scraper()
+        # sportsbusinessjournal_scraper()
         yahoo_scraper()
-        nypost_scraper()
-        foxsports_scraper()
-        insider_scraper()
-        tampabay_scraper()
-        sporting_news()
-        northjersey_scraper()
-        theathletic_scraper()
-        apnews_scraper()
-        mlb_scraper()
-        mlb_extra_scraper()
-        courant_scraper()
-        wsj_scraper()
-        nydailynews_scraper()
-        si_scraper()
-        sny_scraper()
-        newsday_scraper()
+        # nypost_scraper()
+        # foxsports_scraper()
+        # insider_scraper()
+        # tampabay_scraper()
+        # sporting_news()
+        # northjersey_scraper()
+        # theathletic_scraper()
+        # apnews_scraper()
+        #mlb_scraper()
+        #mlb_extra_scraper()
+        # courant_scraper()
+        # wsj_scraper()
+        #nydailynews_scraper()
+        # si_scraper()
+        # sny_scraper()
+        # newsday_scraper()
         
+
         return item_list, post_item_list
