@@ -45,7 +45,7 @@ def delete_blacklisted(df_a):
     conn = engine.connect()
     query = text('SELECT * FROM black_list')
     df_b = pd.read_sql_query(query, conn)
-    links_to_drop = df_a['Post key'].isin(df_b['Post key'])
+    links_to_drop = df_a['Post Key'].isin(df_b['Post Key'])
     df_a = df_a[~links_to_drop]
     return df_a
 
@@ -55,8 +55,8 @@ def downlaod_commited(symb):
     conn = engine.connect()
     query = text('SELECT * FROM commit')
     df = pd.read_sql_query(query, conn)
-    df = df[df['Post key'].str.contains(fr'{symb}')]
-    df = df.drop(['Date', 'Post Link', 'Post key', 'Number of Bylines','Image url'], axis=1)
+    df = df[df['Post Key'].str.contains(fr'{symb}')]
+    df = df.drop(['Date', 'Post Link', 'Post Key', 'Number of Bylines','Image url'], axis=1)
     csv = convert_df(df)
     return csv
 #new
@@ -65,11 +65,11 @@ def commited_data(symb):
     conn = engine.connect()
     query = text('SELECT * FROM commit')
     df = pd.read_sql_query(query, conn)
-    df = df[df['Post key'].str.contains(fr'{symb}')]
+    df = df[df['Post Key'].str.contains(fr'{symb}')]
     if symb == 'I\(\$\)G':
-        df = df.drop(['Date', 'Post key', 'Number of Bylines'], axis=1)
+        df = df.drop(['Date', 'Post Key', 'Number of Bylines'], axis=1)
     else:
-        df = df.drop(['Date', 'Post key', 'Number of Bylines', 'Image url'], axis=1)
+        df = df.drop(['Date', 'Post Key', 'Number of Bylines', 'Image url'], axis=1)
     return df
 
 def add_paywall(text, symb):
@@ -113,7 +113,7 @@ def create_database():
         clean_post = delete_blacklisted(df_post)
         clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
     except:
-        no_data_df = pd.DataFrame(columns=['Text', 'Date', 'Post Link', 'Post key'])
+        no_data_df = pd.DataFrame(columns=['Text', 'Date', 'Post Link', 'Post Key'])
         clean_post = delete_blacklisted(no_data_df)
         clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later 
 
