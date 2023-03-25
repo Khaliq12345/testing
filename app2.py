@@ -9,6 +9,7 @@ from all_scraper import NewsScraper
 from sqlalchemy import create_engine, text
 from datetime import datetime
 #new
+from sqlalchemy.orm import sessionmaker
 import gspread
 from gspread_dataframe import set_with_dataframe
 from google.oauth2.service_account import Credentials
@@ -323,7 +324,10 @@ if send:
     send_to_gsheet(commited_data('Face\(\$\)book'), st.secrets['fb_sheet'])
     send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
     send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
-
+    #empty the database
     engine = st.session_state['engine']
-    empty_df = pd.DataFrame(columns=['Text', 'Date', 'Post Link', 'Post key', 'Number of Bylines', 'Image url'])
-    empty_df.to_sql(name='commit', con=engine, schema='hardball2019_bbwaa', if_exists='replace', index=False)  
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    session.execute(text('''TRUNCATE TABLE commit'''))
+    session.commit()
+    session.close()
