@@ -45,6 +45,7 @@ def delete_blacklisted(df_a):
     conn = engine.connect()
     query = text('SELECT * FROM black_list')
     df_b = pd.read_sql_query(query, conn)
+    st.dataframe(df_b)
     links_to_drop = df_a['Post key'].isin(df_b['Post key'])
     df_a = df_a[~links_to_drop]
     return df_a
@@ -109,7 +110,6 @@ def create_database():
     info, post = scraper.scrapers()
     df_info = pd.DataFrame(info)
     df_post = pd.DataFrame(post)
-    st.dataframe(df_post)
     try:
         clean_post = delete_blacklisted(df_post)
         clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
