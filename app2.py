@@ -152,6 +152,12 @@ def add_rows_to_new_database(selected_rows):
     st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
 
+def clear_commit():
+    engine = st.session_state['engine']
+    with engine.connect() as con:
+        con.execution_options(autocommit=True).execute(text("TRUNCATE TABLE commit"))
+    st.experimental_rerun()
+
 def main():
     pass
 
@@ -325,8 +331,5 @@ if send:
     send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
     send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
     st.write('Good')
-    #empty the database
-    engine = create_engine(f"mysql+pymysql://{st.secrets['uname']}:{st.secrets['pwd']}@{st.secrets['hostname']}/{st.secrets['dbname']}")
-    with engine.connect() as con:
-        con.execution_options(autocommit=True).execute(text("TRUNCATE TABLE commit"))
+    clear_commit()
     st.write('Great')
