@@ -618,8 +618,8 @@ def yahoo_scraper():  #Done
                 headers = {
                     'User-Agent': ua
                 }
-                response = requests.get(url, headers=headers)
-                response = requests.get(url)
+                s = session()
+                response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.item-hover-trigger')
 
@@ -656,7 +656,7 @@ def yahoo_scraper():  #Done
                                 image_url = post.select_one('div img')['data-wf-src']
                             except:
                                 image_url = None
-                            response = requests.get(link)
+                            response = s.get(link, headers=headers)
                             soup = BeautifulSoup(response.text, 'lxml')
                             authors = soup.select('.caas-author-byline-collapse a')
                             authors_num = len(authors)
@@ -1643,7 +1643,7 @@ class NewsScraper:
         # cbs_sports_scraper()
         # ringer_scraper()
         # sportsbusinessjournal_scraper()
-        #yahoo_scraper()
+        yahoo_scraper()
         # nypost_scraper()
         # foxsports_scraper()
         # insider_scraper()
