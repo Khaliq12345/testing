@@ -312,8 +312,8 @@ downlaod_button_3 = downlaod_4.download_button("Press to Download LinkedIn Posts
 #new
 to_gsheet = st.container()
 gsheet_1, gsheet_2 = to_gsheet.columns([1, 1])
-send_to_gsheet = gsheet_1.button('Send to Committed data to Google Sheet')
-if send_to_gsheet:
+send = gsheet_1.button('Send to Committed data to Google Sheet')
+if send:
     send_to_gsheet(commited_data('Twit\(\$\)ter'), st.secrets['twitter_sheet'])
     send_to_gsheet(commited_data('Face\(\$\)book'), st.secrets['fb_sheet'])
     send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
