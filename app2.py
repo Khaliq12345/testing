@@ -68,8 +68,12 @@ def commited_data(symb):
     df = df[df['Post key'].str.contains(fr'{symb}')]
     if symb == 'I\(\$\)G':
         df = df.drop(['Date', 'Post key', 'Number of Bylines'], axis=1)
+        df.rename(columns={'Text': 'Update_Text', 'Post Link': 'Update_URL', 'Image url':'Update_Image'}, inplace=True)
     else:
         df = df.drop(['Date', 'Post key', 'Number of Bylines', 'Image url'], axis=1)
+        df.rename(columns={'Text': 'Update_Text', 'Post Link': 'Update_URL'}, inplace=True)
+        df['Update_Image'] = []
+
     return df
 
 def add_paywall(text, symb):
@@ -307,7 +311,7 @@ downlaod_1, downlaod_2, downlaod_3, downlaod_4 = downlaod_container.columns([1, 
 downlaod_button_1 = downlaod_1.download_button("Press to Download Twitter Posts", downlaod_commited('Twit\(\$\)ter'), "twitter_posts.csv", "text/csv", key='twitter_download-csv')
 downlaod_button_2 = downlaod_2.download_button("Press to Download Facebook Posts", downlaod_commited('Face\(\$\)book'), "fb_posts.csv", "text/csv", key='fb_download-csv')
 downlaod_button_3 = downlaod_3.download_button("Press to Download Instagram Posts", downlaod_commited('I\(\$\)G'), "ig_posts.csv", "text/csv", key='ig_download-csv')
-downlaod_button_3 = downlaod_4.download_button("Press to Download LinkedIn Posts", downlaod_commited('Linked\(\$\)in'), "linkedin_posts.csv", "text/csv", key='linkedin_download-csv')
+downlaod_button_4 = downlaod_4.download_button("Press to Download LinkedIn Posts", downlaod_commited('Linked\(\$\)in'), "linkedin_posts.csv", "text/csv", key='linkedin_download-csv')
 
 #new
 to_gsheet = st.container()
