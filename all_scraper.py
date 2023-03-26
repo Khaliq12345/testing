@@ -107,7 +107,7 @@ def add_up(data, url, link, header, sentence, my_date, image_url=None, author_na
     post = f'''
     '{header}' by {author_twitter} for {pub_twitter}: {sentence}... {paywall} {link} Twit($)ter
     '''
-    post_key = post + '!'
+    post_key = f'Post {link} for Twit($)ter'
     post_item = {
         'Text': post.strip(),
         'Date': my_date,
@@ -121,7 +121,7 @@ def add_up(data, url, link, header, sentence, my_date, image_url=None, author_na
     post = f'''
     '{header}' by {author_fb} for {pub_fb}: {sentence}... {paywall} {link} Face($)book
     '''
-    post_key = post + '!'
+    post_key = f'Post {link} for Face($)book'
     post_item = {
         'Text': post.strip(),
         'Date': my_date,
@@ -137,7 +137,7 @@ def add_up(data, url, link, header, sentence, my_date, image_url=None, author_na
 
 👉VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE⚾️
     '''
-    post_key = post + '!'
+    post_key = f'Post {link} for I($)G'
     if image_url == None:
         post_item = {
         'Text': 'None',
@@ -161,7 +161,7 @@ def add_up(data, url, link, header, sentence, my_date, image_url=None, author_na
     post = f'''
     '{header}' by {author_linkedin} for {pub_linkedin}: {sentence}... {paywall} {link} Linked($)in
     '''
-    post_key = post + '!'
+    post_key = f'Post {link} for Linked($)in'
     post_item = {
         'Text': post.strip(),
         'Date': my_date,
