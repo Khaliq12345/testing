@@ -318,12 +318,14 @@ to_gsheet = st.container()
 gsheet_1, gsheet_2 = to_gsheet.columns([1, 1])
 send_button = gsheet_1.button('Send Committed data to Google Sheet')
 if send_button:
-    clear_commit()
-    st.write('Good')
     send_to_gsheet(commited_data('Twit\(\$\)ter'), st.secrets['twitter_sheet'])
     send_to_gsheet(commited_data('Face\(\$\)book'), st.secrets['fb_sheet'])
     send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
     send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
+
+if send_button:
+    clear_commit()
+    st.write('Good')
     
 downlaod_container = st.container()
 downlaod_1, downlaod_2, downlaod_3, downlaod_4 = downlaod_container.columns([1, 1, 1, 1])
