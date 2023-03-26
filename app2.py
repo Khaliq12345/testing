@@ -119,7 +119,7 @@ def create_database():
         clean_post = delete_blacklisted(df_post)
         clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later
     except:
-        no_data_df = pd.DataFrame(columns=['Text', 'Date', 'Post Link', 'Post key'])
+        no_data_df = pd.DataFrame(columns=['Text', 'Date', 'Post Link', 'Post key', 'Image url'])
         clean_post = delete_blacklisted(no_data_df)
         clean_post.to_csv('temp_database.csv', index=False, encoding='utf-8') #to correct later 
 
