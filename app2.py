@@ -62,11 +62,9 @@ def downlaod_commited(symb):
     csv = convert_df(df)
     return csv
 #new
-def commited_data(symb):
+def commited_data(symb, df):
     engine = st.session_state['engine']
     conn = engine.connect()
-    query = text('SELECT * FROM commit')
-    df = pd.read_sql_query(query, conn)
     df = df[df['Post key'].str.contains(fr'{symb}')]
     if symb == 'I\(\$\)G':
         df = df.drop(['Date', 'Post key', 'Number of Bylines'], axis=1)
@@ -154,8 +152,11 @@ def add_rows_to_new_database(selected_rows):
 
 def clear_commit():
     engine = st.session_state['engine']
+    query = text('SELECT * FROM commit')
+    df = pd.read_sql_query(query, conn)
     with engine.connect() as con:
         con.execution_options(autocommit=True).execute(text("TRUNCATE TABLE commit"))
+    return df
 
 def main():
     pass
@@ -317,10 +318,12 @@ if commit_button or commit_button2:
 to_gsheet = st.container()
 gsheet_1, gsheet_2 = to_gsheet.columns([1, 1])
 send_button = gsheet_1.button('Send Committed data to Google Sheet')
-
 if send_button:
-    clear_commit()
-    st.write('Good')
+    commit_data = clear_commit()
+    send_to_gsheet(commited_data('Twit\(\$\)ter', commit_data), st.secrets['twitter_sheet'])
+    send_to_gsheet(commited_data('Face\(\$\)book', commit_data), st.secrets['fb_sheet'])
+    send_to_gsheet(commited_data('I\(\$\)G', commit_data), st.secrets['ig_sheet'])
+    send_to_gsheet(commited_data('Linked\(\$\)in', commit_data), st.secrets['linkedin_sheet'])
     
 downlaod_container = st.container()
 downlaod_1, downlaod_2, downlaod_3, downlaod_4 = downlaod_container.columns([1, 1, 1, 1])
