@@ -317,11 +317,6 @@ if commit_button or commit_button2:
 to_gsheet = st.container()
 gsheet_1, gsheet_2 = to_gsheet.columns([1, 1])
 send_button = gsheet_1.button('Send Committed data to Google Sheet')
-if send_button:
-    send_to_gsheet(commited_data('Twit\(\$\)ter'), st.secrets['twitter_sheet'])
-    send_to_gsheet(commited_data('Face\(\$\)book'), st.secrets['fb_sheet'])
-    send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
-    send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
 
 if send_button:
     clear_commit()
