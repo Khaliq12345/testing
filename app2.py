@@ -323,8 +323,6 @@ if send_button:
     send_to_gsheet(commited_data('I\(\$\)G'), st.secrets['ig_sheet'])
     send_to_gsheet(commited_data('Linked\(\$\)in'), st.secrets['linkedin_sheet'])
 
-clear_commit_button = gsheet_2.button('Clear the table of the comitted data')
-if clear_commit_button:
     clear_commit()
     
 downlaod_container = st.container()
