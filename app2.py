@@ -155,7 +155,8 @@ def clear_commit():
     engine = st.session_state['engine']
     query = text('SELECT * FROM commit')
     df = pd.read_sql_query(query, conn)
-    conn.execution_options(autocommit=True).execute(text("TRUNCATE TABLE commit"))
+    with engine.connect() as con:
+        con.execution_options(autocommit=True).execute(text("TRUNCATE TABLE commit"))
     return df
 
 def main():
