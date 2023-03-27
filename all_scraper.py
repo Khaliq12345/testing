@@ -710,12 +710,14 @@ def nypost_scraper():   #Done
                             except:
                                 sentence = remove_period(post.select_one('p').text.strip())
                             res = s.get(link, headers=headers)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            json_data = soup.select_one('script[type="application/ld+json"]').text.strip()
+                            json_data = json.loads(json_data, strict = False)
                             try:
-                                image_url = soup.select_one('figure img')['src']
+                                image_url = json_data['image']['url']
                             except:
                                 image_url = None
-                            soup = BeautifulSoup(res.text, 'lxml')
-                            authors = soup.select('.byline__author a.meta__link')
+                            authors = json_data['author']
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
