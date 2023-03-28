@@ -201,55 +201,60 @@ def nytimes_scraper():  #Done
     query = text('SELECT * FROM articles')
     data = pd.read_sql_query(query, conn)
     urls = data['Article URL'][(data['Publication Name'] == 'The New York Times') & (data['Do not scrape'] == 'N')]
-    urls.dropna(inplace=True)     
+    all_authors = data['Author Name'][(data['Publication Name'] == 'The New York Times') & (data['Do not scrape'] == 'N')]
+    urls = urls.dropna().to_list()
+    all_authors = all_authors.dropna().to_list()
     if len(urls) > 0:
-        for url in urls:
+        for x in range(len(urls)):
             try:
                 ua = get_random_user_agent()
                 headers = {
                     'User-Agent': ua
                 }
                 scraper = cloudscraper.create_scraper()
-                response = scraper.get(url, headers=headers)
+                response = scraper.get(urls[x], headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.css-112uytv')
                 for post in posts:
                     try:
                         post_link = post.select_one('.css-1l4spti a')['href']
                         post_link = 'https://www.nytimes.com' + post_link
-                        res = scraper.get(post_link)
-                        soup = BeautifulSoup(res.text, 'lxml')
-                        meta = soup.select_one('script').text
-                        json_data = json.loads(meta)
-                        date = json_data['datePublished']
-                        try:
-                            date = datetime.fromisoformat(date.replace('Z', '+00:00')).date()
-                            my_date = date.strftime("%Y, %m, %d")
-                        except:
-                            date = datetime.strptime('20230215', "%Y%m%d").date()
-                            my_date = date.strftime("%Y, %m, %d")
-                            
-                        try:
-                            delta = today - date
-                        except:
-                            delta = timedelta(days=5)
-                        if delta < timedelta(days=3):
-                            link = json_data['url']
-                            header = json_data['headline']
+                        if all_authors[x] in post.text:
+                            res = scraper.get(post_link)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            meta = soup.select_one('script').text
+                            json_data = json.loads(meta)
+                            date = json_data['datePublished']
                             try:
-                                image_url = json_data['image'][0]['url']
+                                date = datetime.fromisoformat(date.replace('Z', '+00:00')).date()
+                                my_date = date.strftime("%Y, %m, %d")
                             except:
-                                image_url = None
+                                date = datetime.strptime('20230215', "%Y%m%d").date()
+                                my_date = date.strftime("%Y, %m, %d")
+                                
                             try:
-                                sentence = remove_period(json_data['description']).split('.')
-                                sentence = sentence[0]
+                                delta = today - date
                             except:
-                                sentence = remove_period(post.select_one('p'))
-                            authors = json_data['author']
-                            authors_num = len(authors)
-                            add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
+                                delta = timedelta(days=5)
+                            if delta < timedelta(days=3):
+                                link = json_data['url']
+                                header = json_data['headline']
+                                try:
+                                    image_url = json_data['image'][0]['url']
+                                except:
+                                    image_url = None
+                                try:
+                                    sentence = remove_period(json_data['description']).split('.')
+                                    sentence = sentence[0]
+                                except:
+                                    sentence = remove_period(post.select_one('p'))
+                                authors = json_data['author']
+                                authors_num = len(authors)
+                                add_up(data, urls[x], link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
+                            else:
+                                break
                         else:
-                            break
+                            pass
                     except:
                         pass
             except:
