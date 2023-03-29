@@ -1605,7 +1605,7 @@ def newsday_scraper():  #Done
                     try:
                         try:
                             date = post['publishedDate']
-                            date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').date()
+                            date = datetime.fromisoformat(date.replace('Z', '+00:00')).date()
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()                
                         try:
