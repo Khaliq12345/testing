@@ -1658,7 +1658,7 @@ class NewsScraper:
         # sporting_news()
         # northjersey_scraper()
         # theathletic_scraper()
-        #apnews_scraper()
+        apnews_scraper()
         # mlb_scraper()
         # mlb_extra_scraper()
         # courant_scraper()
