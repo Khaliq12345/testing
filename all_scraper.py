@@ -36,18 +36,18 @@ def remove_period(text):
     # Join the modified words back into a string
     return ' '.join(words)
 
-def add_up(data, url, link, header, sentence, my_date, image_url=None, author_name=None, author_number = 1):
+def add_up(data, url, link, header, sentence, my_date, image_url='None', author_name=None, author_number = 1):
     if author_name is not None:
-        author_twitter = str(data.loc[(data['Author Name'] == author_name), 'Author Twitter'].item()).replace('"', '')
-        pub_twitter = str(data.loc[(data['Author Name'] == author_name), 'Publication Twitter'].item()).replace('"', '')
-        author_fb = str(data.loc[(data['Author Name'] == author_name), 'Author FB'].item()).replace('"', '')
-        pub_fb = str(data.loc[(data['Author Name'] == author_name), 'Publication FB'].item()).replace('"', '')
-        author_ig = str(data.loc[(data['Author Name'] == author_name), 'Author IG'].item()).replace('"', '')
-        pub_ig = str(data.loc[(data['Author Name'] == author_name), 'Publication IG'].item()).replace('"', '')
-        author_linkedin = str(data.loc[(data['Author Name'] == author_name), 'Author LinkedIn'].item()).replace('"', '')
-        pub_linkedin = str(data.loc[(data['Author Name'] == author_name), 'Publication LinkedIn'].item()).replace('"', '')
-        paywall = str(data.loc[(data['Author Name'] == author_name), 'Default Paywall  (Y/N)'].item()).replace('"', '')
-        pub_name = str(data.loc[(data['Author Name'] == author_name), 'Publication Name'].item()).replace('"', '')
+        author_twitter = str(data.loc[(data['Author Name'] == author_name), 'Author Twitter'].iloc[0]).replace('"', '')
+        pub_twitter = str(data.loc[(data['Author Name'] == author_name), 'Publication Twitter'].iloc[0]).replace('"', '')
+        author_fb = str(data.loc[(data['Author Name'] == author_name), 'Author FB'].iloc[0]).replace('"', '')
+        pub_fb = str(data.loc[(data['Author Name'] == author_name), 'Publication FB'].iloc[0]).replace('"', '')
+        author_ig = str(data.loc[(data['Author Name'] == author_name), 'Author IG'].iloc[0]).replace('"', '')
+        pub_ig = str(data.loc[(data['Author Name'] == author_name), 'Publication IG'].iloc[0]).replace('"', '')
+        author_linkedin = str(data.loc[(data['Author Name'] == author_name), 'Author LinkedIn'].iloc[0]).replace('"', '')
+        pub_linkedin = str(data.loc[(data['Author Name'] == author_name), 'Publication LinkedIn'].iloc[0]).replace('"', '')
+        paywall = str(data.loc[(data['Author Name'] == author_name), 'Default Paywall  (Y/N)'].iloc[0]).replace('"', '')
+        pub_name = str(data.loc[(data['Author Name'] == author_name), 'Publication Name'].iloc[0]).replace('"', '')
 
         if 'None' in author_twitter:
             author_twitter = author_name
@@ -66,36 +66,36 @@ def add_up(data, url, link, header, sentence, my_date, image_url=None, author_na
         if 'None' in pub_linkedin:
             pub_linkedin = pub_name
     else:
-        author_twitter = str(data.loc[data['Article URL'] == url, 'Author Twitter'].item()).replace('"', '')
-        pub_twitter = str(data.loc[data['Article URL'] == url, 'Publication Twitter'].item()).replace('"', '')
-        author_fb = str(data.loc[data['Article URL'] == url, 'Author FB'].item()).replace('"', '')
-        pub_fb = str(data.loc[data['Article URL'] == url, 'Publication FB'].item()).replace('"', '')
-        author_ig = str(data.loc[data['Article URL'] == url, 'Author IG'].item()).replace('"', '')
-        pub_ig = str(data.loc[data['Article URL'] == url, 'Publication IG'].item()).replace('"', '')
-        author_linkedin = str(data.loc[data['Article URL'] == url, 'Author LinkedIn'].item()).replace('"', '')
-        pub_linkedin = str(data.loc[data['Article URL'] == url, 'Publication LinkedIn'].item()).replace('"', '')
-        paywall = str(data.loc[data['Article URL'] == url, 'Default Paywall  (Y/N)'].item()).replace('"', '')  
-        pub_name = str(data.loc[(data['Article URL'] == url), 'Publication Name'].item()).replace('"', '')     
+        author_twitter = str(data.loc[data['Article URL'] == url, 'Author Twitter'].iloc[0]).replace('"', '')
+        pub_twitter = str(data.loc[data['Article URL'] == url, 'Publication Twitter'].iloc[0]).replace('"', '')
+        author_fb = str(data.loc[data['Article URL'] == url, 'Author FB'].iloc[0]).replace('"', '')
+        pub_fb = str(data.loc[data['Article URL'] == url, 'Publication FB'].iloc[0]).replace('"', '')
+        author_ig = str(data.loc[data['Article URL'] == url, 'Author IG'].iloc[0]).replace('"', '')
+        pub_ig = str(data.loc[data['Article URL'] == url, 'Publication IG'].iloc[0]).replace('"', '')
+        author_linkedin = str(data.loc[data['Article URL'] == url, 'Author LinkedIn'].iloc[0]).replace('"', '')
+        pub_linkedin = str(data.loc[data['Article URL'] == url, 'Publication LinkedIn'].iloc[0]).replace('"', '')
+        paywall = str(data.loc[data['Article URL'] == url, 'Default Paywall  (Y/N)'].iloc[0]).replace('"', '')  
+        pub_name = str(data.loc[(data['Article URL'] == url), 'Publication Name'].iloc[0]).replace('"', '')     
 
         if 'None' in author_twitter:
-            author_twitter = str(data.loc[data['Article URL'] == url, 'Author Name'].item()).replace('"', '')
+            author_twitter = str(data.loc[data['Article URL'] == url, 'Author Name'].iloc[0]).replace('"', '')
         if 'None' in pub_twitter:
-            pub_twitter = str(data.loc[data['Article URL'] == url, 'Publication Name'].item()).replace('"', '')
+            pub_twitter = str(data.loc[data['Article URL'] == url, 'Publication Name'].iloc[0]).replace('"', '')
 
         if 'None' in author_fb:
-            author_fb = str(data.loc[data['Article URL'] == url, 'Author Name'].item()).replace('"', '')
+            author_fb = str(data.loc[data['Article URL'] == url, 'Author Name'].iloc[0]).replace('"', '')
         if 'None' in pub_fb:
-            pub_fb = str(data.loc[data['Article URL'] == url, 'Publication Name'].item()).replace('"', '')
+            pub_fb = str(data.loc[data['Article URL'] == url, 'Publication Name'].iloc[0]).replace('"', '')
 
         if 'None' in author_ig:
-            author_ig = str(data.loc[data['Article URL'] == url, 'Author Name'].item()).replace('"', '')
+            author_ig = str(data.loc[data['Article URL'] == url, 'Author Name'].iloc[0]).replace('"', '')
         if 'None' in pub_ig:
-            pub_ig = str(data.loc[data['Article URL'] == url, 'Publication Name'].item()).replace('"', '')
+            pub_ig = str(data.loc[data['Article URL'] == url, 'Publication Name'].iloc[0]).replace('"', '')
 
         if 'None' in author_linkedin:
-            author_linkedin = str(data.loc[data['Article URL'] == url, 'Author Name'].item()).replace('"', '')
+            author_linkedin = str(data.loc[data['Article URL'] == url, 'Author Name'].iloc[0]).replace('"', '')
         if 'None' in pub_linkedin:
-            pub_linkedin = str(data.loc[data['Article URL'] == url, 'Publication Name'].item()).replace('"', '')
+            pub_linkedin = str(data.loc[data['Article URL'] == url, 'Publication Name'].iloc[0]).replace('"', '')
 
     if 'N' in paywall:
         paywall = ' '
