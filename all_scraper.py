@@ -263,7 +263,7 @@ def nytimes_scraper():  #Done
     else:
         pass
         
-def forbes_scraper():  #edited
+def forbes_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
