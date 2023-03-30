@@ -162,6 +162,7 @@ def clear_commit():
 def main():
     pass
 
+st.write(datetime.today())
 st.set_page_config(page_title="My Web App", page_icon=":memo:", layout="wide")
 st.title("Latest News Extractor")
 st.warning('Please click on the scrape button to refresh the page, especially if you have just loaded it. The displayed data may have been removed or finalized.')
