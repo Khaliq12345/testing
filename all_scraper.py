@@ -1677,8 +1677,8 @@ class NewsScraper:
         post_item_list.clear()
         item_list.clear()
         s = session()
-        # nytimes_scraper()
-        # forbes_scraper()
+        nytimes_scraper()
+        forbes_scraper()
         # nj_scraper()
         # fangraph_scraper()
         # cbs_sports_scraper()
@@ -1692,7 +1692,7 @@ class NewsScraper:
         # sporting_news()
         # northjersey_scraper()
         # theathletic_scraper()
-        apnews_scraper()
+        #apnews_scraper()
         # mlb_scraper()
         # mlb_extra_scraper()
         # courant_scraper()
@@ -1700,6 +1700,6 @@ class NewsScraper:
         # nydailynews_scraper()
         # #si_scraper()
         # sny_scraper()
-        newsday_scraper()
+        #newsday_scraper()
         
         return item_list, post_item_list
