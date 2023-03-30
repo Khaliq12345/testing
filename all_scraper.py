@@ -194,6 +194,7 @@ def add_up(data, url, link, header, sentence, my_date, image_url='None', author_
     }
     item_list.append(item)
 
+
 def nytimes_scraper():  #Done
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
@@ -262,7 +263,7 @@ def nytimes_scraper():  #Done
     else:
         pass
         
-def forbes_scraper():  #Done
+def forbes_scraper():  #edited
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -283,9 +284,14 @@ def forbes_scraper():  #Done
                 posts = soup.select('article')
                 for post in posts:
                     try:
-                        date = post['data-date']
+                        link = post.select_one('.stream-item__title')['href']
+                        res = s.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)
+                        date = json_data['datePublished']
                         try:
-                            date = datetime.fromtimestamp(int(date) / 1000.0).date()
+                            date = parser.parse(date).date()
                             my_date = date.strftime("%Y, %m, %d")
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
@@ -296,17 +302,15 @@ def forbes_scraper():  #Done
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = post.select_one('.stream-item__title')['href']
-                            header = post.select_one('.stream-item__title').text
+                            link = json_data['mainEntityOfPage']
+                            header = json_data['headline']
                             try:
-                                sentence = remove_period(post.select_one('.stream-item__description').text).split('.')
+                                sentence = remove_period(json_data['description']).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = remove_period(post.select_one('.stream-item__description').text)
-                            res = s.get(link, headers=headers)
-                            soup = BeautifulSoup(res.text, 'lxml')
+                                sentence = remove_period(json_data['description'])
                             try:
-                                image_url = soup.select_one('progressive-image')['src']
+                                image_url = json_data['image']['url']
                             except:
                                 image_url = None
                             add_up(data, url, link, header, sentence, my_date, image_url=image_url)
@@ -319,7 +323,7 @@ def forbes_scraper():  #Done
     else:
         pass
 
-def nj_scraper():   #Done
+def nj_scraper():   #edited
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -340,34 +344,35 @@ def nj_scraper():   #Done
                 posts = soup.select('.river-item')
                 for post in posts:
                     try:
-                        date = post.select_one('time')['datetime']
+                        link = post.select_one('a.river-item__headline-link')['href']
+                        res = s.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)[0]
+                        date = json_data['datePublished']
                         try:
-                            date = datetime.fromtimestamp(int(date)).date()
+                            date = parser.parse(date).date()
                             my_date = date.strftime("%Y, %m, %d")
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                             my_date = date.strftime("%Y, %m, %d")          
-
                         try:
                             delta = today - date
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = post.select_one('a.river-item__headline-link')['href']
-                            header = post.select_one('h2').text
+                            link = json_data['url']
+                            header = json_data['headline']
                             try:
                                 sentence = remove_period(post.select_one('.river-item__summary').text.replace('\n', ' ')).split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('p').text)
-                            res = s.get(link, headers=headers)
-                            soup = BeautifulSoup(res.text, 'lxml')
                             try:
-                                image_url = soup.select_one('figure div img')['src']
+                                image_url = json_data['image']
                             except:
                                 image_url = None
-                            authors = post.select_one('.article__details--byline').text
-                            authors = re.split(r'\s+and\s+', authors)
+                            authors = json_data['author']
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
@@ -377,7 +382,7 @@ def nj_scraper():   #Done
             except:
                 pass
 
-def fangraph_scraper():  #Done
+def fangraph_scraper():  #edited
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -399,11 +404,16 @@ def fangraph_scraper():  #Done
 
                 for post in posts:
                     try:
-                        meta = post.select_one('.postmeta_author')
-                        date = meta.find_next_sibling().text
+                        link = post.select_one('h2 a')['href']
+                        res = s.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select('script[type="application/ld+json"]')[-1].text
+                        json_data = json.loads(json_data)
+                        date = json_data['datePublished']
                         try:
-                            date = datetime.strptime(date, "%B %d, %Y").date()
+                            date = parser.parse(date).date()
                             my_date = date.strftime("%Y, %m, %d")
+                            print(date)
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                             my_date = date.strftime("%Y, %m, %d")             
@@ -413,19 +423,18 @@ def fangraph_scraper():  #Done
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = post.select_one('h2 a')['href']
-                            header = post.select_one('h2').text
+                            link = json_data['mainEntityOfPage']['@id']
+                            header = json_data['headline']
                             try:
-                                sentence = post.select_one('p').text.split('.')
+                                sentence = json_data['description'].split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = post.select_one('p').text
+                                sentence = json_data['description']
                             try:
-                                image_url = post.select_one('figure img')['src']
+                                image_url = json_data['image']['url']
                             except:
                                 image_url = None
-                            authors = post.select_one('.postmeta_author').text.strip()
-                            authors = re.split(r'\s+and\s+', authors)
+                            authors = json_data['author']['name'].split('and')
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
@@ -435,7 +444,7 @@ def fangraph_scraper():  #Done
             except:
                 pass
 
-def cbs_sports_scraper():  #Done
+def cbs_sports_scraper():  #edited
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -462,7 +471,7 @@ def cbs_sports_scraper():  #Done
                         soup = BeautifulSoup(res.text, 'lxml')
                         date = soup.select_one('time')['datetime']
                         try:
-                            date = datetime.strptime(date, '%Y-%m-%d %H:%M:%S %Z').date()
+                            date = parser.parse(date).date()
                             my_date = date.strftime("%Y, %m, %d")
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
@@ -492,7 +501,7 @@ def cbs_sports_scraper():  #Done
             except:
                 pass
 
-def ringer_scraper():   #Done
+def ringer_scraper():   #edited
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -511,36 +520,38 @@ def ringer_scraper():   #Done
                 response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.c-compact-river__entry ')
-
                 for post in posts:
                     try:
-                        date = post.select_one('time')['datetime']
+                        link = post.select_one('h2 a')['href']
+                        res = requests.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)[0]
+                        date = json_data['datePublished']
                         try:
-                            date = datetime.fromisoformat(date).date()
+                            date = parser.parse(date).date()
                             my_date = date.strftime("%Y, %m, %d")
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                             my_date = date.strftime("%Y, %m, %d")           
-
                         try:
                             delta = today - date
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = post.select_one('h2 a')['href']
-                            header = post.select_one('h2').text
+                            link = json_data['url']
+                            header = json_data['headline'].replace('‘', '').replace('’', '')
+                            desc = json_data['description'].replace('‘', '').replace('’', '').replace('“', '').replace('”', '')
                             try:
-                                sentence = remove_period(post.select_one('.p-dek.c-entry-box--compact__dek').text).split('.')
+                                sentence = remove_period(desc).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = remove_period(post.select_one('.p-dek.c-entry-box--compact__dek').text)
-                            res = s.get(link, headers=headers)
-                            soup = BeautifulSoup(res.text, 'lxml')
+                                sentence = remove_period(desc)
                             try:
-                                image_url= soup.select_one('.e-image__image')['data-original']
+                                image_url= json_data['image'][0]['url']
                             except:
                                 image_url= None
-                            authors = post.select('.c-byline__author-name')
+                            authors = json_data['author']
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
@@ -550,7 +561,7 @@ def ringer_scraper():   #Done
             except:
                 pass
 
-def sportsbusinessjournal_scraper():  #Done #cu
+def sportsbusinessjournal_scraper():  #edited
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -569,36 +580,38 @@ def sportsbusinessjournal_scraper():  #Done #cu
                 response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.article')[1:]
-
                 for post in posts:
                     try:
-                        date = post.select('span')[-1].text
+                        link = post.select_one('h2 a')['href']
+                        res = s.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)
+                        date = json_data['datePublished']
                         try:
-                            date = datetime.strptime(date, "%A, %B %d, %Y").date()
+                            date = parser.parse(date).date()
                             my_date = date.strftime("%Y, %m, %d")
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                             my_date = date.strftime("%Y, %m, %d")           
-
                         try:
                             delta = today - date
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            header = post.select_one('h2').text
+                            header = json_data['headline']
                             try:
                                 sentence = remove_period(post.select_one('.text-container .text-frame').text.strip().replace('\n', ' ')).split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('.text-container .text-frame').text.strip().replace('\n', ' '))
-                            link = post.select_one('h2 a')['href']
-                            res = s.get(link)
-                            soup = BeautifulSoup(res.text, 'lxml')
                             try:
-                                image_url = soup.select_one('div.img img')['src']
+                                image_url = json_data['image']
+                                if image_url == '':
+                                    image_url = None
                             except:
                                 image_url = None
-                            authors = soup.select('.author a')
+                            authors = json_data['author'].split('and')
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
@@ -608,13 +621,14 @@ def sportsbusinessjournal_scraper():  #Done #cu
             except:
                 pass
 
-def yahoo_scraper():  #Done
+def yahoo_scraper():  #edited
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
     query = text('SELECT * FROM articles')
     data = pd.read_sql_query(query, conn)
     urls = data['Article URL'][(data['Publication Name'] == 'Yahoo') & (data['Do not scrape'] == 'N')]
+    s = session()
     urls.dropna(inplace=True)
     if len(urls) > 0:
         for url in urls:
@@ -623,46 +637,39 @@ def yahoo_scraper():  #Done
                 headers = {
                     'User-Agent': ua
                 }
-                s = session()
                 response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('.item-hover-trigger')
-
                 for post in posts:
                     try:
-                        date = post.select_one('p').find_next().text
-                        if 'h' in date:
-                            try:
-                                date = today - timedelta(hours=int(date.replace('h ago', '')))
-                                my_date = date.strftime("%Y, %m, %d")
-                            except:
-                                date = datetime.strptime('20230215', "%Y%m%d").date()
-                                my_date = date.strftime("%Y, %m, %d")
-                        elif 'd' in date:
-                            try:
-                                date = today - timedelta(days=int(date.replace('d ago', '')))
-                                my_date = date.strftime("%Y, %m, %d")
-                            except:
-                                date = datetime.strptime('20230215', "%Y%m%d").date()
-                                my_date = date.strftime("%Y, %m, %d")       
+                        link = post.select_one('h4 a')['href']
+                        res = s.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)
+                        date = json_data['datePublished']
+                        try:
+                            date = parser.parse(date).date()
+                            my_date = date.strftime("%Y, %m, %d")
+                        except:
+                            date = datetime.strptime('20230215', "%Y%m%d").date()
+                            my_date = date.strftime("%Y, %m, %d")  
                         try:
                             delta = today - date
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = post.select_one('h4 a')['href']
-                            header = post.select_one('h4').text
+                            link = json_data['mainEntityOfPage']
+                            header = json_data['headline']
                             try:
-                                sentence = remove_period(post.select_one('p').text).split('.')
+                                sentence = remove_period(json_data['description']).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = remove_period(post.select_one('p').text)
+                                sentence = remove_period(json_data['description'])
                             try:
-                                image_url = post.select_one('div img')['data-wf-src']
+                                image_url = json_data['image']['url']
                             except:
                                 image_url = None
-                            response = s.get(link, headers=headers)
-                            soup = BeautifulSoup(response.text, 'lxml')
                             authors = soup.select('.caas-author-byline-collapse a')
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
@@ -673,7 +680,7 @@ def yahoo_scraper():  #Done
             except:
                 pass
 
-def nypost_scraper():   #Done
+def nypost_scraper():   #edited test seperately
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -694,30 +701,30 @@ def nypost_scraper():   #Done
                 posts = soup.select('.story.story--archive.story--i-flex')        
                 for post in posts:
                     try:
-                        date = post.select_one('span').text.split('|')[0].strip()
+                        link = post.select_one('a')['href']
+                        res = s.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text.strip()
+                        json_data = json.loads(json_data, strict = False)
+                        date = json_data['datePublished']
                         try:
-                            date = datetime.strptime(date, "%B %d, %Y").date()
+                            date = parser.parse(date).date()
                             my_date = date.strftime("%Y, %m, %d")
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                             my_date = date.strftime("%Y, %m, %d")             
-
                         try:
                             delta = today - date
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = post.select_one('a')['href']
-                            header = post.select_one('h3').text.strip()
+                            link = json_data['url']
+                            header = json_data['headline']
                             try:
                                 sentence = remove_period(post.select_one('p').text.strip()).split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('p').text.strip())
-                            res = s.get(link, headers=headers)
-                            soup = BeautifulSoup(res.text, 'lxml')
-                            json_data = soup.select_one('script[type="application/ld+json"]').text.strip()
-                            json_data = json.loads(json_data, strict = False)
                             try:
                                 image_url = json_data['image']['url']
                             except:
@@ -732,7 +739,7 @@ def nypost_scraper():   #Done
             except:
                 pass
 
-def foxsports_scraper(): #Done
+def foxsports_scraper(): #edited
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -751,19 +758,17 @@ def foxsports_scraper(): #Done
                 response = s.get(url, headers=headers)
                 soup = BeautifulSoup(response.text, 'lxml')
                 posts = soup.select('a.news')
-
                 for post in posts:
                     try:
                         link = post['href']
                         link = 'https://www.foxsports.com' + link
-                        res = s.get(link)
+                        res = s.get(link, headers=headers)
                         soup = BeautifulSoup(res.text, 'lxml')
-                        date = soup.select_one('.info-text > span:nth-child(2)').text.strip()
+                        json_data = soup.select_one('script[type="application/ld+json"]').text.strip()
+                        json_data = json.loads(json_data, strict = False)
+                        date = json_data['datePublished']
                         try:
-                            est_tzinfo = tz.gettz('EST')
-                            eastern_tzinfo = tz.gettz('US/Eastern')
-                            tzinfos = {'EST': est_tzinfo, 'EDT': eastern_tzinfo}
-                            date = dateutil.parser.parse(date, tzinfos=tzinfos).date()
+                            date = parser.parse(date).date()
                             my_date = date.strftime("%Y, %m, %d")
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
@@ -775,17 +780,20 @@ def foxsports_scraper(): #Done
                         if delta < timedelta(days=3):
                             link = post['href']
                             link = 'https://www.foxsports.com' + link
-                            header = post.select_one('h3').text.strip()
+                            header = json_data['headline']
                             try:
                                 sentence = remove_period(post.select_one('span').text.strip()).split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('span').text.strip())
                             try:
-                                image_url = post.select_one('img')['src']
+                                image_url = json_data['image'][0]['url']
                             except:
                                 image_url = None
-                            authors = soup.select('.contributor-name')
+                            try:
+                                authors = json_data['author']
+                            except:
+                                authors = None
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
@@ -795,7 +803,7 @@ def foxsports_scraper(): #Done
             except:
                 pass
 
-def insider_scraper():  #Done
+def insider_scraper():  #edited
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -816,10 +824,17 @@ def insider_scraper():  #Done
                 posts = soup.select('.river-item.featured-post')
                 for post in posts:
                     try:
-                        date = post.select_one('.tout-timestamp').text.strip()
+                        link = post.select_one('h2 a')['href']
+                        link = 'https://www.insider.com' + link
+                        res = s.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text.strip()
+                        json_data = json.loads(json_data, strict = False)
+                        date = json_data['datePublished']
                         try:
-                            date = datetime.fromisoformat(date[:-1]).date()
+                            date = parser.parse(date).date()
                             my_date = date.strftime("%Y, %m, %d")
+                            print(date)
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                             my_date = date.strftime("%Y, %m, %d")             
@@ -828,18 +843,15 @@ def insider_scraper():  #Done
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = post.select_one('h2 a')['href']
-                            link = 'https://www.insider.com' + link
-                            header = post.select_one('h2').text.strip()
+                            link = json_data['mainEntityOfPage']['@id']
+                            header = json_data['headline']
                             try:
-                                sentence = remove_period(post.select_one('.tout-copy.river.body-regular').text.strip()).split('.')
+                                sentence = remove_period(json_data['description']).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = remove_period(post.select_one('.tout-copy.river.body-regular').text.strip())
-                            res = s.get(link, headers=headers)
-                            soup = BeautifulSoup(res.text, 'lxml')
+                                sentence = remove_period(json_data['description'].strip())
                             try:
-                                image_url = soup.select_one('figure div img')['src']
+                                image_url = json_data['image']['url']
                             except:
                                 image_url = None
                             authors = soup.select('.byline-link.byline-author-name')
@@ -852,7 +864,7 @@ def insider_scraper():  #Done
             except:
                 pass
 
-def tampabay_scraper():  #Done
+def tampabay_scraper():  #edited
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -873,9 +885,15 @@ def tampabay_scraper():  #Done
                 posts = soup.select('.feed-item')
                 for post in posts:
                     try:
+                        post_link = 'https://www.tampabay.com' + post.select_one('.headline a')['href']
+                        res = s.get(post_link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)
                         try:
-                            date = post.select_one('.timestamp span')['title']
-                            date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').date()
+                            date = json_data['datePublished']
+                            date = datetime.fromisoformat(date.replace('Z', '+00:00')).date()
+                            print(date)
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                             
@@ -885,21 +903,19 @@ def tampabay_scraper():  #Done
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
-                            post_link = 'https://www.tampabay.com' + post.select_one('.headline a')['href']
-                            res = s.get(post_link, headers=headers)
-                            soup = BeautifulSoup(res.text, 'lxml')
-                            header = soup.select_one('h1').text
+                            link = res.url
+                            header = json_data['headline']
+                            desc = json_data['mainEntityOfPage']['primaryImageOfPage']['description']
                             try:
-                                sentence = remove_period(soup.select_one('.article__summary').text).split('.')
+                                sentence = remove_period(desc).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = remove_period(soup.select_one('.article__summary').text)
-                            link = res.url
+                                sentence = remove_period(desc)
                             try:
-                                image_url = soup.select_one('picture source')['srcset']
+                                image_url = json_data['image'][0]
                             except:
                                 image_url = None
-                            authors = soup.select('.article__byline--name-link')
+                            authors = json_data['author']
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, image_url= image_url, author_number=authors_num)
                         else:
@@ -909,7 +925,7 @@ def tampabay_scraper():  #Done
             except:
                 pass
 
-def sporting_news():   #Done
+def sporting_news():   #edited
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -933,14 +949,16 @@ def sporting_news():   #Done
                         post_link = 'https://www.sportingnews.com' + post.select_one('.list-item__title a')['href']
                         res = s.get(post_link)
                         soup = BeautifulSoup(res.text, 'lxml')
-                        header = soup.select_one('h1').text.strip()
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)
+                        header = json_data['headline']
                         try:
                             sentence = remove_period(soup.select_one('p').text.strip()).split('.')
                             sentence = sentence[0]
                         except:
                             sentence = remove_period(soup.select_one('p').text.strip())
                         try:
-                            date = soup.select_one('time')['datetime']
+                            date = json_data['datePublished']
                             date =  datetime.fromisoformat(date).replace(tzinfo=None).date()
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()                    
@@ -951,13 +969,11 @@ def sporting_news():   #Done
                         if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
                             link = res.url
-                            res = s.get(link, headers=headers)
-                            soup = BeautifulSoup(res.text, 'lxml')
                             try:
-                                image_url = soup.select_one('picture img')['src']
+                                image_url = json_data['image'][0]
                             except:
                                 image_url = None
-                            authors = soup.select('.author-info__description .author-name__link')
+                            authors = json_data['author']
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, image_url= image_url, author_number=authors_num)
                         else:
@@ -967,7 +983,7 @@ def sporting_news():   #Done
             except:
                 pass
 
-def northjersey_scraper():    #Done
+def northjersey_scraper():    #edited
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -988,34 +1004,37 @@ def northjersey_scraper():    #Done
                 posts = soup.select_one('.articles').find_all_next()[:20]
                 for post in posts[:20]:
                     try:
+                        link = post['url']
+                        res = requests.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)[0]
                         try:
-                            date = post['date-published']
-                            date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S %z %Z").replace(tzinfo=None).date()
+                            date = json_data['datePublished']
+                            date = datetime.fromisoformat(date.replace('Z', '+00:00')).date()
                         except:
-                            date = post['publishdate']
-                            date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S %z %Z").replace(tzinfo=None).date()
-                    
+                            date = datetime.strptime('20230215', "%Y%m%d").date()  
+                            
                         try:
                             delta = datetime.now(eastern_tz).date() - date
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            link = post['url']
-                            res = requests.get(link, headers=headers)
-                            soup = BeautifulSoup(res.text, 'lxml')
-                            header = soup.select_one('h1').text
+                            link = json_data['url']
+                            header = json_data['headline']
                             my_date = date.strftime("%Y, %m, %d")
                             try:
-                                sentence = remove_period(soup.select_one('.gnt_ar_b_p').text)
+                                sentence = remove_period(json_data['description'])
                                 sentence = sentence.split('.')
                                 sentence = sentence[0]                          
                             except:
-                                sentence = remove_period(post['descripton'])
+                                sentence = remove_period(json_data['description'])
                             try:
-                                image_url = soup.select_one('img.gnt_em_gl_i')['src']
+                                image_url = json_data['image']['url']
                             except:
                                 image_url = None
-                            authors = soup.select('.gnt_ar_by_a.gnt_ar_by_a__fi')
+                            
+                            authors = [json_data['author']]
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, image_url= image_url, author_number=authors_num)
                         else:
@@ -1025,7 +1044,7 @@ def northjersey_scraper():    #Done
             except:
                 pass
 
-def theathletic_scraper():  #Done
+def theathletic_scraper():  #edited
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -1046,12 +1065,14 @@ def theathletic_scraper():  #Done
                 posts = soup.select('.MuiTypography-root.MuiLink-root.MuiLink-underlineNone.MuiTypography-colorInherit')
                 for post in posts:
                     try:
-                        post_link = post_link = post['href']
+                        post_link = post['href']
                         res = s.get(post_link, headers=headers)
                         soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)
                         try:
-                            date = soup.select_one('.sc-294a6039-3.kpapNT').text
-                            date = datetime.strptime(date, "%b %d, %Y").date()
+                            date = json_data['datePublished']
+                            date = datetime.fromisoformat(date.replace('Z', '+00:00')).date()
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                             
@@ -1061,19 +1082,18 @@ def theathletic_scraper():  #Done
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
-                            link = res.url
-                            header = soup.select_one('h1').text.strip()
+                            link = json_data['url']
+                            header = json_data['headline']
                             try:
-                                sentence = remove_period(soup.select_one('.bodytext1').text.strip()).split('.')
+                                sentence = remove_period(json_data['description']).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = remove_period(soup.select_one('.bodytext1').text.strip())
+                                sentence = remove_period(json_data['description'].strip())
                             try:
-                                image_url = soup.select_one('meta[property="og:image"]')['content']
+                                image_url = json_data['image']['url']
                             except:
                                 image_url = None
-                            authors = soup.select_one('#articleByLineString').text
-                            authors = re.split(r'\s+and\s+', authors)
+                            authors = json_data['author']
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, image_url= image_url, author_number=authors_num)
                         else:
@@ -1083,7 +1103,7 @@ def theathletic_scraper():  #Done
             except:
                 pass
 
-def apnews_scraper():   #Done
+def apnews_scraper():   #edited
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -1115,6 +1135,11 @@ def apnews_scraper():   #Done
             for post in posts:
                 try:
                     if author.upper() in post.text:
+                        link = 'https://apnews.com' + post.select_one('.CardHeadline a')['href']
+                        res = s.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)
                         try:
                             date = post.select_one('.Timestamp')['data-source']
                             date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ").date()
@@ -1127,21 +1152,17 @@ def apnews_scraper():   #Done
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
-                            header = post.select_one('h2').text
+                            header = json_data['headline']
                             try:
-                                sentence = remove_period(post.select_one('p').text).split('.')
+                                sentence = remove_period(json_data['description']).split('.')
                                 sentence = sentence[0]
                             except:
-                                sentence = remove_period(post.select_one('p').text)
-                            link = 'https://apnews.com' + post.select_one('.CardHeadline a')['href']
-                            res = s.get(link, headers=headers)
-                            soup = BeautifulSoup(res.text, 'lxml')
+                                sentence = remove_period(json_data['description'])
                             try:
-                                image_url = soup.select_one('meta[property="og:image"]')['content']
+                                image_url = json_data['image']
                             except:
                                 image_url = None
-                            authors = post.select_one('.Component-bylines-0-2-142.Component-bylines-0-2-133').text
-                            authors = re.split(r'\s+and\s+', authors)
+                            authors = json_data['author']
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num, image_url=image_url)                                               
                         else:
@@ -1153,7 +1174,7 @@ def apnews_scraper():   #Done
         except:
             pass
 
-def mlb_scraper():   #Done
+def mlb_scraper():   #edited
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -1185,9 +1206,14 @@ def mlb_scraper():   #Done
             for post in posts:
                 try:
                     if author in post.text:
+                        link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
+                        res = s.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)
                         try:
-                            date = post.select_one('.article-item__contributor-date')['data-date']
-                            date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ').date()
+                            date = json_data['datePublished']
+                            date = parser.parse(date).date()
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                         try:
@@ -1196,18 +1222,18 @@ def mlb_scraper():   #Done
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
-                            header = post.select_one('h1').text.strip()
+                            header = json_data['headline']
                             try:
                                 sentence = remove_period(post.select_one('p').text.replace('  ', '').replace('\n', ' ')).split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('p').text.replace('  ', '').replace('\n', ''))
-                            link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
+                            link = json_data['url']
                             try:
-                                image_url = post.select_one('.p-image__image img')['data-srcset'].split(' ')[0]
+                                image_url = json_data['image'][0]
                             except:
                                 image_url = None
-                            authors = post.select_one('.article-item__contributor-byline').text.replace(' ', '').split(',')
+                            authors = json_data['author']['name'].split(',')
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num, image_url=image_url)
                         else:
@@ -1219,7 +1245,7 @@ def mlb_scraper():   #Done
         except:
             pass
 
-def mlb_extra_scraper():   #Done
+def mlb_extra_scraper():   #edited
     s = session()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
@@ -1241,35 +1267,38 @@ def mlb_extra_scraper():   #Done
                 try:
                     for author in all_authors:
                         if author in post.text:
+                            link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
+                            res = s.get(link, headers=headers)
+                            soup = BeautifulSoup(res.text, 'lxml')
+                            json_data = soup.select_one('script[type="application/ld+json"]').text
+                            json_data = json.loads(json_data)
                             try:
-                                date = post.select_one('.article-item__contributor-date')['data-date']
-                                date = datetime.fromisoformat(date.replace("Z", "+00:00")).date()
+                                date = json_data['datePublished']
+                                date = parser.parse(date).date()
                             except:
                                 date = datetime.strptime('20230215', "%Y%m%d").date()
-                        
                             try:
                                 delta = datetime.now(eastern_tz).date() - date
                             except:
                                 delta = timedelta(days=5)
                             if delta < timedelta(days=3):
                                 my_date = date.strftime("%Y, %m, %d")
-                                header = post.select_one('h1').text.strip()
-                                sentence = post.select_one('p').text
+                                header = json_data['headline']
                                 try:
-                                    sentence = remove_period(sentence.replace('  ', '').replace('\n', ' ')).split('.')
+                                    sentence = remove_period(post.select_one('p').text.replace('  ', '').replace('\n', ' ')).split('.')
                                     sentence = sentence[0]
                                 except:
                                     sentence = remove_period(post.select_one('p').text.replace('  ', '').replace('\n', ''))
-                                link = 'https://www.mlb.com' + post.select_one('.p-button__link')['href']
+                                link = json_data['url']
                                 try:
-                                    image_url = post.select_one('.p-image__image img')['data-srcset'].split(' ')[0]
+                                    image_url = json_data['image'][0]
                                 except:
-                                    image_url = None 
-                                authors = post.select_one('.article-item__contributor-byline').text.replace(' ', '').split(',')
+                                    image_url = None
+                                authors = json_data['author']['name'].split(',')
                                 authors_num = len(authors)
-                                add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num, image_url=image_url)               
+                                add_up(data, url, link, header, sentence, my_date, author_name=author, author_number=authors_num, image_url=image_url)
                             else:
-                                break
+                                pass
                         else:
                             pass
                 except:
@@ -1277,7 +1306,7 @@ def mlb_extra_scraper():   #Done
         except:
             pass
 
-def courant_scraper():   #Done
+def courant_scraper():   #edited
     today = datetime.now(eastern_tz).date()
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     conn = engine.connect()
@@ -1299,9 +1328,14 @@ def courant_scraper():   #Done
                 posts = posts_table.select('article')
                 for post in posts:
                     try:
-                        date = post.select_one('time').text.split('at')[0].strip()
+                        link = post.select_one('.article-title')['href']
+                        res = s.get(link, headers=headers)
+                        soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)
+                        date = json_data['datePublished']
                         try:
-                            date = datetime.strptime(date,"%B %d, %Y").date()
+                            date = parser.parse(date).date()
                             my_date = date.strftime("%Y, %m, %d")
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
@@ -1312,20 +1346,18 @@ def courant_scraper():   #Done
                         except:
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
-                            header = post.select_one('.article-title').text.strip()
-                            link = post.select_one('.article-title')['href']
+                            header = json_data['headline'].replace('&#8217;', "'")
+                            link = json_data['url']
                             try:
                                 sentence = remove_period(post.select_one('.excerpt').text.strip()).split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = remove_period(post.select_one('.excerpt').text.strip())
-                            res = requests.get(link)
-                            soup = BeautifulSoup(res.text, 'lxml')
                             try:
-                                image_url = soup.select_one('.image-wrapper img')['data-src']
+                                image_url = json_data['image']['url']
                             except:
                                 image_url = None
-                            authors = soup.select('.fn a')
+                            authors = json_data['author']
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)
                         else:
@@ -1393,7 +1425,7 @@ def wsj_scraper():  #Done
             except:
                pass
         
-def nydailynews_scraper():  #Done
+def nydailynews_scraper():  #edited
     engine = create_engine(f"mysql+pymysql://{uname}:{pwd}@{hostname}/{dbname}")
     engine = engine
     conn = engine.connect()
@@ -1417,9 +1449,11 @@ def nydailynews_scraper():  #Done
                         post_link = 'https://www.nydailynews.com' + post.select_one('a')['href']
                         res = s.get(post_link, headers=headers)
                         soup = BeautifulSoup(res.text, 'lxml')
+                        json_data = soup.select_one('script[type="application/ld+json"]').text
+                        json_data = json.loads(json_data)
                         try:
-                            date = soup.select_one('time')['datetime']
-                            date = datetime.strptime(date, '%Y-%m-%d %H:%M:%S').date()
+                            date = json_data['datePublished']
+                            date = datetime.fromisoformat(date.replace('Z', '+00:00')).date()
                         except:
                             date = datetime.strptime('20230215', "%Y%m%d").date()
                         
@@ -1429,19 +1463,19 @@ def nydailynews_scraper():  #Done
                             delta = timedelta(days=5)
                         if delta < timedelta(days=3):
                             my_date = date.strftime("%Y, %m, %d")
-                            link = res.url
-                            header = soup.select_one('h1').text
-                            sentence = remove_period(soup.select_one('article p').text)
+                            link = json_data['url']
+                            header = json_data['headline']
+                            sentence = remove_period(json_data['description'])
                             try:
                                 sentence = sentence.split('.')
                                 sentence = sentence[0]
                             except:
                                 sentence = sentence
                             try:
-                                image_url = soup.select_one('figure picture img')['src']
+                                image_url = json_data['image']['url']
                             except:
                                 image_url = None
-                            authors = soup.select('.article_byline a')
+                            authors = json_data['author']
                             authors_num = len(authors)
                             add_up(data, url, link, header, sentence, my_date, author_number=authors_num, image_url=image_url)      
                         else:
