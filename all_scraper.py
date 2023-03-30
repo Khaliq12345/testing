@@ -1678,7 +1678,7 @@ class NewsScraper:
         item_list.clear()
         s = session()
         #nytimes_scraper()
-        #forbes_scraper()
+        forbes_scraper()
         nj_scraper()
         fangraph_scraper()
         # cbs_sports_scraper()
