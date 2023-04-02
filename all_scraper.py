@@ -111,7 +111,8 @@ def add_up(data, url, link, header, sentence, my_date, image_url='None', author_
         paywall = '<$>'
         
     sentence = sentence.encode('utf-8').decode('utf-8').replace('“', '').replace('”', '').replace('$', '')
-
+    link = get_short_url(link)
+    
     post = f'''
     '{header}' by {author_twitter} for {pub_twitter}: {sentence}... {paywall} {link} Twit($)ter
     '''
