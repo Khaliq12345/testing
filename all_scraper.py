@@ -16,6 +16,9 @@ from dateutil import tz
 import dateutil.parser
 from dateutil import tz, parser
 import pytz
+import pyshorteners
+
+shorter = pyshorteners.Shortener()
 eastern_tz = pytz.timezone('US/Eastern')
 
 hostname=st.secrets['hostname']
@@ -36,6 +39,10 @@ def remove_period(text):
     
     # Join the modified words back into a string
     return ' '.join(words)
+
+def get_short_url(url):
+    short_url = shorter.tinyurl.short(url)
+    return short_url
 
 def add_up(data, url, link, header, sentence, my_date, image_url='None', author_name=None, author_number = 1):
     if author_name is not None:
