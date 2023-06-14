@@ -17,6 +17,7 @@ import dateutil.parser
 from dateutil import tz, parser
 import pytz
 import pyshorteners
+from cleantext import clean
 
 shorter = pyshorteners.Shortener()
 eastern_tz = pytz.timezone('US/Eastern')
@@ -28,6 +29,11 @@ pwd=st.secrets['pwd']
 
 post_item_list =[]
 item_list = []
+
+def clean_text(text):
+    text = clean(text, lower=False, keep_two_line_breaks=True)
+
+    return text
 
 def remove_period(text):
     # Split the text into words
@@ -110,11 +116,21 @@ def add_up(data, url, link, header, sentence, my_date, image_url='None', author_
     elif 'Y' in paywall:
         paywall = '<$>'
         
-    sentence = sentence.encode('utf-8').decode('utf-8').replace('“', '').replace('”', '').replace('$', '')
+    sentence = clean_text(sentence)
+    header = clean_text(header)
+    if len(sentence) > 50:
+        words = sentence.split()
+        reduced_sentence = ''
+        for word in words:
+            samp = reduced_sentence + ' ' + word
+            if len(samp) > 50:
+                break
+            reduced_sentence += ' ' + word
+        sentence = reduced_sentence.strip()
     link = get_short_url(link)
-    
+
     post = f'''
-    '{header}' by {author_twitter} for {pub_twitter}: {sentence}... {paywall} {link} Twit($)ter
+    "{header}" by {author_twitter} for {pub_twitter}: {sentence}... {paywall} {link} Twit($)ter
     '''
     post_key = f'Post {link} for Twit($)ter'
     post_item = {
@@ -128,11 +144,11 @@ def add_up(data, url, link, header, sentence, my_date, image_url='None', author_
     post_item_list.append(post_item)
 
     post = f'''
-    '{header}' by {author_fb} for {pub_fb}: {sentence}... {paywall} {link} Face($)book
+    "{header}" by {author_fb} for {pub_fb}: {sentence}... {paywall} {link} Face($)book
     '''
     post_key = f'Post {link} for Face($)book'
     post_item = {
-        'Text': post.strip(),
+        'Text': clean_text(post),
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
@@ -142,7 +158,7 @@ def add_up(data, url, link, header, sentence, my_date, image_url='None', author_
     post_item_list.append(post_item)
 
     post = f'''
-    '{header}' by {author_ig} for {pub_ig}: {sentence}... {paywall} {link} I($)G
+    "{header}" by {author_ig} for {pub_ig}: {sentence}... {paywall} {link} I($)G
 
 👉VISIT THE LINK IN OUR BIO TO READ THIS ARTICLE⚾️
     '''
@@ -158,7 +174,7 @@ def add_up(data, url, link, header, sentence, my_date, image_url='None', author_
         }
     else:
         post_item = {
-            'Text': post.strip(),
+            'Text': clean_text(post),
             'Date': my_date,
             'Post Link': link,
             'Post key': post_key,
@@ -168,11 +184,11 @@ def add_up(data, url, link, header, sentence, my_date, image_url='None', author_
     post_item_list.append(post_item)
 
     post = f'''
-    '{header}' by {author_linkedin} for {pub_linkedin}: {sentence}... {paywall} {link} Linked($)in
+    "{header}" by {author_linkedin} for {pub_linkedin}: {sentence}... {paywall} {link} Linked($)in
     '''
     post_key = f'Post {link} for Linked($)in'
     post_item = {
-        'Text': post.strip(),
+        'Text': clean_text(post),
         'Date': my_date,
         'Post Link': link,
         'Post key': post_key,
@@ -202,7 +218,6 @@ def add_up(data, url, link, header, sentence, my_date, image_url='None', author_
         
     }
     item_list.append(item)
-
 
 def nytimes_scraper():  #Done
     today = datetime.now(eastern_tz).date()
@@ -914,7 +929,7 @@ def tampabay_scraper():  #edited
                             my_date = date.strftime("%Y, %m, %d")
                             link = res.url
                             header = json_data['headline']
-                            desc = json_data['mainEntityOfPage']['primaryImageOfPage']['description']
+                            desc = json_data['articleBody']
                             try:
                                 sentence = remove_period(desc).split('.')
                                 sentence = sentence[0]
@@ -1688,27 +1703,27 @@ class NewsScraper:
         s = session()
         nytimes_scraper()
         forbes_scraper()
-        nj_scraper()
-        fangraph_scraper()
-        cbs_sports_scraper()
-        ringer_scraper()
-        sportsbusinessjournal_scraper()
-        yahoo_scraper()
-        nypost_scraper()
-        foxsports_scraper()
-        insider_scraper()
-        tampabay_scraper()
-        sporting_news()
-        northjersey_scraper()
-        theathletic_scraper()
-        apnews_scraper()
-        mlb_scraper()
-        mlb_extra_scraper()
-        courant_scraper()
-        wsj_scraper()
-        nydailynews_scraper()
-        # # #si_scraper()
-        sny_scraper()
-        newsday_scraper()
+        # nj_scraper()
+        # fangraph_scraper()
+        # cbs_sports_scraper()
+        # ringer_scraper()
+        # sportsbusinessjournal_scraper()
+        # yahoo_scraper()
+        # nypost_scraper()
+        # foxsports_scraper()
+        # insider_scraper()
+        # tampabay_scraper()
+        # sporting_news()
+        # northjersey_scraper()
+        # theathletic_scraper()
+        # apnews_scraper()
+        # mlb_scraper()
+        # mlb_extra_scraper()
+        # courant_scraper()
+        # wsj_scraper()
+        # nydailynews_scraper()
+        # # si_scraper()
+        # sny_scraper()
+        # newsday_scraper()
         
         return item_list, post_item_list
