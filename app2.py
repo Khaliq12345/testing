@@ -131,6 +131,8 @@ def delete_rows(selected_rows):
         if index in selected_rows:
             st.session_state['data1'] = st.session_state['data1'].drop(index)
             st.session_state['data2'] = st.session_state['data2'].drop(index)
+            st.session_state['original_data1'] = st.session_state['original_data1'].drop(index)
+            st.session_state['original_data2'] = st.session_state['original_data2'].drop(index)
     st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
 
@@ -147,6 +149,8 @@ def add_rows_to_new_database(selected_rows):
         if index in selected_rows:
             st.session_state['data1'] = st.session_state['data1'].drop(index)
             st.session_state['data2'] = st.session_state['data2'].drop(index)
+            st.session_state['original_data1'] = st.session_state['original_data1'].drop(index)
+            st.session_state['original_data2'] = st.session_state['original_data2'].drop(index)
     st.session_state["default_checkbox_value"] = False
     st.experimental_rerun()
 
@@ -175,15 +179,39 @@ if scrape_button:
     #st.session_state
 
 if 'data1' not in st.session_state:
+    st.session_state['data1'] = None
+    st.session_state['data2'] = None
+
+if 'original_data1' not in st.session_state:
     try:
         df1 = pd.read_csv("temp_database.csv")
         df2 = pd.read_csv("temp_database.csv")
-        st.session_state['data1'] = df1
-        st.session_state['data2'] = df2
+        st.session_state['original_data1'] = df1
+        st.session_state['original_data2'] = df2
     except:
         st.warning('The scraper has no scraped data to display. Click on the scrape to display the latest news.', icon="⚠️")
         st.stop()
-        
+
+filters = st.text_input('Social Media to filter', placeholder= 'Twitter or Facebook or Instagram or Linkedin')
+st.session_state['filters'] = filters
+for all_filter in st.session_state['filters'].split(';'):
+    if all_filter == 'Twitter':
+        st.session_state['data1'] = st.session_state['original_data1'][~st.session_state['original_data1']['Post key'].str.endswith('Twit($)ter')]
+        st.session_state['data2'] = st.session_state['original_data2'][~st.session_state['original_data2']['Post key'].str.endswith('Twit($)ter')] 
+    elif all_filter == 'Facebook':
+        st.session_state['data1'] = st.session_state['original_data1'][~st.session_state['original_data1']['Post key'].str.endswith('Face($)book')]
+        st.session_state['data2'] = st.session_state['original_data2'][~st.session_state['original_data2']['Post key'].str.endswith('Face($)book')]
+    elif all_filter == 'Instagram':
+        st.session_state['data1'] = st.session_state['original_data1'][~st.session_state['original_data1']['Post key'].str.endswith('I($)G')]
+        st.session_state['data2'] = st.session_state['original_data2'][~st.session_state['original_data2']['Post key'].str.endswith('I($)G')] 
+    elif all_filter == 'Linkedin':
+        st.session_state['data1'] = st.session_state['original_data1'][~st.session_state['original_data1']['Post key'].str.endswith('Linked($)in')] 
+        st.session_state['data2'] = st.session_state['original_data2'][~st.session_state['original_data2']['Post key'].str.endswith('Linked($)in')]
+    else:
+        st.session_state['data1'] = st.session_state['original_data1']
+        st.session_state['data2'] = st.session_state['original_data2']
+        pass
+    
 total_data = len(st.session_state['data1'])
 st.subheader(f'Total Posts to be processed: {total_data}')
 
@@ -227,6 +255,7 @@ if select_all_button:
 if deselect_all_button:
     st.session_state["default_checkbox_value"] = False
 
+
 selected_rows = []
 for index, row in st.session_state['data1'][:40].iterrows():
     row_container = st.container()
@@ -235,13 +264,16 @@ for index, row in st.session_state['data1'][:40].iterrows():
     if checkbox:
         selected_rows.append(index)
     if "Twit($)ter" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Twit($)ter", "").strip().replace('', ''), height=150)
+        text_display = row["Text"].replace("Twit($)ter", "").strip()
+        edited_text = col1.text_area(f'post_{index}',value=f'''{text_display}''', height=150)
+        if len(edited_text) > 280:
+            col2.warning('Post is over character limit')
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("Twitter")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
         col2.write(date_obj)
     elif "Face($)book" in row["Text"]:
-        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150)
+        edited_text = col1.text_area(f'post_{index}',row["Text"].replace("Face($)book", "").strip(), height=150) 
         st.session_state['data2'].at[index, 'Text'] = edited_text
         col2.write("Facebook")
         date_obj = datetime.strptime(row["Date"], "%Y, %m, %d").strftime("%B %d, %Y")
@@ -270,11 +302,15 @@ for index, row in st.session_state['data1'][:40].iterrows():
         if paywall_button:
             st.session_state['data1'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
             st.session_state['data2'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
+            st.session_state['original_data1'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
+            st.session_state['original_data2'].at[index, 'Text'] = add_paywall(row['Text'], '<$>')
             st.experimental_rerun()
     else:
         if paywall_button:
             st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('<$>', '')
             st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('<$>', '')
+            st.session_state['original_data1'].at[index, 'Text'] = row['Text'].replace('<$>', '')
+            st.session_state['original_data2'].at[index, 'Text'] = row['Text'].replace('<$>', '')
             st.experimental_rerun()
 
     #add #Yankees hashtags to the post
@@ -282,11 +318,15 @@ for index, row in st.session_state['data1'][:40].iterrows():
         if yankees_button:
             st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
             st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
+            st.session_state['original_data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
+            st.session_state['original_data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Yankees')
             st.experimental_rerun()           
     else:
         if yankees_button:
             st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
             st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+            st.session_state['original_data1'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
+            st.session_state['original_data2'].at[index, 'Text'] = row['Text'].replace('#Yankees', '')
             st.experimental_rerun()
             
     # Add #Mets hashtags to post
@@ -294,11 +334,15 @@ for index, row in st.session_state['data1'][:40].iterrows():
         if mets_button:
             st.session_state['data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
             st.session_state['data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
+            st.session_state['original_data1'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
+            st.session_state['original_data2'].at[index, 'Text'] = add_hash_tags(row['Text'], '#Mets')
             st.experimental_rerun()
     else:
         if mets_button:
             st.session_state['data1'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
             st.session_state['data2'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
+            st.session_state['original_data1'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
+            st.session_state['original_data2'].at[index, 'Text'] = row['Text'].replace('#Mets', '')
             st.experimental_rerun()
 
 # Add buttons to the container
@@ -332,4 +376,3 @@ downlaod_button_1 = downlaod_1.download_button("Press to Download Twitter Posts"
 downlaod_button_2 = downlaod_2.download_button("Press to Download Facebook Posts", downlaod_commited('Face\(\$\)book'), "fb_posts.csv", "text/csv", key='fb_download-csv')
 downlaod_button_3 = downlaod_3.download_button("Press to Download Instagram Posts", downlaod_commited('I\(\$\)G'), "ig_posts.csv", "text/csv", key='ig_download-csv')
 downlaod_button_4 = downlaod_4.download_button("Press to Download LinkedIn Posts", downlaod_commited('Linked\(\$\)in'), "linkedin_posts.csv", "text/csv", key='linkedin_download-csv')
-
