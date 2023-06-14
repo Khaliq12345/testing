@@ -1,6 +1,6 @@
 pandas
 beautifulsoup4
-streamlit == 1.20.0 
+streamlit
 requests
 lxml
 streamlit
@@ -16,3 +16,5 @@ gspread_dataframe
 pydrive
 google
 pyshorteners
+clean-text
+unidecode
